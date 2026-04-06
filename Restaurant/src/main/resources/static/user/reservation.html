@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Book your table at RestaurantOS">
+  <title>Reservations - RestaurantOS</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <style>
+    .reservation-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .reservation-panel,
+    .table-map-panel {
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+
+    .reservation-panel h3,
+    .table-map-panel h3 {
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .reservation-panel p,
+    .table-map-panel p {
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+
+    .table-legend,
+    .table-type-legend {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .legend-dot.available { background: #22c55e; }
+    .legend-dot.reserved { background: #f59e0b; }
+    .legend-dot.occupied { background: #ef4444; }
+
+    .table-type-badge {
+      display: inline-block;
+      padding: 0.28rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .table-type-badge.standard {
+      background: rgba(255,255,255,0.08);
+      color: #cbd5e1;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .table-type-badge.vip {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+    }
+
+    .table-type-badge.private {
+      background: rgba(168, 85, 247, 0.18);
+      color: #d8b4fe;
+      border: 1px solid rgba(168, 85, 247, 0.45);
+    }
+
+    .table-map-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(110px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .table-card {
+      border-radius: 18px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: 2px solid transparent;
+      user-select: none;
+    }
+
+    .table-card h4 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: #fff;
+    }
+
+    .table-card p {
+      margin: 0.4rem 0 0;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+    }
+
+    .table-card small {
+      display: block;
+      margin-top: 0.4rem;
+      color: #cbd5e1;
+      font-size: 0.8rem;
+    }
+
+    .table-card.available {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: #22c55e;
+    }
+
+    .table-card.available:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
+    }
+
+    .table-card.reserved {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: #f59e0b;
+      cursor: not-allowed;
+    }
+
+    .table-card.occupied {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: #ef4444;
+      cursor: not-allowed;
+    }
+
+    .table-card.selected {
+      outline: 3px solid #38bdf8;
+      transform: scale(1.02);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+    }
+
+    .table-card-top {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    .table-deposit-note {
+      margin-top: 0.45rem;
+      color: #fbbf24;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .selected-table-box {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px dashed rgba(255,255,255,0.15);
+      color: #e2e8f0;
+    }
+
+    .selected-table-box strong {
+      color: #fff;
+    }
+
+    .selected-table-box > div {
+      margin-bottom: 0.35rem;
+    }
+
+    .selected-table-box > div:last-child {
+      margin-bottom: 0;
+    }
+
+    .helper-note {
+      margin-top: 1rem;
+      font-size: 0.92rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .form-group label {
+      color: #e5e7eb;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #0f172a;
+      color: #fff;
+      padding: 0.85rem 1rem;
+      outline: none;
+    }
+
+    .form-group textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #64748b;
+    }
+
+    .form-error {
+      color: #f87171;
+      font-size: 0.85rem;
+      margin-top: 0.35rem;
+      min-height: 1rem;
+    }
+
+    .btn[disabled] {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 992px) {
+      .reservation-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .table-map-grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
+    }
+
+    @media (max-width: 576px) {
+      .table-map-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <div class="logo">RestaurantOS</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="reservation.html">Reservations</a>
+      <a href="reservation-history.html">My Bookings</a>
+      <a href="review.html">Reviews</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1>Reserve Your Table</h1>
+    <p>Choose your ideal table and enjoy your dining experience</p>
+  </div>
+</section>
+
+<section class="container">
+  <div class="section-title">
+    <h2>Book Your Reservation</h2>
+    <p>Pick your date, time, guests and select an available table</p>
+  </div>
+
+  <div class="reservation-layout">
+    <div class="reservation-panel">
+      <h3>Reservation Form</h3>
+      <p>Fill in your details and choose a green table from the table map.</p>
+
+      <form id="reservationForm">
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" name="name" required placeholder="John Doe">
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" required placeholder="john@example.com">
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number *</label>
+          <input type="tel" id="phone" name="phone" required placeholder="0901234567">
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="date">Reservation Date *</label>
+          <input type="date" id="date" name="date" required>
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="time">Reservation Time *</label>
+          <select id="time" name="time" required>
+            <option value="">Select a time</option>
+            <option value="17:00">5:00 PM</option>
+            <option value="17:30">5:30 PM</option>
+            <option value="18:00">6:00 PM</option>
+            <option value="18:30">6:30 PM</option>
+            <option value="19:00">7:00 PM</option>
+            <option value="19:30">7:30 PM</option>
+            <option value="20:00">8:00 PM</option>
+            <option value="20:30">8:30 PM</option>
+            <option value="21:00">9:00 PM</option>
+            <option value="21:30">9:30 PM</option>
+          </select>
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="guests">Number of Guests *</label>
+          <select id="guests" name="guests" required>
+            <option value="">Select number of guests</option>
+            <option value="1">1 Guest</option>
+            <option value="2">2 Guests</option>
+            <option value="3">3 Guests</option>
+            <option value="4">4 Guests</option>
+            <option value="5">5 Guests</option>
+            <option value="6">6 Guests</option>
+            <option value="7">7 Guests</option>
+            <option value="8">8 Guests</option>
+            <option value="9">9 Guests</option>
+            <option value="10">10 Guests</option>
+          </select>
+          <div class="form-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="specialRequests">Special Requests (Optional)</label>
+          <textarea id="specialRequests" name="specialRequests" placeholder="Any allergies, birthday, near window..."></textarea>
+        </div>
+
+        <input type="hidden" id="selectedTableId" name="selectedTableId">
+        <input type="hidden" id="selectedTableNumber" name="selectedTableNumber">
+
+        <div class="selected-table-box" id="selectedTableBox">
+          <div><strong>Selected table:</strong> <span id="selectedTableText">No table selected</span></div>
+          <div><strong>Table type:</strong> <span id="selectedTableTypeText">-</span></div>
+          <div><strong>Deposit:</strong> <span id="selectedTableDepositText">Not required</span></div>
+        </div>
+
+        <button id="submitReservationBtn" type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+          Complete Reservation
+        </button>
+      </form>
+    </div>
+
+    <div class="table-map-panel">
+      <h3>Choose Your Table</h3>
+      <p>Only green tables can be selected.</p>
+
+      <div class="table-legend">
+        <div class="legend-item">
+          <span class="legend-dot available"></span> Available
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot reserved"></span> Reserved
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot occupied"></span> Occupied
+        </div>
+      </div>
+
+      <div class="table-type-legend">
+        <div class="legend-item">
+          <span class="table-type-badge standard">Standard</span>
+        </div>
+        <div class="legend-item">
+          <span class="table-type-badge vip">VIP</span>
+        </div>
+        <div class="legend-item">
+          <span class="table-type-badge private">Private Room</span>
+        </div>
+      </div>
+
+      <div class="table-map-grid" id="tableMapGrid"></div>
+
+      <div class="helper-note">
+        Green = empty table you can choose.<br>
+        Yellow = already reserved.<br>
+        Red = currently occupied / unavailable.
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 2rem; background-color: #f8f9fa;">
+    <h3>Reservation Information</h3>
+    <ul style="list-style: none; padding: 0;">
+      <li style="padding: 0.5rem 0;">✓ Reservations accepted Monday - Sunday</li>
+      <li style="padding: 0.5rem 0;">✓ Please arrive 10-15 minutes early</li>
+      <li style="padding: 0.5rem 0;">✓ Tables held for 10 minutes after reservation time</li>
+      <li style="padding: 0.5rem 0;">✓ Late arrivals may lead to automatic cancellation</li>
+      <li style="padding: 0.5rem 0;">✓ Groups of 10+ require a phone call</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>RestaurantOS</h4>
+      <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+    </div>
+
+    <div class="footer-section">
+      <h4>Quick Links</h4>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="/user/reservation-history.html">My Bookings</a>
+      <a href="review.html">Reviews</a>
+      <a href="contact.html">Contact</a>
+    </div>
+
+    <div class="footer-section">
+      <h4>Hours of Operation</h4>
+      <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
+      <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
+      <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
+    </div>
+
+    <div class="footer-section">
+      <h4>Contact Info</h4>
+      <p>📍 123 Gourmet Street, Food City</p>
+      <p>📞 (123) 456-7890</p>
+      <p>✉️ info@restaurantos.com</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>2024 RestaurantOS. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  const TABLE_API = "/api/customer/tables";
+  const RESERVATION_API = "/api/customer/reservations";
+  const DEPOSIT_PAYMENT_API = "/api/payment/deposit/create";
+
+  let tables = [];
+  let selectedTableId = null;
+
+  const tableMapGrid = document.getElementById("tableMapGrid");
+  const selectedTableText = document.getElementById("selectedTableText");
+  const selectedTableIdInput = document.getElementById("selectedTableId");
+  const selectedTableNumberInput = document.getElementById("selectedTableNumber");
+  const selectedTableTypeText = document.getElementById("selectedTableTypeText");
+  const selectedTableDepositText = document.getElementById("selectedTableDepositText");
+  const reservationFormEl = document.getElementById("reservationForm");
+  const submitReservationBtn = document.getElementById("submitReservationBtn");
+  const guestsInput = document.getElementById("guests");
+
+  function getSelectedGuests() {
+    return Number(guestsInput.value || 0);
+  }
+
+  function getTableTypeBadge(tableType) {
+    if (tableType === "VIP") {
+      return `<span class="table-type-badge vip">VIP</span>`;
+    }
+    if (tableType === "PRIVATE_ROOM") {
+      return `<span class="table-type-badge private">Private Room</span>`;
+    }
+    return `<span class="table-type-badge standard">Standard</span>`;
+  }
+
+  function getDepositAmount(tableType) {
+    if (tableType === "VIP") return 300000;
+    if (tableType === "PRIVATE_ROOM") return 500000;
+    return 0;
+  }
+
+  function formatMoney(amount) {
+    return Number(amount || 0).toLocaleString("vi-VN") + " đ";
+  }
+
+  function getTypeText(tableType) {
+    if (tableType === "VIP") return "VIP";
+    if (tableType === "PRIVATE_ROOM") return "Private Room";
+    return "Standard";
+  }
+
+  function getSelectedTable() {
+    return tables.find(t => t.id === Number(selectedTableId)) || null;
+  }
+
+  async function loadTables() {
+    try {
+      const response = await fetch(TABLE_API, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        },
+        credentials: "include"
+      });
+
+      const tableText = await response.text();
+      console.log("loadTables status:", response.status);
+      console.log("loadTables raw response:", tableText);
+
+      if (response.status === 401 || response.status === 403) {
+        tableMapGrid.innerHTML = `<div style="color:#f87171;">Bạn chưa có quyền xem danh sách bàn.</div>`;
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Không tải được danh sách bàn. HTTP ${response.status}`);
+      }
+
+      let data = [];
+      try {
+        data = tableText ? JSON.parse(tableText) : [];
+      } catch (e) {
+        data = [];
+      }
+
+      tables = Array.isArray(data) ? data : [];
+      validateSelectedTableAfterReload();
+      renderTableMap();
+    } catch (error) {
+      console.error("Lỗi loadTables:", error);
+      tableMapGrid.innerHTML = `<div style="color:#f87171;">Không thể tải danh sách bàn.</div>`;
+    }
+  }
+
+  function validateSelectedTableAfterReload() {
+    if (!selectedTableId) return;
+
+    const selectedTable = getSelectedTable();
+    const selectedGuests = getSelectedGuests();
+
+    if (!selectedTable) {
+      resetSelectedTable();
+      return;
+    }
+
+    const isAvailable = selectedTable.status === "AVAILABLE";
+    const enoughCapacity = !selectedGuests || selectedTable.capacity >= selectedGuests;
+
+    if (!isAvailable || !enoughCapacity) {
+      resetSelectedTable();
+    }
+  }
+
+  function renderTableMap() {
+    tableMapGrid.innerHTML = "";
+
+    const selectedGuests = getSelectedGuests();
+
+    tables.forEach(table => {
+      const div = document.createElement("div");
+
+      const isAvailable = table.status === "AVAILABLE";
+      const enoughCapacity = !selectedGuests || table.capacity >= selectedGuests;
+      const selectable = isAvailable && enoughCapacity;
+
+      div.className = `table-card ${String(table.status || "AVAILABLE").toLowerCase()}`;
+      div.dataset.id = table.id;
+
+      if (selectedTableId === table.id) {
+        div.classList.add("selected");
+      }
+
+      if (!enoughCapacity) {
+        div.classList.add("disabled-capacity");
+      }
+
+      const depositAmount = getDepositAmount(table.tableType);
+
+      div.innerHTML = `
+        <div class="table-card-top">
+          <h4>${table.tableNumber}</h4>
+          ${getTableTypeBadge(table.tableType)}
+        </div>
+        <p>${table.capacity} seats</p>
+        <small>${table.status}</small>
+        ${depositAmount > 0 ? `<div class="table-deposit-note">Deposit ${formatMoney(depositAmount)}</div>` : ""}
+        ${!enoughCapacity && selectedGuests ? `<div class="table-capacity-warning">Không đủ chỗ</div>` : ""}
+      `;
+
+      if (selectable) {
+        div.addEventListener("click", () => selectTable(table));
+        div.style.cursor = "pointer";
+      } else {
+        div.style.cursor = "not-allowed";
+      }
+
+      tableMapGrid.appendChild(div);
+    });
+  }
+
+  function selectTable(table) {
+    const selectedGuests = getSelectedGuests();
+
+    if (!selectedGuests) {
+      alert("Vui lòng chọn số lượng khách trước.");
+      return;
+    }
+
+    if (table.status !== "AVAILABLE") {
+      alert("Bàn này hiện không khả dụng.");
+      return;
+    }
+
+    if (table.capacity < selectedGuests) {
+      alert(`Bàn ${table.tableNumber} chỉ có ${table.capacity} chỗ. Vui lòng chọn bàn khác.`);
+      return;
+    }
+
+    selectedTableId = table.id;
+    selectedTableIdInput.value = table.id;
+    selectedTableNumberInput.value = table.tableNumber;
+
+    const depositAmount = getDepositAmount(table.tableType);
+
+    selectedTableText.textContent = `Table ${table.tableNumber} - ${table.capacity} seats`;
+    selectedTableTypeText.textContent = getTypeText(table.tableType);
+    selectedTableDepositText.textContent =
+      depositAmount > 0 ? formatMoney(depositAmount) : "Not required";
+
+    renderTableMap();
+  }
+
+  function resetSelectedTable() {
+    selectedTableId = null;
+    selectedTableIdInput.value = "";
+    selectedTableNumberInput.value = "";
+    selectedTableText.textContent = "No table selected";
+    selectedTableTypeText.textContent = "-";
+    selectedTableDepositText.textContent = "Not required";
+  }
+
+  function handleGuestsChange() {
+    const selectedGuests = getSelectedGuests();
+
+    if (selectedTableId) {
+      const selectedTable = getSelectedTable();
+
+      if (!selectedTable) {
+        resetSelectedTable();
+      } else if (selectedGuests > selectedTable.capacity) {
+        alert(`Bàn ${selectedTable.tableNumber} chỉ có ${selectedTable.capacity} chỗ. Vui lòng chọn bàn khác.`);
+        resetSelectedTable();
+      }
+    }
+
+    renderTableMap();
+  }
+
+  guestsInput.addEventListener("change", handleGuestsChange);
+  guestsInput.addEventListener("input", handleGuestsChange);
+
+  reservationFormEl.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const date = document.getElementById("date").value;
+    const time = document.getElementById("time").value;
+    const guests = document.getElementById("guests").value;
+    const specialRequests = document.getElementById("specialRequests").value.trim();
+
+    if (!name || !email || !phone || !date || !time || !guests) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    if (!selectedTableId) {
+      alert("Please select an available table first.");
+      return;
+    }
+
+    const selectedTable = getSelectedTable();
+
+    if (!selectedTable) {
+      alert("Không tìm thấy thông tin bàn đã chọn. Vui lòng chọn lại bàn.");
+      resetSelectedTable();
+      renderTableMap();
+      return;
+    }
+
+    if (selectedTable.status !== "AVAILABLE") {
+      alert("Bàn đã chọn hiện không còn khả dụng. Vui lòng chọn bàn khác.");
+      resetSelectedTable();
+      renderTableMap();
+      return;
+    }
+
+    if (Number(guests) > Number(selectedTable.capacity)) {
+      alert(`Bàn ${selectedTable.tableNumber} chỉ có ${selectedTable.capacity} chỗ. Vui lòng chọn bàn khác.`);
+      resetSelectedTable();
+      renderTableMap();
+      return;
+    }
+
+    submitReservationBtn.disabled = true;
+    submitReservationBtn.textContent = "Processing...";
+
+    try {
+      const payload = {
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+        reservationDate: date,
+        reservationTime: time,
+        numberOfGuests: Number(guests),
+        specialRequest: specialRequests,
+        tableId: Number(selectedTableId)
+      };
+
+      const reservationResponse = await fetch(RESERVATION_API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(payload)
+      });
+
+      const reservationText = await reservationResponse.text();
+      console.log("reservation status:", reservationResponse.status);
+      console.log("reservation raw:", reservationText);
+
+      if (reservationResponse.status === 401 || reservationResponse.status === 403) {
+        alert("Bạn cần đăng nhập bằng tài khoản khách hàng để đặt bàn.");
+        window.location.href = "/auth/login.html";
+        return;
+      }
+
+      if (reservationText && reservationText.trim().startsWith("<!DOCTYPE")) {
+        window.location.href = "/auth/login.html";
+        return;
+      }
+
+      let reservationData = null;
+      let reservationErrorData = null;
+
+      try {
+        reservationData = reservationText ? JSON.parse(reservationText) : null;
+        reservationErrorData = reservationData;
+      } catch (e) {
+        reservationData = null;
+        reservationErrorData = null;
+      }
+
+      if (!reservationResponse.ok) {
+        const errorMessage =
+          reservationErrorData?.message ||
+          reservationErrorData?.error ||
+          reservationText ||
+          "Đặt bàn thất bại";
+
+        alert(errorMessage);
+        return;
+      }
+
+      if (!reservationData) {
+        throw new Error("Backend không trả dữ liệu reservation hợp lệ");
+      }
+
+      if (reservationData.depositRequired) {
+        const paymentResponse = await fetch(
+          `${DEPOSIT_PAYMENT_API}?reservationId=${reservationData.id}`,
+          {
+            method: "POST",
+            headers: {
+              "Accept": "application/json"
+            },
+            credentials: "include"
+          }
+        );
+
+        const paymentText = await paymentResponse.text();
+        console.log("payment status:", paymentResponse.status);
+        console.log("payment raw:", paymentText);
+
+        if (paymentResponse.status === 401 || paymentResponse.status === 403) {
+          alert("Bạn cần đăng nhập bằng tài khoản khách hàng để thanh toán cọc.");
+          window.location.href = "/auth/login.html";
+          return;
+        }
+
+        let paymentData = null;
+        try {
+          paymentData = paymentText ? JSON.parse(paymentText) : null;
+        } catch (e) {
+          paymentData = null;
+        }
+
+        if (!paymentResponse.ok || !paymentData?.paymentUrl) {
+          throw new Error(paymentText || "Không tạo được link thanh toán cọc");
+        }
+
+        window.location.href = paymentData.paymentUrl;
+        return;
+      }
+
+      alert(`Reservation successful! Reservation ID: #${reservationData.id}`);
+
+      reservationFormEl.reset();
+      resetSelectedTable();
+      await loadTables();
+
+    } catch (error) {
+      console.error("Reservation error:", error);
+      alert(error.message || "Reservation failed.");
+    } finally {
+      submitReservationBtn.disabled = false;
+      submitReservationBtn.textContent = "Complete Reservation";
+    }
+  });
+
+  loadTables();
+</script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

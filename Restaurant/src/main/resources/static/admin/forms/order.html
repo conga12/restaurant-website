@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đơn hàng - RestaurantOS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="bi bi-shop"></i>
+                    <span>RestaurantOS</span>
+                </div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="/admin/index.html" class="nav-link">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/forms/category.html" class="nav-link">
+                        <i class="bi bi-folder-fill"></i>
+                        <span>Danh mục</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/forms/product.html" class="nav-link">
+                        <i class="bi bi-cup-hot-fill"></i>
+                        <span>Món ăn</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/forms/table.html" class="nav-link">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                        <span>Bàn</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/forms/reservation.html" class="nav-link">
+                        <i class="bi bi-calendar-check-fill"></i>
+                        <span>Đặt bàn</span>
+                        <span id="reservationUnreadBadge" class="sidebar-menu-badge d-none">0</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="/admin/forms/order.html" class="nav-link">
+                        <i class="bi bi-receipt"></i>
+                        <span>Đơn hàng</span>
+                        <span id="orderUnreadBadge" class="sidebar-menu-badge d-none">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/forms/payment.html" class="nav-link">
+                        <i class="bi bi-credit-card-fill"></i>
+                        <span>Thanh toán</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/forms/user.html" class="nav-link">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Người dùng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/forms/review.html" class="nav-link">
+                        <i class="bi bi-star-fill"></i>
+                        <span>Đánh giá</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../auth/login.html" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div id="content" class="content">
+            <!-- Top Bar -->
+            <nav class="topbar">
+                <button id="sidebarToggle" class="btn btn-link">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Tìm kiếm...">
+                </div>
+                <div class="topbar-right">
+                    <button class="btn btn-icon">
+                        <i class="bi bi-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <div class="dropdown">
+                        <button class="btn user-dropdown" data-bs-toggle="dropdown">
+                            <div class="avatar">AD</div>
+                            <span>Admin</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="../../auth/login.html"><i class="bi bi-box-arrow-left"></i> Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <div class="page-title-box">
+                    <div class="page-title-left">
+                        <h1>Quản lý Đơn hàng</h1>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="../index.html">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Đơn hàng</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#orderModal">
+                        <i class="bi bi-plus-lg me-1"></i> Tạo đơn mới
+                    </button>
+                </div>
+
+                <!-- Status Tabs -->
+                <ul class="nav nav-pills mb-4" style="gap: 0.5rem;" id="orderStatusTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-status="ALL">Tất cả <span class="badge bg-secondary ms-1" id="countAll">0</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-status="PENDING">Chờ xử lý <span class="badge bg-warning ms-1" id="countPending">0</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-status="PREPARING">Đang nấu <span class="badge bg-info ms-1" id="countPreparing">0</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-status="SERVED">Đã phục vụ <span class="badge bg-success ms-1" id="countServed">0</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-status="CANCELLED">Đã hủy <span class="badge bg-danger ms-1" id="countCancelled">0</span></a>
+                    </li>
+                </ul>
+                <!-- Table Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Danh sách đơn hàng</h5>
+                        <div class="d-flex gap-2">
+                            <input type="date" class="form-control form-control-sm" style="width: auto;" id="filterOrderDate">
+                            <div class="search-input">
+                                <i class="bi bi-search"></i>
+                                <input type="text" class="form-control form-control-sm" placeholder="Tìm mã đơn..." style="padding-left: 2rem;" id="filterOrderKeyword">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="orderTable">
+                                <thead>
+                                    <tr>
+                                        <th>Mã đơn</th>
+                                        <th>Bàn</th>
+                                        <th>Khách hàng</th>
+                                        <th>Thời gian</th>
+                                        <th>Số món</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Trạng thái</th>
+                                        <th style="width: 150px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center" style="background: var(--dark-light); border-top: 1px solid var(--gray-800); padding: 1rem 1.25rem;">
+                        <span class="text-muted" id="orderSummary">Hiển thị 0 / 0 đơn hàng</span>
+                        <nav>
+                            <ul class="pagination mb-0">
+                                <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Order Detail Modal -->
+    <div class="modal fade" id="viewOrderModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded" style="background: var(--gray-800);">
+                                <h6 class="mb-3">Thông tin đơn hàng</h6>
+                                <p class="mb-2"><strong>Bàn:</strong> <span id="viewOrderTable">-</span></p>
+                                <p class="mb-2"><strong>Khách hàng:</strong> <span id="viewOrderCustomer">-</span></p>
+                                <p class="mb-2"><strong>Thời gian:</strong> <span id="viewOrderTime">-</span></p>
+                                <p class="mb-0"><strong>Trạng thái:</strong> <span id="viewOrderStatus">-</span></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded" style="background: var(--gray-800);">
+                                <h6 class="mb-3">Thanh toán</h6>
+                                <p class="mb-2"><strong>Tạm tính:</strong> <span id="viewOrderSubTotal">0đ</span></p>
+                                <p class="mb-2"><strong>Thuế (5%):</strong> <span id="viewOrderTax">0đ</span></p>
+                                <p class="mb-2"><strong>Giảm giá:</strong> <span id="viewOrderDiscount">0đ</span></p>
+                                <p class="mb-0 h5 text-primary"><strong>Tổng cộng:</strong> <span id="viewOrderTotal">0đ</span></p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h6 class="mb-3">Danh sách món</h6>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Món ăn</th>
+                                        <th class="text-center">SL</th>
+                                        <th class="text-end">Đơn giá</th>
+                                        <th class="text-end">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="viewOrderItemsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary"><i class="bi bi-printer me-1"></i> In hóa đơn</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Order Modal -->
+    <div class="modal fade" id="orderModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tạo đơn hàng mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="orderForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Bàn <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="">Chọn bàn</option>
+                                    <option>Bàn 1 - 4 chỗ</option>
+                                    <option>Bàn 2 - 4 chỗ</option>
+                                    <option>Bàn 3 - 6 chỗ</option>
+                                    <option>Bàn 5 - 2 chỗ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Khách hàng</label>
+                                <input type="text" class="form-control" placeholder="Tên khách (tùy chọn)">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Ghi chú</label>
+                                <textarea class="form-control" rows="2" placeholder="Ghi chú cho đơn hàng"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="showToast('Đã tạo đơn hàng mới')" data-bs-dismiss="modal">Tạo đơn hàng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/order.js"></script>
+    <style>
+        .nav-pills .nav-link {
+            background: var(--gray-800);
+            color: var(--gray-300);
+            border-radius: 0.5rem;
+        }
+        .nav-pills .nav-link:hover {
+            background: var(--gray-700);
+            color: var(--gray-100);
+        }
+        .nav-pills .nav-link.active {
+            background: var(--primary);
+            color: var(--dark);
+        }
+    </style>
+</body>
+</html>
+

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - RestaurantOS</title>
+    <link rel="stylesheet" href="../assets/css/style.css" />
+
+    <style>
+        body {
+          background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(44,44,44,0.95)),
+            url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200");
+          background-size: cover;
+          background-position: center;
+          min-height: 100vh;
+        }
+
+        .auth-wrapper {
+          max-width: 520px;
+          margin: 4rem auto;
+          background: rgba(17, 24, 39, 0.96);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 20px;
+          padding: 2.5rem;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          backdrop-filter: blur(10px);
+          color: white;
+          animation: fadeInUp 0.6s ease;
+        }
+
+        .logo-auth {
+          text-align: center;
+          font-size: 1.5rem;
+          letter-spacing: 3px;
+          margin-bottom: 1rem;
+          color: #d4af37;
+        }
+
+        .auth-wrapper h2 {
+          text-align: center;
+          margin-bottom: 0.5rem;
+          color: #f4e8c1;
+          font-weight: 400;
+        }
+
+        .auth-wrapper p {
+          text-align: center;
+          color: #aaa;
+          margin-bottom: 2rem;
+        }
+
+        .auth-wrapper input {
+          background: #0f172a;
+          border: 1px solid rgba(255,255,255,0.08);
+          color: white;
+        }
+
+        .auth-wrapper input::placeholder {
+          color: #888;
+        }
+
+        .auth-wrapper input:focus {
+          border-color: #d4af37;
+          box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
+        }
+
+        .auth-wrapper .btn {
+          width: 100%;
+          margin-top: 0.75rem;
+        }
+
+        .auth-message {
+          margin-top: 1rem;
+          text-align: center;
+          font-size: 0.95rem;
+          color: #f87171;
+          min-height: 24px;
+        }
+
+        .auth-footer {
+          text-align: center;
+          margin-top: 1.5rem;
+          font-size: 0.9rem;
+          color: #aaa;
+        }
+
+        .auth-footer a {
+          color: #d4af37;
+        }
+    </style>
+</head>
+<body>
+<div class="auth-wrapper">
+    <div class="logo-auth">🍽️ RestaurantOS</div>
+
+    <h2>Create Account</h2>
+    <p>Register to book and manage your reservations</p>
+
+    <form id="registerForm">
+        <label for="username">Full Name</label>
+        <input id="username" name="username" type="text" placeholder="Enter your full name" required />
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="Enter your email" required />
+
+        <label for="phone">Phone</label>
+        <input id="phone" name="phone" type="text" placeholder="Enter your phone number" required />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="Create a password" required />
+
+        <button type="submit" class="btn btn-primary">Create Account</button>
+    </form>
+
+    <div id="authMessage" class="auth-message"></div>
+
+    <div class="auth-footer">
+        Already have an account?
+        <a href="/auth/login.html">Login</a>
+    </div>
+</div>
+
+<script>
+    const registerForm = document.getElementById("registerForm");
+    const authMessage = document.getElementById("authMessage");
+
+    registerForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      authMessage.textContent = "";
+      authMessage.style.color = "#f87171";
+
+      const payload = {
+        username: document.getElementById("username").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        password: document.getElementById("password").value.trim()
+      };
+
+      try {
+        const response = await fetch("/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify(payload)
+        });
+
+        const text = await response.text();
+        let data = {};
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch (e) {
+          data = {};
+        }
+
+        if (!response.ok) {
+          throw new Error(data.message || "Đăng ký thất bại");
+        }
+
+        authMessage.style.color = "#4ade80";
+        authMessage.textContent = "Đăng ký thành công. Đang chuyển sang trang đăng nhập...";
+
+        setTimeout(() => {
+          window.location.href = "/auth/login.html";
+        }, 1200);
+      } catch (error) {
+        console.error("Register error:", error);
+        authMessage.textContent = error.message || "Không thể đăng ký.";
+      }
+    });
+</script>
+</body>
+</html>

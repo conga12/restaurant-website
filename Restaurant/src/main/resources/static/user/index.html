@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="RestaurantOS - Premium dining experience with online reservation and menu browsing">
+  <title>RestaurantOS - Premium Fine Dining</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- ============================================
+       HEADER & NAVIGATION
+       ============================================ -->
+  <header>
+    <div class="header-container">
+      <div class="logo">RestaurantOS</div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="reservation.html">Reservations</a>
+        <a href="/user/reservation-history.html">My Bookings</a>
+        <a href="review.html">Reviews</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================
+       HERO SECTION
+       ============================================ -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to RestaurantOS</h1>
+      <p>Experience exquisite culinary artistry in an ambiance of refined elegance</p>
+      <button class="btn btn-primary" onclick="window.location.href='reservation.html'">Reserve Your Table</button>
+    </div>
+  </section>
+
+  <!-- ============================================
+       ABOUT SECTION
+       ============================================ -->
+  <section class="container">
+    <div class="grid grid-2">
+      <div>
+        <h2>About Us</h2>
+        <p>RestaurantOS is a premier fine dining establishment dedicated to delivering an unforgettable culinary experience. With over 15 years of excellence, we combine traditional flavors with modern techniques.</p>
+        <p>Our award-winning chefs source the finest local and international ingredients to create dishes that delight the palate and inspire conversation.</p>
+        <p>Whether you're celebrating a special occasion or enjoying a casual evening, RestaurantOS welcomes you to our table.</p>
+        <a href="menu.html" class="btn btn-primary mt-3">Explore Our Menu</a>
+      </div>
+      <div>
+        <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&h=400&fit=crop" alt="Restaurant interior" class="card-image" style="border-radius: 8px; margin-top: 0;">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FEATURED DISHES SECTION
+       ============================================ -->
+  <section class="featured-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Chef's Featured Dishes</h2>
+        <p>Discover our most celebrated creations</p>
+      </div>
+      <div class="grid grid-3">
+        <!-- Dish 1 -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.2s">
+          <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop" alt="Pan-Seared Salmon" class="card-image">
+          <h3 class="card-title">Pan-Seared Salmon</h3>
+          <p class="card-subtitle">With lemon beurre blanc and seasonal vegetables</p>
+          <p class="card-price">$32</p>
+          <a href="menu.html" class="btn btn-secondary">View Full Menu</a>
+        </div>
+
+        <!-- Dish 2 -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.4s">
+          <img src="https://images.unsplash.com/photo-1555939594-58d7cb561286?w=400&h=300&fit=crop" alt="Ribeye Steak" class="card-image">
+          <h3 class="card-title">Premium Ribeye Steak</h3>
+          <p class="card-subtitle">Dry-aged 45 days, served with truffle mashed potatoes</p>
+          <p class="card-price">$48</p>
+          <a href="menu.html" class="btn btn-secondary">View Full Menu</a>
+        </div>
+
+        <!-- Dish 3 -->
+        <div class="card animate-fade-in-up" style="animation-delay: 0.6s">
+          <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop" alt="Lobster Tail" class="card-image">
+          <h3 class="card-title">Atlantic Lobster Tail</h3>
+          <p class="card-subtitle">Butter-poached, served with seasonal greens</p>
+          <p class="card-price">$44</p>
+          <a href="menu.html" class="btn btn-secondary">View Full Menu</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       WHY CHOOSE US SECTION
+       ============================================ -->
+  <section class="container">
+    <div class="section-title">
+      <h2>Why Choose RestaurantOS</h2>
+      <p>Excellence in every detail</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card">
+        <h3 style="text-align: center; color: var(--color-accent);">🍽️ Culinary Excellence</h3>
+        <p>Our award-winning chefs craft each dish with meticulous attention to quality and presentation.</p>
+      </div>
+      <div class="card">
+        <h3 style="text-align: center; color: var(--color-accent);">🌟 Exceptional Service</h3>
+        <p>Our trained staff provides personalized service tailored to your dining preferences.</p>
+      </div>
+      <div class="card">
+        <h3 style="text-align: center; color: var(--color-accent);">✨ Elegant Ambiance</h3>
+        <p>Dine in our beautifully appointed spaces designed for intimate and celebratory moments.</p>
+      </div>
+      <div class="card">
+        <h3 style="text-align: center; color: var(--color-accent);">🏆 Award-Winning</h3>
+        <p>Recognized by leading culinary organizations for our innovation and consistency.</p>
+      </div>
+      <div class="card">
+        <h3 style="text-align: center; color: var(--color-accent);">🌍 Premium Ingredients</h3>
+        <p>We source the finest local and international ingredients for optimal flavor.</p>
+      </div>
+      <div class="card">
+        <h3 style="text-align: center; color: var(--color-accent);">💝 Special Events</h3>
+        <p>Perfect venue for weddings, anniversaries, and corporate celebrations.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       TESTIMONIALS SECTION
+       ============================================ -->
+  <section class="container">
+    <div class="section-title">
+      <h2>What Our Guests Say</h2>
+      <p>Join thousands of satisfied diners</p>
+    </div>
+    <div class="grid grid-2">
+      <div class="testimonial-card">
+        <div class="stars">
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"An absolutely exceptional dining experience. The food was exquisite, the service impeccable, and the atmosphere perfect for our anniversary celebration."</p>
+        <p class="testimonial-author">- Sarah Johnson</p>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="stars">
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"Every dish was a masterpiece. The chef's attention to detail is remarkable, and the wine pairings were spot-on. Will definitely return!"</p>
+        <p class="testimonial-author">- Michael Chen</p>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="stars">
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"RestaurantOS is simply the best. The ambiance is elegant, the staff is attentive, and the food is absolutely divine. Highly recommend!"</p>
+        <p class="testimonial-author">- Emily Rodriguez</p>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="stars">
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"Outstanding experience from start to finish. The chef's tasting menu was innovative and delicious. Worth every penny!"</p>
+        <p class="testimonial-author">- David Thompson</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       CTA SECTION
+       ============================================ -->
+  <section style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%); color: white; text-align: center; padding: 4rem 2rem;">
+    <div class="container">
+      <h2 style="color: white; margin-bottom: 1rem;">Ready for an Unforgettable Experience?</h2>
+      <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 2rem; font-size: 1.1rem;">Book your table today and discover why RestaurantOS is the destination for fine dining.</p>
+      <button class="btn btn-primary" onclick="window.location.href='reservation.html'">Reserve Your Table</button>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer>
+    <div class="footer-content">
+      <!-- Restaurant Info -->
+      <div class="footer-section">
+        <h4>RestaurantOS</h4>
+        <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+        <div class="social-links">
+          <a href="#facebook" title="Facebook">f</a>
+          <a href="#twitter" title="Twitter">𝕏</a>
+          <a href="#instagram" title="Instagram">📷</a>
+          <a href="#youtube" title="YouTube">▶️</a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="reservation.html">Reservations</a>
+        <a href="review.html">Reviews</a>
+        <a href="contact.html">Contact</a>
+      </div>
+
+      <!-- Hours -->
+      <div class="footer-section">
+        <h4>Hours of Operation</h4>
+        <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
+        <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
+        <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
+        <p><strong>Closed:</strong> Mondays (except holidays)</p>
+      </div>
+
+      <!-- Contact -->
+      <div class="footer-section">
+        <h4>Contact Info</h4>
+        <p>📍 123 Gourmet Street, Food City, FC 12345</p>
+        <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
+        <p>✉️ <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
+        <p>🌐 www.restaurantos.com</p>
+      </div>
+    </div>
+    <div id="chatbotBox" style="position:fixed;bottom:20px;right:20px;width:320px;background:#fff;border:1px solid #ddd;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.15);overflow:hidden;z-index:9999;">
+      <div style="background:#0f172a;color:#fff;padding:12px 14px;font-weight:700;">
+        Chatbot nhà hàng
+      </div>
+
+      <div id="chatMessages" style="height:300px;overflow-y:auto;padding:12px;background:#f8fafc;">
+        <div style="margin-bottom:10px;">
+          <div style="display:inline-block;background:#e2e8f0;padding:8px 10px;border-radius:10px;">
+            Xin chào, tôi có thể hỗ trợ đặt bàn và menu cho bạn.
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;border-top:1px solid #eee;">
+        <input id="chatInput" type="text" placeholder="Nhập tin nhắn..." style="flex:1;border:none;padding:12px;outline:none;">
+        <button onclick="sendChatMessage()" style="border:none;background:#0f172a;color:#fff;padding:0 16px;cursor:pointer;">
+          Gửi
+        </button>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    </div>
+  </footer>
+  <script>
+    function appendMessage(text, sender) {
+      const chatMessages = document.getElementById("chatMessages");
+      const wrapper = document.createElement("div");
+      wrapper.style.marginBottom = "10px";
+      wrapper.style.textAlign = sender === "user" ? "right" : "left";
+
+      const bubble = document.createElement("div");
+      bubble.style.display = "inline-block";
+      bubble.style.padding = "8px 10px";
+      bubble.style.borderRadius = "10px";
+      bubble.style.maxWidth = "80%";
+      bubble.style.whiteSpace = "pre-wrap";
+      bubble.textContent = text;
+
+      if (sender === "user") {
+        bubble.style.background = "#0f172a";
+        bubble.style.color = "#fff";
+      } else {
+        bubble.style.background = "#e2e8f0";
+        bubble.style.color = "#111";
+      }
+
+      wrapper.appendChild(bubble);
+      chatMessages.appendChild(wrapper);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById("chatInput");
+      const message = input.value.trim();
+
+      if (!message) return;
+
+      appendMessage(message, "user");
+      input.value = "";
+
+      try {
+        const res = await fetch("/api/ai/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message })
+        });
+
+        if (!res.ok) {
+          appendMessage("Xin lỗi, chatbot đang bận.", "bot");
+          return;
+        }
+
+        const data = await res.json();
+        appendMessage(data.reply || "Xin lỗi, tôi chưa trả lời được.", "bot");
+      } catch (e) {
+        appendMessage("Có lỗi kết nối tới chatbot.", "bot");
+      }
+    }
+
+    document.getElementById("chatInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        sendChatMessage();
+      }
+    });
+  </script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

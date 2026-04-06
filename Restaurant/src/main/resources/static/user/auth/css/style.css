@@ -1,0 +1,15 @@
+.auth-wrapper {
+  max-width: 480px;
+  margin: 4rem auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.auth-message {
+  margin-top: 1rem;
+  color: #c94c4c;
+  font-size: 0.95rem;
+}

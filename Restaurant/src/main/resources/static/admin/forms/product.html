@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Món ăn - RestaurantOS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="bi bi-shop"></i>
+                    <span>RestaurantOS</span>
+                </div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="category.html" class="nav-link">
+                        <i class="bi bi-folder-fill"></i>
+                        <span>Danh mục</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="product.html" class="nav-link">
+                        <i class="bi bi-cup-hot-fill"></i>
+                        <span>Món ăn</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="table.html" class="nav-link">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                        <span>Bàn</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reservation.html" class="nav-link">
+                        <i class="bi bi-calendar-check-fill"></i>
+                        <span>Đặt bàn</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="order.html" class="nav-link">
+                        <i class="bi bi-receipt"></i>
+                        <span>Đơn hàng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="payment.html" class="nav-link">
+                        <i class="bi bi-credit-card-fill"></i>
+                        <span>Thanh toán</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="user.html" class="nav-link">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Người dùng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="review.html" class="nav-link">
+                        <i class="bi bi-star-fill"></i>
+                        <span>Đánh giá</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../auth/login.html" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div id="content" class="content">
+            <!-- Top Bar -->
+            <nav class="topbar">
+                <button id="sidebarToggle" class="btn btn-link">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Tìm kiếm...">
+                </div>
+                <div class="topbar-right">
+                    <button class="btn btn-icon">
+                        <i class="bi bi-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <div class="dropdown">
+                        <button class="btn user-dropdown" data-bs-toggle="dropdown">
+                            <div class="avatar">AD</div>
+                            <span>Admin</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="../../auth/login.html"><i class="bi bi-box-arrow-left"></i> Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <div class="page-title-box">
+                    <div class="page-title-left">
+                        <h1>Quản lý Món ăn</h1>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="../index.html">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Món ăn</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
+                        <i class="bi bi-plus-lg me-1"></i> Thêm món ăn
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label">Danh mục</label>
+                                <select class="form-select">
+                                    <option value="">Tất cả danh mục</option>
+                                    <option>Món khai vị</option>
+                                    <option>Phở & Bún</option>
+                                    <option>Cơm</option>
+                                    <option>Đồ uống</option>
+                                    <option>Tráng miệng</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option>Còn món</option>
+                                    <option>Hết món</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tìm kiếm</label>
+                                <div class="search-input">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" class="form-control" placeholder="Tên món ăn..." onkeyup="searchTable(this, 'productTable')">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-funnel me-1"></i> Lọc
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="productTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;">ID</th>
+                                        <th style="width: 80px;">Hình</th>
+                                        <th>Tên món</th>
+                                        <th>Danh mục</th>
+                                        <th>Giá</th>
+                                        <th style="width: 100px;">Trạng thái</th>
+                                        <th style="width: 120px;">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>1</strong></td>
+                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-cup-hot text-danger"></i></div></td>
+                                        <td>
+                                            <div><strong>Phở bò tái chín</strong></div>
+                                            <small class="text-muted">Phở bò với thịt tái và chín</small>
+                                        </td>
+                                        <td>Phở & Bún</td>
+                                        <td><strong class="text-primary">65,000đ</strong></td>
+                                        <td><span class="badge bg-success">Còn món</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn btn-action btn-view" data-bs-toggle="modal" data-bs-target="#viewProductModal" title="Xem">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-delete" onclick="deleteItem(1, 'Phở bò tái chín')" title="Xóa">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>2</strong></td>
+                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-grid text-success"></i></div></td>
+                                        <td>
+                                            <div><strong>Cơm tấm sườn bì</strong></div>
+                                            <small class="text-muted">Cơm tấm với sườn nướng và bì</small>
+                                        </td>
+                                        <td>Cơm</td>
+                                        <td><strong class="text-primary">55,000đ</strong></td>
+                                        <td><span class="badge bg-success">Còn món</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn btn-action btn-view" title="Xem">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-delete" onclick="deleteItem(2, 'Cơm tấm sườn bì')" title="Xóa">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>3</strong></td>
+                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-cup-hot text-danger"></i></div></td>
+                                        <td>
+                                            <div><strong>Bún chả Hà Nội</strong></div>
+                                            <small class="text-muted">Bún với chả nướng kiểu Hà Nội</small>
+                                        </td>
+                                        <td>Phở & Bún</td>
+                                        <td><strong class="text-primary">60,000đ</strong></td>
+                                        <td><span class="badge bg-success">Còn món</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn btn-action btn-view" title="Xem">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-delete" onclick="deleteItem(3, 'Bún chả Hà Nội')" title="Xóa">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>4</strong></td>
+                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-egg-fried text-warning"></i></div></td>
+                                        <td>
+                                            <div><strong>Gỏi cuốn tôm thịt</strong></div>
+                                            <small class="text-muted">2 cuốn với tôm và thịt heo</small>
+                                        </td>
+                                        <td>Món khai vị</td>
+                                        <td><strong class="text-primary">35,000đ</strong></td>
+                                        <td><span class="badge bg-success">Còn món</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn btn-action btn-view" title="Xem">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-delete" onclick="deleteItem(4, 'Gỏi cuốn tôm thịt')" title="Xóa">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>5</strong></td>
+                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-cup-straw text-info"></i></div></td>
+                                        <td>
+                                            <div><strong>Trà đào cam sả</strong></div>
+                                            <small class="text-muted">Trà tươi với đào và cam sả</small>
+                                        </td>
+                                        <td>Đồ uống</td>
+                                        <td><strong class="text-primary">35,000đ</strong></td>
+                                        <td><span class="badge bg-danger">Hết món</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn btn-action btn-view" title="Xem">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-delete" onclick="deleteItem(5, 'Trà đào cam sả')" title="Xóa">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>6</strong></td>
+                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-cake text-primary"></i></div></td>
+                                        <td>
+                                            <div><strong>Chè ba màu</strong></div>
+                                            <small class="text-muted">Chè đậu xanh, đậu đỏ, thạch</small>
+                                        </td>
+                                        <td>Tráng miệng</td>
+                                        <td><strong class="text-primary">25,000đ</strong></td>
+                                        <td><span class="badge bg-success">Còn món</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn btn-action btn-view" title="Xem">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-action btn-delete" onclick="deleteItem(6, 'Chè ba màu')" title="Xóa">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center" style="background: var(--dark-light); border-top: 1px solid var(--gray-800); padding: 1rem 1.25rem;">
+                        <span class="text-muted">Hiển thị 1-6 / 75 món</span>
+                        <nav>
+                            <ul class="pagination mb-0">
+                                <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Product Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm món ăn mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Tên món ăn <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" required placeholder="Nhập tên món">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="">Chọn danh mục</option>
+                                    <option>Món khai vị</option>
+                                    <option>Phở & Bún</option>
+                                    <option>Cơm</option>
+                                    <option>Đồ uống</option>
+                                    <option>Tráng miệng</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Mô tả</label>
+                                <textarea class="form-control" rows="2" placeholder="Mô tả ngắn về món ăn"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Giá <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" required placeholder="0">
+                                    <span class="input-group-text" style="background: var(--gray-700); border-color: var(--gray-700); color: var(--gray-300);">VNĐ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-select">
+                                    <option value="1">Còn món</option>
+                                    <option value="0">Hết món</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Hình ảnh</label>
+                                <input type="file" class="form-control" accept="image/*">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="showToast('Đã lưu món ăn thành công')" data-bs-dismiss="modal">Lưu món ăn</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

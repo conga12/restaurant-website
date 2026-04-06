@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - RestaurantOS</title>
+    <link rel="stylesheet" href="/user/auth/css/style.css" />
+    <style>
+        .auth-wrapper {
+          max-width: 480px;
+          margin: 4rem auto;
+          background: #fff;
+          border: 1px solid #ddd;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .auth-message {
+          margin-top: 1rem;
+          color: #c94c4c;
+          font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+<section class="container">
+    <div class="auth-wrapper">
+        <h2>Login</h2>
+        <p>Please login to view your bookings.</p>
+
+        <form method="post" action="/login">
+            <label for="username">Email</label>
+            <input id="username" name="username" type="text" placeholder="Enter your email" required />
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" placeholder="Enter your password" required />
+
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+
+        <div class="auth-message" id="authMessage"></div>
+    </div>
+</section>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const authMessage = document.getElementById("authMessage");
+
+    if (params.has("error")) {
+      authMessage.textContent = "Email hoặc mật khẩu không đúng.";
+    }
+
+    if (params.has("logout")) {
+      authMessage.style.color = "#2e7d32";
+      authMessage.textContent = "Bạn đã đăng xuất.";
+    }
+</script>
+</body>
+</html>

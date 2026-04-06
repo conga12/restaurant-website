@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gọi món tại bàn</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          background: #f7f7f7;
+          color: #222;
+        }
+
+        .topbar {
+          background: #111827;
+          color: white;
+          padding: 16px;
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+        }
+
+        .topbar h1 {
+          margin: 0;
+          font-size: 20px;
+        }
+
+        .topbar p {
+          margin: 6px 0 0;
+          font-size: 14px;
+          opacity: 0.9;
+        }
+
+        .container {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 16px;
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 20px;
+        }
+
+        .search-box input {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          margin-bottom: 16px;
+          box-sizing: border-box;
+        }
+
+        .menu-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 16px;
+        }
+
+        .dish-card {
+          background: white;
+          border-radius: 14px;
+          overflow: hidden;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+
+        .dish-card img {
+          width: 100%;
+          height: 160px;
+          object-fit: cover;
+          display: block;
+        }
+
+        .dish-content {
+          padding: 14px;
+        }
+
+        .dish-content h3 {
+          margin: 0 0 8px;
+          font-size: 18px;
+        }
+
+        .dish-content p {
+          margin: 0 0 10px;
+          color: #666;
+          font-size: 14px;
+        }
+
+        .dish-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .price {
+          font-weight: 700;
+          color: #111827;
+        }
+
+        .btn {
+          border: none;
+          border-radius: 10px;
+          padding: 10px 14px;
+          cursor: pointer;
+          font-weight: 600;
+        }
+
+        .btn-primary {
+          background: #111827;
+          color: white;
+        }
+
+        .btn-light {
+          background: #eef2ff;
+          color: #111827;
+        }
+
+        .cart-panel {
+          background: white;
+          border-radius: 14px;
+          padding: 16px;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+          position: sticky;
+          top: 90px;
+          height: fit-content;
+        }
+
+        .cart-item {
+          border-bottom: 1px solid #eee;
+          padding: 12px 0;
+        }
+
+        .cart-item:last-child {
+          border-bottom: none;
+        }
+
+        .cart-item strong {
+          display: block;
+          margin-bottom: 6px;
+        }
+
+        .qty-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 8px 0;
+        }
+
+        .qty-btn {
+          width: 30px;
+          height: 30px;
+          border: none;
+          border-radius: 8px;
+          background: #111827;
+          color: white;
+          cursor: pointer;
+        }
+
+        .cart-note, #orderNote {
+          width: 100%;
+          box-sizing: border-box;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          margin-top: 8px;
+        }
+
+        .summary {
+          margin-top: 16px;
+          border-top: 2px solid #111827;
+          padding-top: 14px;
+        }
+
+        .summary p {
+          display: flex;
+          justify-content: space-between;
+          margin: 8px 0;
+        }
+
+        .empty {
+          color: #777;
+          font-style: italic;
+        }
+
+        .error-box {
+          background: #fee2e2;
+          color: #991b1b;
+          padding: 12px;
+          border-radius: 10px;
+          margin-bottom: 16px;
+          display: none;
+        }
+
+        .mobile-cartbar {
+          display: none;
+        }
+
+        @media (max-width: 900px) {
+          .container {
+            grid-template-columns: 1fr;
+          }
+
+          .cart-panel {
+            position: static;
+          }
+
+          .mobile-cartbar {
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #ddd;
+            padding: 10px 14px;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+          }
+
+          body {
+            padding-bottom: 70px;
+          }
+        }
+    </style>
+</head>
+<body>
+<div class="topbar">
+    <h1>Gọi món tại bàn</h1>
+    <p id="tableBadge">Đang xác định bàn...</p>
+</div>
+
+<div class="container">
+    <div>
+        <div id="errorBox" class="error-box"></div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm món..." oninput="filterDishes()">
+        </div>
+        <div id="menuGrid" class="menu-grid"></div>
+    </div>
+
+    <div class="cart-panel" id="cartPanel">
+        <h3>Giỏ hàng</h3>
+        <div id="cartList">
+            <p class="empty">Chưa có món nào.</p>
+        </div>
+
+        <div class="summary">
+            <p><span>Tổng món</span><strong id="totalItems">0</strong></p>
+            <p><span>Tổng tiền</span><strong id="totalAmount">0đ</strong></p>
+
+            <label for="orderNote"><strong>Ghi chú đơn</strong></label>
+            <textarea id="orderNote" rows="3" placeholder="Ví dụ: làm nhanh giúp..."></textarea>
+
+            <button class="btn btn-primary" style="width:100%; margin-top:12px;" onclick="submitOrder()">
+                Gọi món
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="mobile-cartbar">
+    <div>
+        <strong id="mobileTotalItems">0 món</strong><br>
+        <span id="mobileTotalAmount">0đ</span>
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('cartPanel').scrollIntoView({behavior:'smooth'})">
+        Xem giỏ
+    </button>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const tableId = params.get("tableId");
+
+    const tableBadge = document.getElementById("tableBadge");
+    const errorBox = document.getElementById("errorBox");
+    const menuGrid = document.getElementById("menuGrid");
+    const cartList = document.getElementById("cartList");
+    const totalItemsEl = document.getElementById("totalItems");
+    const totalAmountEl = document.getElementById("totalAmount");
+    const mobileTotalItems = document.getElementById("mobileTotalItems");
+    const mobileTotalAmount = document.getElementById("mobileTotalAmount");
+    const searchInput = document.getElementById("searchInput");
+    const orderNote = document.getElementById("orderNote");
+
+    let dishes = [];
+    let filteredDishes = [];
+    let cart = [];
+
+    if (tableId) {
+      tableBadge.textContent = "Bàn số " + tableId;
+    } else {
+      tableBadge.textContent = "Không xác định bàn";
+      showError("Link QR không hợp lệ hoặc thiếu tableId.");
+    }
+
+    function showError(message) {
+      errorBox.style.display = "block";
+      errorBox.textContent = message;
+    }
+
+    function hideError() {
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+    }
+
+    function formatPrice(value) {
+      return Number(value || 0).toLocaleString("vi-VN") + "đ";
+    }
+
+    function getImageUrl(imageUrl) {
+      const rawImage = (imageUrl || "").trim();
+
+      if (!rawImage) {
+        return "/images/no-image.jpg";
+      }
+
+      if (rawImage.startsWith("/images/")) {
+        return rawImage;
+      }
+
+      if (rawImage.startsWith("images/")) {
+        return "/" + rawImage;
+      }
+
+      if (rawImage.startsWith("http://") || rawImage.startsWith("https://")) {
+        return rawImage;
+      }
+
+      return "/images/" + rawImage;
+    }
+
+    async function loadDishes() {
+      try {
+        hideError();
+        const res = await fetch("/api/dishes");
+        if (!res.ok) throw new Error("Không tải được danh sách món.");
+        dishes = await res.json();
+        filteredDishes = [...dishes];
+        renderDishes();
+      } catch (e) {
+        showError(e.message || "Lỗi tải món ăn.");
+      }
+    }
+
+    function filterDishes() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      filteredDishes = dishes.filter(d => {
+        const name = (d.name || "").toLowerCase();
+        const desc = (d.description || "").toLowerCase();
+        return name.includes(keyword) || desc.includes(keyword);
+      });
+      renderDishes();
+    }
+
+    function renderDishes() {
+      menuGrid.innerHTML = "";
+
+      if (!filteredDishes.length) {
+        menuGrid.innerHTML = "<p>Không có món nào phù hợp.</p>";
+        return;
+      }
+
+      filteredDishes.forEach(dish => {
+        const imageSrc = getImageUrl(dish.imageUrl);
+
+        const div = document.createElement("div");
+        div.className = "dish-card";
+        div.innerHTML = `
+          <img src="${imageSrc}" alt="${dish.name || ""}">
+          <div class="dish-content">
+            <h3>${dish.name || "Không tên món"}</h3>
+            <p>${dish.description || "Chưa có mô tả"}</p>
+            <div class="dish-footer">
+              <span class="price">${formatPrice(dish.price)}</span>
+              <button class="btn btn-primary" onclick="addToCart(${dish.id})">+ Chọn</button>
+            </div>
+          </div>
+        `;
+
+        const img = div.querySelector("img");
+        img.onerror = function () {
+          this.onerror = null;
+          this.src = "/images/no-image.jpg";
+        };
+
+        menuGrid.appendChild(div);
+      });
+    }
+
+    function addToCart(dishId) {
+      const dish = dishes.find(d => d.id === dishId);
+      if (!dish) return;
+
+      const existing = cart.find(i => i.dishId === dishId);
+
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({
+          dishId: dish.id,
+          name: dish.name,
+          price: Number(dish.price || 0),
+          quantity: 1,
+          note: ""
+        });
+      }
+
+      renderCart();
+    }
+
+    function increaseQuantity(dishId) {
+      const item = cart.find(i => i.dishId === dishId);
+      if (!item) return;
+      item.quantity += 1;
+      renderCart();
+    }
+
+    function decreaseQuantity(dishId) {
+      const item = cart.find(i => i.dishId === dishId);
+      if (!item) return;
+
+      item.quantity -= 1;
+
+      if (item.quantity <= 0) {
+        cart = cart.filter(i => i.dishId !== dishId);
+      }
+
+      renderCart();
+    }
+
+    function updateItemNote(dishId, value) {
+      const item = cart.find(i => i.dishId === dishId);
+      if (item) item.note = value;
+    }
+
+    function renderCart() {
+      if (!cart.length) {
+        cartList.innerHTML = '<p class="empty">Chưa có món nào.</p>';
+        totalItemsEl.textContent = "0";
+        totalAmountEl.textContent = "0đ";
+        mobileTotalItems.textContent = "0 món";
+        mobileTotalAmount.textContent = "0đ";
+        return;
+      }
+
+      let totalItems = 0;
+      let totalAmount = 0;
+      cartList.innerHTML = "";
+
+      cart.forEach(item => {
+        totalItems += item.quantity;
+        totalAmount += item.price * item.quantity;
+
+        const div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `
+          <strong>${item.name}</strong>
+          <div>Đơn giá: ${formatPrice(item.price)}</div>
+          <div>Thành tiền: ${formatPrice(item.price * item.quantity)}</div>
+
+          <div class="qty-row">
+            <button class="qty-btn" onclick="decreaseQuantity(${item.dishId})">-</button>
+            <span>${item.quantity}</span>
+            <button class="qty-btn" onclick="increaseQuantity(${item.dishId})">+</button>
+          </div>
+
+          <textarea class="cart-note" placeholder="Ghi chú món..." oninput="updateItemNote(${item.dishId}, this.value)">${item.note || ""}</textarea>
+        `;
+        cartList.appendChild(div);
+      });
+
+      totalItemsEl.textContent = totalItems;
+      totalAmountEl.textContent = formatPrice(totalAmount);
+      mobileTotalItems.textContent = totalItems + " món";
+      mobileTotalAmount.textContent = formatPrice(totalAmount);
+    }
+
+    async function submitOrder() {
+      if (!tableId) {
+        alert("Không xác định được bàn.");
+        return;
+      }
+
+      if (!cart.length) {
+        alert("Bạn chưa chọn món nào.");
+        return;
+      }
+
+      const payload = {
+        tableId: Number(tableId),
+        note: orderNote.value.trim(),
+        items: cart.map(item => ({
+          dishId: item.dishId,
+          quantity: item.quantity,
+          note: item.note || ""
+        }))
+      };
+
+      try {
+        const res = await fetch("/api/orders/from-qr", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || "Gọi món thất bại");
+        }
+
+        const data = await res.json();
+        alert("Đặt món thành công! Mã đơn: " + data.orderId);
+        cart = [];
+        orderNote.value = "";
+        renderCart();
+      } catch (e) {
+        alert("Có lỗi khi gọi món: " + (e.message || "Không xác định"));
+      }
+    }
+
+    loadDishes();
+    renderCart();
+</script>
+</body>
+</html>

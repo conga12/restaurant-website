@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="My Reservations - RestaurantOS">
+  <title>My Bookings - RestaurantOS</title>
+  <link rel="stylesheet" href="/user/assets/css/style.css">
+
+  <style>
+    .history-grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .booking-card {
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 1.25rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    }
+
+    .booking-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .booking-id {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+
+    .booking-sub {
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.38rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      border: 1px solid transparent;
+    }
+
+    .badge.status-pending {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .badge.status-confirmed {
+      background: rgba(34, 197, 94, 0.18);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.45);
+    }
+
+    .badge.status-completed {
+      background: rgba(59, 130, 246, 0.18);
+      color: #60a5fa;
+      border-color: rgba(59, 130, 246, 0.45);
+    }
+
+    .badge.status-cancelled {
+      background: rgba(239, 68, 68, 0.18);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.45);
+    }
+
+    .badge.deposit-not-required {
+      background: rgba(255,255,255,0.08);
+      color: #cbd5e1;
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .badge.deposit-pending {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .badge.deposit-paid {
+      background: rgba(34, 197, 94, 0.18);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.45);
+    }
+
+    .badge.deposit-refunded {
+      background: rgba(59, 130, 246, 0.18);
+      color: #60a5fa;
+      border-color: rgba(59, 130, 246, 0.45);
+    }
+
+    .badge.deposit-forfeited {
+      background: rgba(239, 68, 68, 0.18);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.45);
+    }
+
+    .badge.type-standard {
+      background: rgba(255,255,255,0.08);
+      color: #cbd5e1;
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .badge.type-vip {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .badge.type-private {
+      background: rgba(168, 85, 247, 0.18);
+      color: #d8b4fe;
+      border-color: rgba(168, 85, 247, 0.45);
+    }
+
+    .booking-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .info-box {
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 0.95rem 1rem;
+    }
+
+    .info-box span {
+      display: block;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .info-box strong {
+      color: #fff;
+      font-size: 1rem;
+      word-break: break-word;
+    }
+
+    .booking-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1.2rem;
+    }
+
+    .btn-small {
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn-pay {
+      background: linear-gradient(135deg, #14b8a6, #22c55e);
+      color: white;
+    }
+
+    .btn-cancel {
+      background: rgba(239, 68, 68, 0.14);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .btn-disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .empty-state {
+      background: #111827;
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      color: #94a3b8;
+    }
+
+    .loading-state {
+      text-align: center;
+      color: #94a3b8;
+      padding: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .booking-info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <div class="logo">RestaurantOS</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="reservation.html">Reservations</a>
+      <a href="/user/reservation-history.html">My Bookings</a>
+      <a href="review.html">Reviews</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1>My Bookings</h1>
+    <p>View and manage your reservations</p>
+  </div>
+</section>
+
+<section class="container">
+  <div class="section-title">
+    <h2>Your Reservations</h2>
+    <p>All your upcoming and past reservations</p>
+  </div>
+
+  <div id="reservationHistory" class="history-grid">
+    <div class="loading-state">Loading your reservations...</div>
+  </div>
+
+  <div style="text-align: center; margin-top: 2rem;">
+    <button class="btn btn-secondary" onclick="window.location.href='reservation.html'">Make a New Reservation</button>
+    <button class="btn btn-outline" onclick="loadReservations()">Refresh List</button>
+  </div>
+</section>
+
+<section class="container">
+  <div class="card" style="background-color: #f8f9fa;">
+    <h3>Reservation Management Tips</h3>
+    <ul style="list-style: none; padding: 0;">
+      <li style="padding: 0.75rem 0; border-bottom: 1px solid #ddd;">
+        <strong>✓ Modify:</strong> To modify an existing reservation, please cancel and create a new one
+      </li>
+      <li style="padding: 0.75rem 0; border-bottom: 1px solid #ddd;">
+        <strong>✓ Cancel:</strong> Cancellations must be made at least 24 hours in advance
+      </li>
+      <li style="padding: 0.75rem 0; border-bottom: 1px solid #ddd;">
+        <strong>✓ Arrival:</strong> Please arrive 10-15 minutes before your reservation time
+      </li>
+      <li style="padding: 0.75rem 0; border-bottom: 1px solid #ddd;">
+        <strong>✓ Contact:</strong> For changes or questions, call us at <a href="tel:+1234567890">(123) 456-7890</a>
+      </li>
+      <li style="padding: 0.75rem 0;">
+        <strong>✓ Late Tables:</strong> Tables held for 15 minutes past reservation time
+      </li>
+    </ul>
+  </div>
+
+  <div class="card" style="margin-top: 2rem; border-left: 4px solid var(--color-accent);">
+    <h3>Need Help?</h3>
+    <p>If you need assistance with your reservations or have any questions:</p>
+    <p>
+      <strong>📞 Phone:</strong> <a href="tel:+1234567890">(123) 456-7890</a><br>
+      <strong>✉️ Email:</strong> <a href="mailto:reservations@restaurantos.com">reservations@restaurantos.com</a><br>
+      <strong>⏰ Hours:</strong> Monday - Sunday, 5:00 PM - 10:00 PM
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>RestaurantOS</h4>
+      <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+      <div class="social-links">
+        <a href="#facebook" title="Facebook">f</a>
+        <a href="#twitter" title="Twitter">𝕏</a>
+        <a href="#instagram" title="Instagram">📷</a>
+        <a href="#youtube" title="YouTube">▶️</a>
+      </div>
+    </div>
+
+    <div class="footer-section">
+      <h4>Quick Links</h4>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="reservation.html">Reservations</a>
+      <a href="review.html">Reviews</a>
+      <a href="contact.html">Contact</a>
+    </div>
+
+    <div class="footer-section">
+      <h4>Hours of Operation</h4>
+      <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
+      <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
+      <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
+      <p><strong>Closed:</strong> Mondays (except holidays)</p>
+    </div>
+
+    <div class="footer-section">
+      <h4>Contact Info</h4>
+      <p>📍 123 Gourmet Street, Food City, FC 12345</p>
+      <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
+      <p>✉️ <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
+      <p>🌐 www.restaurantos.com</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+  </div>
+</footer>
+
+<script>
+  const RESERVATION_HISTORY_API = "/api/customer/reservations";
+  const DEPOSIT_PAYMENT_API = "/api/payment/deposit/create";
+
+  const reservationHistory = document.getElementById("reservationHistory");
+
+  function formatMoney(v) {
+    return Number(v || 0).toLocaleString("vi-VN") + " đ";
+  }
+
+  function formatDateTime(date, time) {
+    if (!date) return "-";
+    return `${date} ${time || ""}`.trim();
+  }
+
+  function getStatusBadge(status) {
+    const s = String(status || "").toUpperCase();
+
+    if (s === "PENDING") return `<span class="badge status-pending">PENDING</span>`;
+    if (s === "CONFIRMED") return `<span class="badge status-confirmed">CONFIRMED</span>`;
+    if (s === "COMPLETED") return `<span class="badge status-completed">COMPLETED</span>`;
+    if (s === "CANCELLED") return `<span class="badge status-cancelled">CANCELLED</span>`;
+
+    return `<span class="badge status-pending">${s || "UNKNOWN"}</span>`;
+  }
+
+  function getDepositBadge(depositStatus) {
+    const s = String(depositStatus || "").toUpperCase();
+
+    if (s === "NOT_REQUIRED") return `<span class="badge deposit-not-required">No Deposit</span>`;
+    if (s === "PENDING") return `<span class="badge deposit-pending">Deposit Pending</span>`;
+    if (s === "PAID") return `<span class="badge deposit-paid">Deposit Paid</span>`;
+    if (s === "REFUNDED") return `<span class="badge deposit-refunded">Deposit Refunded</span>`;
+    if (s === "FORFEITED") return `<span class="badge deposit-forfeited">Deposit Forfeited</span>`;
+
+    return `<span class="badge deposit-not-required">${s || "UNKNOWN"}</span>`;
+  }
+
+  function getTableTypeBadge(tableType) {
+    const t = String(tableType || "").toUpperCase();
+
+    if (t === "VIP") return `<span class="badge type-vip">VIP</span>`;
+    if (t === "PRIVATE_ROOM") return `<span class="badge type-private">Private Room</span>`;
+    return `<span class="badge type-standard">Standard</span>`;
+  }
+
+  function canPayDeposit(item) {
+    return item.depositRequired === true
+      && String(item.depositStatus || "").toUpperCase() === "PENDING"
+      && String(item.status || "").toUpperCase() === "PENDING";
+  }
+
+  function canCancelReservation(item) {
+    const status = String(item.status || "").toUpperCase();
+    return status === "PENDING" || status === "CONFIRMED";
+  }
+
+  async function payDeposit(reservationId) {
+    try {
+      const response = await fetch(`${DEPOSIT_PAYMENT_API}?reservationId=${reservationId}`, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json"
+        },
+        credentials: "include"
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = "/auth/login.html";
+        return;
+      }
+
+      const text = await response.text();
+      let data = null;
+
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch (e) {
+        data = null;
+      }
+
+      if (!response.ok || !data?.paymentUrl) {
+        throw new Error("Không tạo được link thanh toán cọc");
+      }
+
+      window.location.href = data.paymentUrl;
+    } catch (error) {
+      console.error("Deposit payment error:", error);
+      alert(error.message || "Không thể thanh toán cọc.");
+    }
+  }
+
+  async function cancelReservation(reservationId) {
+    const ok = confirm("Bạn có chắc muốn hủy đặt bàn này không?");
+    if (!ok) return;
+
+    try {
+      const response = await fetch(`/api/customer/reservations/${reservationId}/cancel`, {
+        method: "PUT",
+        headers: {
+          "Accept": "application/json"
+        },
+        credentials: "include"
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = "/auth/login.html";
+        return;
+      }
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Hủy đặt bàn thất bại");
+      }
+
+      alert("Hủy đặt bàn thành công");
+      loadReservations();
+    } catch (error) {
+      console.error("Cancel reservation error:", error);
+      alert(error.message || "Không thể hủy đặt bàn.");
+    }
+  }
+
+  function renderReservations(items) {
+    if (!items || items.length === 0) {
+      reservationHistory.innerHTML = `
+        <div class="empty-state">
+          You have no reservations yet.<br><br>
+          Click <strong>Make a New Reservation</strong> to create one.
+        </div>
+      `;
+      return;
+    }
+
+    reservationHistory.innerHTML = items.map(item => `
+      <div class="booking-card">
+        <div class="booking-top">
+          <div>
+            <div class="booking-id">Reservation #${item.id}</div>
+            <div class="booking-sub">${formatDateTime(item.reservationDate, item.reservationTime)}</div>
+          </div>
+
+          <div class="badge-row">
+            ${getStatusBadge(item.status)}
+            ${getDepositBadge(item.depositStatus)}
+            ${getTableTypeBadge(item.tableType)}
+          </div>
+        </div>
+
+        <div class="booking-info-grid">
+          <div class="info-box">
+            <span>Customer</span>
+            <strong>${item.customerName || "-"}</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Phone</span>
+            <strong>${item.customerPhone || "-"}</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Guests</span>
+            <strong>${item.numberOfGuests || 0}</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Table</span>
+            <strong>${item.tableNumber ? `Table ${item.tableNumber}` : "-"}</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Deposit Amount</span>
+            <strong>${item.depositRequired ? formatMoney(item.depositAmount) : "Not required"}</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Special Request</span>
+            <strong>${item.specialRequest || "-"}</strong>
+          </div>
+        </div>
+
+        <div class="booking-actions">
+          ${canPayDeposit(item) ? `
+            <button class="btn-small btn-pay" onclick="payDeposit(${item.id})">
+              Pay Deposit
+            </button>
+          ` : ""}
+
+          ${canCancelReservation(item) ? `
+            <button class="btn-small btn-cancel" onclick="cancelReservation(${item.id})">
+              Cancel Reservation
+            </button>
+          ` : ""}
+        </div>
+      </div>
+    `).join("");
+  }
+
+  async function loadReservations() {
+    reservationHistory.innerHTML = `<div class="loading-state">Loading your reservations...</div>`;
+
+    try {
+      const response = await fetch(RESERVATION_HISTORY_API, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        },
+        credentials: "include"
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = "/auth/login.html";
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Không tải được danh sách đặt bàn");
+      }
+
+      const data = await response.json();
+      renderReservations(data);
+    } catch (error) {
+      console.error("Load reservations error:", error);
+      reservationHistory.innerHTML = `
+        <div class="empty-state">
+          Không thể tải danh sách đặt bàn.
+        </div>
+      `;
+    }
+  }
+
+  window.payDeposit = payDeposit;
+  window.cancelReservation = cancelReservation;
+  window.loadReservations = loadReservations;
+
+  loadReservations();
+</script>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

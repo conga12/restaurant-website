@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Món Trước - RestaurantOS</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <style>
+        :root {
+          --bg: #081225;
+          --panel: #111c33;
+          --panel-2: #16233f;
+          --text: #f8fafc;
+          --muted: #94a3b8;
+          --accent: #22c55e;
+          --accent-2: #14b8a6;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --border: rgba(255,255,255,0.08);
+          --shadow: 0 12px 30px rgba(0,0,0,0.25);
+          --radius: 18px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+          margin: 0;
+          font-family: Arial, sans-serif;
+          background: var(--bg);
+          color: var(--text);
+        }
+
+        a {
+          text-decoration: none;
+          color: inherit;
+        }
+
+        .container {
+          width: min(1280px, 92%);
+          margin: 0 auto;
+        }
+
+        header {
+          border-bottom: 1px solid var(--border);
+          background: rgba(8, 18, 37, 0.95);
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+          width: min(1280px, 92%);
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1rem 0;
+          gap: 1rem;
+        }
+
+        .logo {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--accent-2);
+        }
+
+        nav {
+          display: flex;
+          gap: 1.2rem;
+          align-items: center;
+        }
+
+        nav a {
+          color: var(--muted);
+          transition: 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+          color: #fff;
+        }
+
+        .btn {
+          border: none;
+          border-radius: 12px;
+          padding: 0.85rem 1.1rem;
+          cursor: pointer;
+          font-weight: 600;
+          transition: 0.2s ease;
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, var(--accent-2), var(--accent));
+          color: white;
+        }
+
+        .btn-primary:hover {
+          transform: translateY(-1px);
+          opacity: 0.95;
+        }
+
+        .btn-outline {
+          background: transparent;
+          color: #fff;
+          border: 1px solid var(--border);
+        }
+
+        .hero {
+          padding: 3rem 0 1.5rem;
+          border-bottom: 1px solid var(--border);
+          background: radial-gradient(circle at top left, rgba(20,184,166,0.15), transparent 30%),
+                      radial-gradient(circle at top right, rgba(34,197,94,0.12), transparent 28%);
+        }
+
+        .hero h1 {
+          margin: 0 0 0.7rem;
+          font-size: 2.3rem;
+        }
+
+        .hero p {
+          margin: 0;
+          color: var(--muted);
+          max-width: 760px;
+          line-height: 1.7;
+        }
+
+        .page-section {
+          padding: 2rem 0 3rem;
+        }
+
+        .verify-panel,
+        .booking-info-panel,
+        .menu-panel,
+        .cart-panel {
+          background: var(--panel);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+        }
+
+        .verify-panel {
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .verify-title {
+          margin: 0 0 0.4rem;
+          font-size: 1.4rem;
+        }
+
+        .verify-desc {
+          color: var(--muted);
+          margin-bottom: 1rem;
+          line-height: 1.6;
+        }
+
+        .verify-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr auto;
+          gap: 1rem;
+          align-items: end;
+        }
+
+        .form-group label {
+          display: block;
+          margin-bottom: 0.45rem;
+          color: #e5e7eb;
+          font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+          width: 100%;
+          border-radius: 12px;
+          border: 1px solid var(--border);
+          background: #0b1529;
+          color: #fff;
+          padding: 0.9rem 1rem;
+          outline: none;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+          color: #64748b;
+        }
+
+        .verify-message {
+          margin-top: 1rem;
+          min-height: 1.2rem;
+          font-size: 0.95rem;
+        }
+
+        .verify-message.success { color: #4ade80; }
+        .verify-message.error { color: #f87171; }
+
+        .hidden {
+          display: none !important;
+        }
+
+        .booking-info-panel {
+          padding: 1.25rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .booking-info-panel h3 {
+          margin: 0 0 1rem;
+        }
+
+        .booking-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1rem;
+        }
+
+        .booking-card {
+          background: #0c162b;
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          padding: 1rem;
+        }
+
+        .booking-card span {
+          display: block;
+          font-size: 0.85rem;
+          color: var(--muted);
+          margin-bottom: 0.35rem;
+        }
+
+        .booking-card strong {
+          color: #fff;
+          font-size: 1rem;
+        }
+
+        .order-layout {
+          display: grid;
+          grid-template-columns: 1.6fr 0.9fr;
+          gap: 1.5rem;
+          align-items: start;
+        }
+
+        .panel-header {
+          padding: 1.2rem 1.2rem 0;
+        }
+
+        .panel-header h2,
+        .panel-header h3 {
+          margin: 0 0 0.35rem;
+        }
+
+        .panel-header p {
+          margin: 0;
+          color: var(--muted);
+          font-size: 0.95rem;
+        }
+
+        .filters {
+          display: grid;
+          grid-template-columns: 1fr 220px;
+          gap: 1rem;
+          padding: 1.2rem;
+        }
+
+        .menu-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1rem;
+          padding: 0 1.2rem 1.2rem;
+        }
+
+        .menu-card {
+          background: var(--panel-2);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          overflow: hidden;
+          transition: 0.25s ease;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .menu-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+        }
+
+        .menu-card img {
+          width: 100%;
+          height: 190px;
+          object-fit: cover;
+          display: block;
+        }
+
+        .menu-body {
+          padding: 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          flex: 1;
+        }
+
+        .menu-top {
+          display: flex;
+          justify-content: space-between;
+          gap: 1rem;
+          align-items: start;
+        }
+
+        .menu-top h4 {
+          margin: 0;
+          font-size: 1.05rem;
+        }
+
+        .price {
+          color: var(--accent);
+          font-weight: 700;
+          white-space: nowrap;
+        }
+
+        .badge {
+          display: inline-block;
+          padding: 0.35rem 0.6rem;
+          border-radius: 999px;
+          font-size: 0.78rem;
+          background: rgba(20,184,166,0.16);
+          color: #7dd3fc;
+          width: fit-content;
+        }
+
+        .menu-desc {
+          color: var(--muted);
+          font-size: 0.93rem;
+          line-height: 1.6;
+          min-height: 48px;
+        }
+
+        .menu-actions {
+          margin-top: auto;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0.8rem;
+        }
+
+        .menu-actions .btn {
+          flex: 1;
+        }
+
+        .cart-panel {
+          position: sticky;
+          top: 90px;
+          overflow: hidden;
+        }
+
+        .cart-content {
+          padding: 1.2rem;
+        }
+
+        .cart-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.9rem;
+          margin: 1rem 0 1.2rem;
+          max-height: 360px;
+          overflow-y: auto;
+          padding-right: 0.2rem;
+        }
+
+        .empty-cart {
+          color: var(--muted);
+          text-align: center;
+          padding: 1rem 0;
+          border: 1px dashed var(--border);
+          border-radius: 14px;
+          background: rgba(255,255,255,0.02);
+        }
+
+        .cart-item {
+          border: 1px solid var(--border);
+          background: #0c162b;
+          border-radius: 14px;
+          padding: 0.9rem;
+        }
+
+        .cart-item-top {
+          display: flex;
+          justify-content: space-between;
+          gap: 1rem;
+          align-items: start;
+        }
+
+        .cart-item-top h5 {
+          margin: 0;
+          font-size: 0.98rem;
+        }
+
+        .cart-item-price {
+          color: var(--accent);
+          font-weight: 700;
+        }
+
+        .cart-controls {
+          margin-top: 0.7rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.8rem;
+          flex-wrap: wrap;
+        }
+
+        .qty-box {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          background: var(--panel-2);
+          padding: 0.35rem;
+          border-radius: 999px;
+        }
+
+        .qty-btn {
+          width: 32px;
+          height: 32px;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          background: rgba(255,255,255,0.08);
+          color: #fff;
+          font-size: 1rem;
+        }
+
+        .qty-value {
+          min-width: 24px;
+          text-align: center;
+          font-weight: 700;
+        }
+
+        .remove-btn {
+          background: transparent;
+          color: var(--danger);
+          border: none;
+          cursor: pointer;
+          font-weight: 600;
+        }
+
+        .cart-note {
+          margin-top: 0.7rem;
+          min-height: 70px;
+          resize: vertical;
+        }
+
+        .summary-box {
+          background: #0c162b;
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          padding: 1rem;
+          display: grid;
+          gap: 0.65rem;
+          margin-bottom: 1rem;
+        }
+
+        .summary-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 1rem;
+          color: var(--muted);
+        }
+
+        .summary-row.total {
+          color: #fff;
+          font-size: 1.08rem;
+          font-weight: 700;
+          border-top: 1px solid var(--border);
+          padding-top: 0.8rem;
+          margin-top: 0.3rem;
+        }
+
+        .submit-btn {
+          width: 100%;
+        }
+
+        .small-note {
+          margin-top: 0.8rem;
+          color: var(--muted);
+          font-size: 0.88rem;
+          text-align: center;
+          line-height: 1.6;
+        }
+
+        footer {
+          border-top: 1px solid var(--border);
+          padding: 2rem 0;
+          color: var(--muted);
+          text-align: center;
+        }
+
+        @media (max-width: 1100px) {
+          .order-layout {
+            grid-template-columns: 1fr;
+          }
+
+          .cart-panel {
+            position: static;
+          }
+
+          .booking-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+
+        @media (max-width: 768px) {
+          nav {
+            display: none;
+          }
+
+          .menu-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .filters,
+          .verify-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .booking-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .hero h1 {
+            font-size: 1.8rem;
+          }
+        }
+        .payment-option-group {
+            margin: 1rem 0;
+        }
+
+            .payment-option-list {
+              display: flex;
+              flex-direction: column;
+              gap: 0.8rem;
+              margin-top: 0.6rem;
+            }
+
+            .payment-option-item {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+              padding: 0.9rem 1rem;
+              border: 1px solid var(--border);
+              border-radius: 12px;
+              background: #0c162b;
+              cursor: pointer;
+              color: #fff;
+              transition: 0.2s ease;
+            }
+
+            .payment-option-item:hover {
+              border-color: rgba(34, 197, 94, 0.5);
+              background: #13203a;
+            }
+
+            .payment-option-item input[type="radio"] {
+              margin: 0;
+              transform: scale(1.1);
+            }
+
+            .payment-option-item span {
+              font-weight: 500;
+              line-height: 1.4;
+            }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo">RestaurantOS</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="reservation.html">Reservations</a>
+            <a href="order.html" class="active">Order</a>
+            <a href="/user/reservation-history.html">My Bookings</a>
+            <a href="review.html">Reviews</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+        <button class="btn btn-primary" onclick="window.location.href='reservation.html'">Reserve Now</button>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <h1>Đặt Món Trước Theo Mã Đặt Bàn</h1>
+        <p>
+            Nhập mã đặt bàn và số điện thoại để xác minh. Sau khi đặt bàn đã được nhà hàng xác nhận,
+            bạn có thể chọn món trước để tiết kiệm thời gian khi đến.
+        </p>
+    </div>
+</section>
+
+<section class="page-section">
+    <div class="container">
+        <!-- VERIFY -->
+        <div class="verify-panel">
+            <h2 class="verify-title">Bước 1: Xác minh đặt bàn</h2>
+            <div class="verify-desc">
+                Chỉ những đặt bàn đã được xác nhận mới có thể đặt món trước.
+            </div>
+
+            <div class="verify-grid">
+                <div class="form-group">
+                    <label for="reservationIdInput">Mã đặt bàn *</label>
+                    <input type="number" id="reservationIdInput" placeholder="Ví dụ: 12">
+                </div>
+
+                <div class="form-group">
+                    <label for="customerPhoneInput">Số điện thoại *</label>
+                    <input type="text" id="customerPhoneInput" placeholder="Ví dụ: 0931366983">
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" id="verifyBtn" style="width:100%;">Xác minh</button>
+                </div>
+            </div>
+
+            <div id="verifyMessage" class="verify-message"></div>
+        </div>
+
+        <!-- BOOKING INFO -->
+        <div class="booking-info-panel hidden" id="bookingInfoPanel">
+            <h3>Thông tin đặt bàn đã xác minh</h3>
+            <div class="booking-grid">
+                <div class="booking-card">
+                    <span>Mã đặt bàn</span>
+                    <strong id="infoReservationId">-</strong>
+                </div>
+                <div class="booking-card">
+                    <span>Khách hàng</span>
+                    <strong id="infoCustomerName">-</strong>
+                </div>
+                <div class="booking-card">
+                    <span>Thời gian</span>
+                    <strong id="infoReservationTime">-</strong>
+                </div>
+                <div class="booking-card">
+                    <span>Bàn</span>
+                    <strong id="infoTableNumber">-</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORDER AREA -->
+        <div class="order-layout hidden" id="orderLayout">
+            <!-- LEFT -->
+            <div class="menu-panel">
+                <div class="panel-header">
+                    <h2>Chọn món</h2>
+                    <p>Tìm kiếm và thêm món ăn vào giỏ hàng của bạn.</p>
+                </div>
+
+                <div class="filters">
+                    <div class="form-group" style="margin:0;">
+                        <input type="text" id="searchInput" placeholder="Tìm món ăn theo tên...">
+                    </div>
+
+                    <div class="form-group" style="margin:0;">
+                        <select id="categoryFilter">
+                            <option value="all">Tất cả danh mục</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="menu-grid" id="menuGrid"></div>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="cart-panel">
+                <div class="panel-header">
+                    <h3>Giỏ món ăn</h3>
+                    <p>Kiểm tra lại món đã chọn trước khi gửi order.</p>
+                </div>
+
+                <div class="cart-content">
+                    <div class="form-group">
+                        <label for="orderNote">Ghi chú chung cho đơn hàng</label>
+                        <textarea id="orderNote" placeholder="Ví dụ: lên món sớm, ít cay..."></textarea>
+                    </div>
+
+                    <div class="cart-list" id="cartList">
+                        <div class="empty-cart">Chưa có món nào trong giỏ.</div>
+                    </div>
+
+                    <div class="summary-box">
+                        <div class="summary-row">
+                            <span>Số món</span>
+                            <span id="totalItems">0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tạm tính</span>
+                            <span id="subTotal">0 đ</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Tổng cộng</span>
+                            <span id="grandTotal">0 đ</span>
+                        </div>
+                    </div>
+                    <div class="form-group payment-option-group">
+                        <label>Hình thức thanh toán</label>
+
+                        <div class="payment-option-list">
+                            <label class="payment-option-item">
+                                <input type="radio" name="paymentOption" value="PAY_AT_RESTAURANT" checked>
+                                <span>Thanh toán tại quán</span>
+                            </label>
+
+                            <label class="payment-option-item">
+                                <input type="radio" name="paymentOption" value="PAY_NOW">
+                                <span>Thanh toán bằng VNPAY</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary submit-btn" id="submitOrderBtn">Gửi order</button>
+
+                    <div class="small-note">
+                        Order này sẽ được gắn trực tiếp với mã đặt bàn của bạn.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="orderDetailContent">
+                    Đang tải...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        © 2024 RestaurantOS. All rights reserved.
+    </div>
+</footer>
+
+<script src="assets/js/order.js"></script>
+</body>
+</html>

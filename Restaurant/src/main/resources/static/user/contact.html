@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact RestaurantOS">
+  <title>Contact - RestaurantOS</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- ============================================
+       HEADER & NAVIGATION
+       ============================================ -->
+  <header>
+    <div class="header-container">
+      <div class="logo">RestaurantOS</div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="reservation.html">Reservations</a>
+        <a href="/user/reservation-history.html">My Bookings</a>
+        <a href="review.html">Reviews</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================
+       HERO SECTION
+       ============================================ -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Get In Touch</h1>
+      <p>We'd love to hear from you. Contact us with any questions.</p>
+    </div>
+  </section>
+
+  <!-- ============================================
+       CONTACT SECTION
+       ============================================ -->
+  <section class="container">
+    <div class="grid grid-2">
+      <!-- Contact Form -->
+      <div>
+        <div class="section-title" style="text-align: left;">
+          <h2>Send us a Message</h2>
+        </div>
+
+        <div class="card" style="padding: 2rem;">
+          <form id="contactForm">
+            <!-- Name -->
+            <div class="form-group">
+              <label for="contact-name">Full Name *</label>
+              <input type="text" id="contact-name" name="name" required placeholder="John Doe">
+              <div class="form-error"></div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label for="contact-email">Email Address *</label>
+              <input type="email" id="contact-email" name="email" required placeholder="john@example.com">
+              <div class="form-error"></div>
+            </div>
+
+            <!-- Subject -->
+            <div class="form-group">
+              <label for="contact-subject">Subject *</label>
+              <select id="contact-subject" name="subject" required>
+                <option value="">Select a subject</option>
+                <option value="reservation">Reservation Inquiry</option>
+                <option value="event">Event Hosting</option>
+                <option value="catering">Catering Services</option>
+                <option value="feedback">Feedback</option>
+                <option value="job">Career Opportunities</option>
+                <option value="other">Other</option>
+              </select>
+              <div class="form-error"></div>
+            </div>
+
+            <!-- Message -->
+            <div class="form-group">
+              <label for="contact-message">Message *</label>
+              <textarea id="contact-message" name="message" required placeholder="Your message here..." style="min-height: 150px;"></textarea>
+              <div class="form-error"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Send Message</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div>
+        <div class="section-title" style="text-align: left;">
+          <h2>Contact Information</h2>
+        </div>
+
+        <!-- Address Card -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <h4 style="color: var(--color-accent); display: flex; align-items: center; gap: 0.5rem;">📍 Address</h4>
+          <p style="margin: 0;">
+            RestaurantOS<br>
+            123 Gourmet Street<br>
+            Food City, FC 12345
+          </p>
+        </div>
+
+        <!-- Phone Card -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <h4 style="color: var(--color-accent); display: flex; align-items: center; gap: 0.5rem;">📞 Phone</h4>
+          <p style="margin: 0;">
+            <a href="tel:+1234567890">(123) 456-7890</a><br>
+            <span style="font-size: 0.9rem; color: #999;">Available during business hours</span>
+          </p>
+        </div>
+
+        <!-- Email Card -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <h4 style="color: var(--color-accent); display: flex; align-items: center; gap: 0.5rem;">✉️ Email</h4>
+          <p style="margin: 0;">
+            <a href="mailto:info@restaurantos.com">info@restaurantos.com</a><br>
+            <a href="mailto:reservations@restaurantos.com">reservations@restaurantos.com</a>
+          </p>
+        </div>
+
+        <!-- Hours Card -->
+        <div class="card" style="background-color: var(--color-light-gray);">
+          <h4 style="color: var(--color-accent); display: flex; align-items: center; gap: 0.5rem;">⏰ Hours of Operation</h4>
+          <p style="margin: 0;">
+            <strong>Monday - Thursday:</strong><br>5:00 PM - 10:00 PM<br><br>
+            <strong>Friday - Saturday:</strong><br>5:00 PM - 11:00 PM<br><br>
+            <strong>Sunday:</strong><br>5:00 PM - 9:00 PM<br><br>
+            <strong>Closed:</strong> Select Mondays (except holidays)
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       DEPARTMENTS SECTION
+       ============================================ -->
+  <section class="container">
+    <div class="section-title">
+      <h2>Departments</h2>
+      <p>Contact the right department for your needs</p>
+    </div>
+
+    <div class="grid grid-3">
+      <!-- Reservations -->
+      <div class="card">
+        <h3 style="color: var(--color-accent);">Reservations</h3>
+        <p>For booking tables and special events</p>
+        <p><strong>📞</strong> <a href="tel:+1234567890">(123) 456-7890</a></p>
+        <p><strong>✉️</strong> <a href="mailto:reservations@restaurantos.com">reservations@restaurantos.com</a></p>
+        <p style="font-size: 0.9rem; color: #999;">Open during service hours</p>
+      </div>
+
+      <!-- Kitchen/Chef -->
+      <div class="card">
+        <h3 style="color: var(--color-accent);">Chef's Office</h3>
+        <p>For inquiries about our menu and catering</p>
+        <p><strong>📞</strong> <a href="tel:+1234567891">(123) 456-7891</a></p>
+        <p><strong>✉️</strong> <a href="mailto:chef@restaurantos.com">chef@restaurantos.com</a></p>
+        <p style="font-size: 0.9rem; color: #999;">Monday - Friday, 2:00 PM - 5:00 PM</p>
+      </div>
+
+      <!-- General -->
+      <div class="card">
+        <h3 style="color: var(--color-accent);">General Inquiries</h3>
+        <p>For all other questions and feedback</p>
+        <p><strong>📞</strong> <a href="tel:+1234567890">(123) 456-7890</a></p>
+        <p><strong>✉️</strong> <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
+        <p style="font-size: 0.9rem; color: #999;">We typically respond within 24 hours</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FAQ SECTION
+       ============================================ -->
+  <section class="container" style="background-color: var(--color-light-gray); padding: 4rem 2rem; margin: 2rem 0;">
+    <div class="section-title">
+      <h2>Frequently Asked Questions</h2>
+      <p>Find answers to common questions</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <h4 style="color: var(--color-primary);">Can I make a reservation online?</h4>
+        <p style="margin: 0;">Yes! You can book your table directly through our <a href="reservation.html">online reservation system</a>. We also accept phone reservations for large parties.</p>
+      </div>
+
+      <div class="card">
+        <h4 style="color: var(--color-primary);">Do you accommodate dietary restrictions?</h4>
+        <p style="margin: 0;">Absolutely! We accommodate dietary restrictions, allergies, and special requests. Please mention them when making your reservation so our chefs can prepare accordingly.</p>
+      </div>
+
+      <div class="card">
+        <h4 style="color: var(--color-primary);">Is private dining available?</h4>
+        <p style="margin: 0;">Yes, we offer private dining rooms for special events. Please contact our reservations team at (123) 456-7890 for more information and availability.</p>
+      </div>
+
+      <div class="card">
+        <h4 style="color: var(--color-primary);">What is your cancellation policy?</h4>
+        <p style="margin: 0;">Cancellations must be made at least 24 hours in advance to receive a full refund of any deposit. Tables are held for 15 minutes past reservation time.</p>
+      </div>
+
+      <div class="card">
+        <h4 style="color: var(--color-primary);">Do you offer catering services?</h4>
+        <p style="margin: 0;">Yes! We provide catering services for corporate events, weddings, and special occasions. Contact our chef's office for a custom quote.</p>
+      </div>
+
+      <div class="card">
+        <h4 style="color: var(--color-primary);">Do you have a dress code?</h4>
+        <p style="margin: 0;">We recommend smart casual or business attire. For special events, please check with us directly. Jackets are suggested but not required.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>RestaurantOS</h4>
+        <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+        <div class="social-links">
+          <a href="#facebook" title="Facebook">f</a>
+          <a href="#twitter" title="Twitter">𝕏</a>
+          <a href="#instagram" title="Instagram">📷</a>
+          <a href="#youtube" title="YouTube">▶️</a>
+        </div>
+      </div>
+
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="reservation.html">Reservations</a>
+        <a href="review.html">Reviews</a>
+        <a href="contact.html">Contact</a>
+      </div>
+
+      <div class="footer-section">
+        <h4>Hours of Operation</h4>
+        <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
+        <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
+        <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
+        <p><strong>Closed:</strong> Mondays (except holidays)</p>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contact Info</h4>
+        <p>📍 123 Gourmet Street, Food City, FC 12345</p>
+        <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
+        <p>✉️ <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
+        <p>🌐 www.restaurantos.com</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Bàn - RestaurantOS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/admin/assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="bi bi-shop"></i>
+                <span>RestaurantOS</span>
+            </div>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a href="/admin/index.html" class="nav-link">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/category.html" class="nav-link">
+                    <i class="bi bi-folder-fill"></i>
+                    <span>Danh mục</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/product.html" class="nav-link">
+                    <i class="bi bi-cup-hot-fill"></i>
+                    <span>Món ăn</span>
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a href="/admin/forms/table.html" class="nav-link">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                    <span>Bàn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/reservation.html" class="nav-link">
+                    <i class="bi bi-calendar-check-fill"></i>
+                    <span>Đặt bàn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/order.html" class="nav-link">
+                    <i class="bi bi-receipt"></i>
+                    <span>Đơn hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/payment.html" class="nav-link">
+                    <i class="bi bi-credit-card-fill"></i>
+                    <span>Thanh toán</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/user.html" class="nav-link">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Người dùng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/review.html" class="nav-link">
+                    <i class="bi bi-star-fill"></i>
+                    <span>Đánh giá</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/auth/login.html" class="nav-link text-danger">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Đăng xuất</span>
+            </a>
+        </div>
+    </nav>
+
+    <div id="content" class="content">
+        <nav class="topbar">
+            <button id="sidebarToggle" class="btn btn-link">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Tìm kiếm...">
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-icon">
+                    <i class="bi bi-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <div class="dropdown">
+                    <button class="btn user-dropdown" data-bs-toggle="dropdown">
+                        <div class="avatar">AD</div>
+                        <span>Admin</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Cài đặt</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/auth/login.html"><i class="bi bi-box-arrow-left"></i> Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="page-content">
+            <div class="page-title-box">
+                <div class="page-title-left">
+                    <h1>Quản lý Bàn</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/admin/index.html">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Bàn</li>
+                        </ol>
+                    </nav>
+                </div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tableModal" onclick="openCreateTableModal()">
+                    <i class="bi bi-plus-lg me-1"></i> Thêm bàn
+                </button>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card stat-card-success">
+                        <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h3 id="availableCount">0</h3>
+                            <p>Bàn trống</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-card-warning">
+                        <div class="stat-icon"><i class="bi bi-people"></i></div>
+                        <div class="stat-info">
+                            <h3 id="occupiedCount">0</h3>
+                            <p>Có khách</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-card-info">
+                        <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <h3 id="reservedCount">0</h3>
+                            <p>Đã đặt trước</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-card-primary">
+                        <div class="stat-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalCount">0</h3>
+                            <p>Tổng số bàn</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Sơ đồ bàn</h5>
+                    <div class="table-legend">
+                        <span class="legend-item"><span class="dot available"></span> Trống</span>
+                        <span class="legend-item"><span class="dot occupied"></span> Có khách</span>
+                        <span class="legend-item"><span class="dot reserved"></span> Đã đặt</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-grid" id="tableGrid"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5>Danh sách bàn</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                            <tr>
+                                <th>Số bàn</th>
+                                <th>Loại bàn</th>
+                                <th>Số chỗ</th>
+                                <th>Khu vực</th>
+                                <th>Trạng thái</th>
+                                <th style="width: 120px;">Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tableListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="tableModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm bàn mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="tableForm">
+                    <input type="hidden" id="tableId">
+
+                    <div class="mb-3">
+                        <label class="form-label">Số bàn <span class="text-danger">*</span></label>
+                        <input type="number" id="tableNumber" class="form-control" required placeholder="VD: 13">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Số chỗ ngồi <span class="text-danger">*</span></label>
+                        <select id="capacity" class="form-select" required>
+                            <option value="">Chọn số chỗ</option>
+                            <option value="2">2 chỗ</option>
+                            <option value="4">4 chỗ</option>
+                            <option value="6">6 chỗ</option>
+                            <option value="8">8 chỗ</option>
+                            <option value="10">10 chỗ</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Loại bàn <span class="text-danger">*</span></label>
+                        <select id="tableType" class="form-select" required>
+                            <option value="STANDARD">Bàn thường</option>
+                            <option value="VIP">Bàn VIP</option>
+                            <option value="PRIVATE_ROOM">Phòng riêng</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Khu vực</label>
+                        <input type="text" id="location" class="form-control" placeholder="VD: Tầng 1 - Khu A">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select id="status" class="form-select">
+                            <option value="AVAILABLE">Trống</option>
+                            <option value="OCCUPIED">Có khách</option>
+                            <option value="RESERVED">Đã đặt trước</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveTable()">Lưu bàn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/assets/js/main.js"></script>
+<script src="/admin/assets/js/table.js"></script>
+</body>
+</html>
