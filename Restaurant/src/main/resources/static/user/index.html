@@ -6,6 +6,7 @@
   <meta name="description" content="RestaurantOS - Premium dining experience with online reservation and menu browsing">
   <title>RestaurantOS - Premium Fine Dining</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/global-style.css">
 </head>
 <body>
   <!-- ============================================
@@ -251,94 +252,11 @@
         <p>🌐 www.restaurantos.com</p>
       </div>
     </div>
-    <div id="chatbotBox" style="position:fixed;bottom:20px;right:20px;width:320px;background:#fff;border:1px solid #ddd;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.15);overflow:hidden;z-index:9999;">
-      <div style="background:#0f172a;color:#fff;padding:12px 14px;font-weight:700;">
-        Chatbot nhà hàng
-      </div>
-
-      <div id="chatMessages" style="height:300px;overflow-y:auto;padding:12px;background:#f8fafc;">
-        <div style="margin-bottom:10px;">
-          <div style="display:inline-block;background:#e2e8f0;padding:8px 10px;border-radius:10px;">
-            Xin chào, tôi có thể hỗ trợ đặt bàn và menu cho bạn.
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex;border-top:1px solid #eee;">
-        <input id="chatInput" type="text" placeholder="Nhập tin nhắn..." style="flex:1;border:none;padding:12px;outline:none;">
-        <button onclick="sendChatMessage()" style="border:none;background:#0f172a;color:#fff;padding:0 16px;cursor:pointer;">
-          Gửi
-        </button>
-      </div>
-    </div>
     <div class="footer-bottom">
       <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
     </div>
   </footer>
-  <script>
-    function appendMessage(text, sender) {
-      const chatMessages = document.getElementById("chatMessages");
-      const wrapper = document.createElement("div");
-      wrapper.style.marginBottom = "10px";
-      wrapper.style.textAlign = sender === "user" ? "right" : "left";
-
-      const bubble = document.createElement("div");
-      bubble.style.display = "inline-block";
-      bubble.style.padding = "8px 10px";
-      bubble.style.borderRadius = "10px";
-      bubble.style.maxWidth = "80%";
-      bubble.style.whiteSpace = "pre-wrap";
-      bubble.textContent = text;
-
-      if (sender === "user") {
-        bubble.style.background = "#0f172a";
-        bubble.style.color = "#fff";
-      } else {
-        bubble.style.background = "#e2e8f0";
-        bubble.style.color = "#111";
-      }
-
-      wrapper.appendChild(bubble);
-      chatMessages.appendChild(wrapper);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    async function sendChatMessage() {
-      const input = document.getElementById("chatInput");
-      const message = input.value.trim();
-
-      if (!message) return;
-
-      appendMessage(message, "user");
-      input.value = "";
-
-      try {
-        const res = await fetch("/api/ai/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ message })
-        });
-
-        if (!res.ok) {
-          appendMessage("Xin lỗi, chatbot đang bận.", "bot");
-          return;
-        }
-
-        const data = await res.json();
-        appendMessage(data.reply || "Xin lỗi, tôi chưa trả lời được.", "bot");
-      } catch (e) {
-        appendMessage("Có lỗi kết nối tới chatbot.", "bot");
-      }
-    }
-
-    document.getElementById("chatInput").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        sendChatMessage();
-      }
-    });
-  </script>
+  <script src="assets/js/chatbot.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>
