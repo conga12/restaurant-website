@@ -39,8 +39,6 @@ public class User {
     public User() {
     }
 
-
-
     public Long getId() {
         return id;
     }
@@ -95,5 +93,23 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    // ← THÊM 2 METHOD NÀY CHO OAUTH2
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", role=" + role +
+                ", createdAt=" + createdAt +
+                '}';
+    }
+
+    // ← Method này để check user
+    public boolean isActive() {
+        return this.id != null;
     }
 }
