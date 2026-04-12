@@ -8,14 +8,16 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    // ← THÊM: Tìm user by email
     Optional<User> findByEmail(String email);
 
-    // Check if email exists
+    // ← THÊM: Tìm user by username
+    Optional<User> findByUsername(String username);
+
+    // ← THÊM: Check email tồn tại
     boolean existsByEmail(String email);
 
-    // Check if username exists
+    // ← THÊM: Check username tồn tại
     boolean existsByUsername(String username);
-
-    // Find by username
-    User findByUsername(String username);
 }

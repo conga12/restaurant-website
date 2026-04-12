@@ -42,4 +42,5 @@ public interface EmailService {
                                      String reservationDate,
                                      String reservationTime,
                                      java.math.BigDecimal depositAmount);
+    void sendPasswordResetEmail(String to, String resetLink);
 }

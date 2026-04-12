@@ -1,8 +1,8 @@
 package com.tt.Restaurant.service;
 
 import com.tt.Restaurant.model.User;
-
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     List<User> getAllUsers();
@@ -12,5 +12,10 @@ public interface UserService {
     void deleteUser(Long id);
 
     User register(User user) throws Exception;
-}
 
+    // ← THÊM: Tìm user by email
+    Optional<User> findByEmail(String email);
+
+    // ← THÊM: Tìm user by username
+    Optional<User> findByUsername(String username);
+}

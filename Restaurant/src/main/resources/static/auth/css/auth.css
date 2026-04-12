@@ -373,3 +373,8 @@ body {
         height: 80px;
     }
 }
+.page-register .login-card{
+   padding-bottom: 30px;
+   margin-top: 20px;
+   box-sizing: border-box;
+}

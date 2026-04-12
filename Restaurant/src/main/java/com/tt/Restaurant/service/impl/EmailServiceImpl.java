@@ -118,4 +118,19 @@ public class EmailServiceImpl implements EmailService {
         );
         mailSender.send(message);
     }
+    @Override
+    public void sendPasswordResetEmail(String to, String resetLink) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Reset mật khẩu - RestaurantOS");
+        message.setText(
+                "Xin chào,\n\n" +
+                        "Bạn vừa yêu cầu đặt lại mật khẩu.\n\n" +
+                        "Vui lòng mở link sau để đặt mật khẩu mới (hết hạn sau 15 phút):\n" +
+                        resetLink + "\n\n" +
+                        "Nếu bạn không yêu cầu, hãy bỏ qua email này.\n\n" +
+                        "Trân trọng."
+        );
+        mailSender.send(message);
+    }
 }

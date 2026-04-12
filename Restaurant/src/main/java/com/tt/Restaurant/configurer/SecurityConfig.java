@@ -113,68 +113,42 @@ public class SecurityConfig {
                             }
                         })
                         .failureHandler((request, response, exception) -> {
-                            String errorMessage = "Đăng nhập thất bại!";
-                            String errorCode = "UNKNOWN";
-
-                            System.out.println("======== OAUTH2 FAILURE HANDLER ========");
-                            System.out.println("Exception class: " + exception.getClass().getName());
-                            System.out.println("Exception message: " + exception.getMessage());
-                            if (exception.getCause() != null) {
-                                System.out.println("Exception cause: " + exception.getCause().getMessage());
-                            }
-
-                            // ← Priority 1: Parse từ exception.getMessage()
-                            if (exception.getMessage() != null && !exception.getMessage().isEmpty()) {
-                                String fullMsg = exception.getMessage();
-                                System.out.println("Full message from exception: " + fullMsg);
-
-                                if (fullMsg.contains("|")) {
-                                    String[] parts = fullMsg.split("\\|", 2);
-                                    errorMessage = parts[0].trim();
-                                    errorCode = parts[1].trim();
-                                    System.out.println("Parsed - Message: " + errorMessage + ", Code: " + errorCode);
-                                } else {
-                                    errorMessage = fullMsg;
-                                    System.out.println("No code separator found, using full message: " + errorMessage);
-                                }
-                            }
-
-                            // ← Priority 2: Check cause
-                            if (errorMessage.equals("Đăng nhập thất bại!") && exception.getCause() != null) {
-                                String causeMsg = exception.getCause().getMessage();
-                                System.out.println("Checking cause: " + causeMsg);
-                                if (causeMsg != null && !causeMsg.isEmpty()) {
-                                    if (causeMsg.contains("|")) {
-                                        String[] parts = causeMsg.split("\\|", 2);
-                                        errorMessage = parts[0].trim();
-                                        errorCode = parts[1].trim();
-                                    } else {
-                                        errorMessage = causeMsg;
-                                    }
-                                }
-                            }
-
-                            System.out.println("Final - Error Message: " + errorMessage);
-                            System.out.println("Final - Error Code: " + errorCode);
                             String mode = (String) request.getSession().getAttribute("oauth2_mode");
-                            System.out.println("Mode: " + mode);
-                            System.out.println("========================================");
+
+                            // Default message theo mode
+                            String errorMessage = "register".equals(mode)
+                                    ? "Đăng ký thất bại!"
+                                    : "Đăng nhập thất bại!";
+
+                            // LẤY MESSAGE TỪ SESSION DO CustomOAuth2UserService SET
+                            String sessionMessage = (String) request.getSession().getAttribute("oauth2_error_message");
+                            if (sessionMessage != null && !sessionMessage.isBlank()) {
+                                errorMessage = sessionMessage;
+                                request.getSession().removeAttribute("oauth2_error_message");
+                                request.getSession().removeAttribute("oauth2_error_code");
+                            }
 
                             try {
-                                String encodedError = java.net.URLEncoder.encode(errorMessage, "UTF-8");
+                                String encodedError = java.net.URLEncoder.encode(
+                                        errorMessage,
+                                        java.nio.charset.StandardCharsets.UTF_8
+                                );
 
+                                // QUAN TRỌNG: dùng chung param `error` cho cả login & register
                                 if ("register".equals(mode)) {
-                                    String redirectUrl = "/auth/register.html?oauth2_error=" + encodedError + "&code=" + errorCode;
-                                    System.out.println("Redirect to: " + redirectUrl);
-                                    response.sendRedirect(redirectUrl);
+                                    response.sendRedirect("/auth/register.html?error=" + encodedError);
                                 } else {
-                                    String redirectUrl = "/auth/login.html?oauth2_error=" + encodedError + "&code=" + errorCode;
-                                    System.out.println("Redirect to: " + redirectUrl);
-                                    response.sendRedirect(redirectUrl);
+                                    response.sendRedirect("/auth/login.html?error=" + encodedError);
                                 }
                             } catch (Exception e) {
-                                e.printStackTrace();
-                                response.sendRedirect("/auth/login.html?error=true");
+                                if ("register".equals(mode)) {
+                                    response.sendRedirect("/auth/register.html?error=Đăng%20ký%20thất%20bại");
+                                } else {
+                                    response.sendRedirect("/auth/login.html?error=Đăng%20nhập%20thất%20bại");
+                                }
+                            } finally {
+                                // dọn để tránh dính mode cũ sang lần sau
+                                request.getSession().removeAttribute("oauth2_mode");
                             }
                         })
                 )

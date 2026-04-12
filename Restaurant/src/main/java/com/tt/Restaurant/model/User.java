@@ -5,7 +5,10 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "User")
+@Table(name = "User", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email", name = "uk_user_email"),
+        @UniqueConstraint(columnNames = "username", name = "uk_user_username")
+})
 public class User {
 
     public enum Role {
@@ -16,7 +19,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)  // ← THÊM: unique = true
     private String username;
 
     @Column(nullable = false, unique = true, length = 100)
@@ -95,7 +98,6 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    // ← THÊM 2 METHOD NÀY CHO OAUTH2
     @Override
     public String toString() {
         return "User{" +
@@ -108,7 +110,6 @@ public class User {
                 '}';
     }
 
-    // ← Method này để check user
     public boolean isActive() {
         return this.id != null;
     }

@@ -15,6 +15,9 @@
             right: 20px;
             z-index: 9999;
             max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .toast {
@@ -22,49 +25,24 @@
             border-left: 4px solid #ef4444;
             border-radius: 8px;
             padding: 16px 20px;
-            margin-bottom: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             animation: slideIn 0.3s ease-out;
             display: flex;
             align-items: center;
             gap: 12px;
+            min-width: 300px;
+            max-width: 400px;
         }
 
-        .toast.success {
-            border-left-color: #22c55e;
-        }
+        .toast.success { border-left-color: #22c55e; }
+        .toast.error { border-left-color: #ef4444; }
+        .toast.warning { border-left-color: #f59e0b; }
+        .toast.info { border-left-color: #3b82f6; }
 
-        .toast.error {
-            border-left-color: #ef4444;
-        }
-
-        .toast.warning {
-            border-left-color: #f59e0b;
-        }
-
-        .toast.info {
-            border-left-color: #3b82f6;
-        }
-
-        .toast-icon {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .toast-content {
-            flex: 1;
-        }
-
-        .toast-title {
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-
-        .toast-message {
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
+        .toast-icon { font-size: 20px; flex-shrink: 0; }
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: 600; color: #1f2937; margin-bottom: 4px; }
+        .toast-message { color: #6b7280; font-size: 0.9rem; word-wrap: break-word; }
 
         .toast-close {
             background: none;
@@ -76,30 +54,16 @@
             padding: 0;
         }
 
-        .toast-close:hover {
-            color: #4b5563;
-        }
+        .toast-close:hover { color: #4b5563; }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
         }
 
         .toast.removing {
@@ -111,7 +75,17 @@
                 left: 12px;
                 right: 12px;
                 max-width: none;
+                top: 10px;
             }
+
+            .toast {
+                min-width: auto;
+                max-width: 100%;
+                padding: 12px 16px;
+            }
+
+            .toast-title { font-size: 0.9rem; }
+            .toast-message { font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -138,16 +112,11 @@
 
         <!-- Login Form -->
         <form action="/login" method="post" id="loginForm">
-            <!-- Username Input -->
+            <!-- Email/Username Input -->
             <div class="form-group">
                 <div class="input-wrapper">
-                    <i class="bi bi-person-circle"></i>
-                    <input
-                            type="email"
-                            name="username"
-                            placeholder="Username"
-                            required
-                    >
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" name="username" placeholder="Email" required>
                 </div>
             </div>
 
@@ -155,18 +124,8 @@
             <div class="form-group">
                 <div class="input-wrapper">
                     <i class="bi bi-lock"></i>
-                    <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Password"
-                            required
-                    >
-                    <button
-                            type="button"
-                            class="toggle-password"
-                            onclick="togglePassword()"
-                    >
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
                         <i class="bi bi-eye" id="toggleIcon"></i>
                     </button>
                 </div>
@@ -182,15 +141,11 @@
             </div>
 
             <!-- Login Button -->
-            <button type="submit" class="btn-login">
-                Login
-            </button>
+            <button type="submit" class="btn-login">Login</button>
         </form>
 
         <!-- Divider -->
-        <div class="divider">
-            <span>hoặc</span>
-        </div>
+        <div class="divider"><span>hoặc</span></div>
 
         <!-- Google OAuth Form -->
         <form id="googleForm" action="/auth/oauth2/login" method="post">
@@ -209,12 +164,15 @@
 <script>
     function showToast(title, message, type = 'error', duration = 5000) {
         const toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) return;
+
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
 
         let icon = '❌';
         if (type === 'success') icon = '✅';
-        if (type === 'warning') icon = '⚠️';  // ← THÊM: Warning icon
+        if (type === 'warning') icon = '⚠️';
+        if (type === 'info') icon = 'ℹ️';
 
         toast.innerHTML = `
             <div class="toast-icon">${icon}</div>
@@ -222,9 +180,8 @@
                 <div class="toast-title">${title}</div>
                 <div class="toast-message">${message}</div>
             </div>
-            <button class="toast-close" onclick="this.parentElement.remove()">
-                <i class="bi bi-x"></i>
-            </button>
+            <button class="toast-close" type="button" aria-label="Close"
+                    onclick="this.closest('.toast').remove()">×</button>
         `;
 
         toastContainer.appendChild(toast);
@@ -238,6 +195,7 @@
     function togglePassword() {
         const password = document.getElementById('password');
         const icon = document.getElementById('toggleIcon');
+        if (!password || !icon) return;
 
         if (password.type === 'password') {
             password.type = 'text';
@@ -253,24 +211,63 @@
     document.addEventListener('DOMContentLoaded', function() {
         const params = new URLSearchParams(window.location.search);
 
-        if (params.has('oauth2_error')) {
-            const error = decodeURIComponent(params.get('oauth2_error'));
-            const code = params.get('code') || 'UNKNOWN';
+        const rawMessage = params.get('message');
+        const rawError = params.get('error');
+        const rawOauth2Error = params.get('oauth2_error');
+        const code = params.get('code') || 'UNKNOWN';
 
-            // ← THÊM: Phân biệt message theo error code
+        // show once per value (tránh dính history.state từ lần trước)
+        const toastKey = `toast_shown_${rawMessage || rawError || rawOauth2Error || (params.has('logout') ? 'logout' : '')}`;
+        const alreadyShown = sessionStorage.getItem(toastKey) === '1';
+        if (alreadyShown) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return;
+        }
+
+        if (rawMessage === 'register_success') {
+            showToast('Thành công', 'Đăng ký thành công! Vui lòng đăng nhập.', 'success', 3000);
+            sessionStorage.setItem(toastKey, '1');
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return;
+        }
+
+        if (rawMessage === 'reset_success') {
+            showToast('Thành công', 'Đổi mật khẩu thành công! Vui lòng đăng nhập.', 'success', 3000);
+            sessionStorage.setItem(toastKey, '1');
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return;
+        }
+
+        if (rawOauth2Error) {
+            const error = decodeURIComponent(rawOauth2Error);
+
             if (code === 'LOGIN_EMAIL_NOT_FOUND') {
                 showToast('Tài khoản không tồn tại', error, 'warning', 5000);
             } else {
                 showToast('Đăng nhập thất bại', error, 'error', 5000);
             }
 
+            sessionStorage.setItem(toastKey, '1');
             window.history.replaceState({}, document.title, window.location.pathname);
-        } else if (params.has('error')) {
-            showToast('Đăng nhập thất bại', 'Email hoặc mật khẩu không đúng.', 'error', 5000);
+            return;
+        }
+
+        if (rawError) {
+            // nếu error là chuỗi encode từ failure handler thì decode; nếu chỉ ?error thì fallback
+            const err = rawError === 'true' ? 'Email hoặc mật khẩu không đúng.' : decodeURIComponent(rawError);
+            showToast('Đăng nhập thất bại', err, 'error', 5000);
+
+            sessionStorage.setItem(toastKey, '1');
             window.history.replaceState({}, document.title, window.location.pathname);
-        } else if (params.has('logout')) {
+            return;
+        }
+
+        if (params.has('logout')) {
             showToast('Đăng xuất thành công', 'Bạn đã đăng xuất khỏi tài khoản.', 'success', 3000);
+
+            sessionStorage.setItem(toastKey, '1');
             window.history.replaceState({}, document.title, window.location.pathname);
+            return;
         }
     });
 </script>
