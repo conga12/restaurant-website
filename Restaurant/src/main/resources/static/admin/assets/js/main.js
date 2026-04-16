@@ -10,6 +10,119 @@ const ORDER_UNREAD_URL = "/admin/api/orders/unread-count";
 let lastReservationUnreadCount = 0;
 let lastOrderUnreadCount = 0;
 
+// ===============================
+// Role/Modules-based UI (STAFF)
+// ===============================
+
+const ALL_ADMIN_MODULES = [
+    "DASHBOARD", "CATEGORY", "DISH", "TABLE",
+    "RESERVATION", "ORDER", "PAYMENT", "USER", "REVIEW"
+];
+
+// module -> href trong sidebar
+const MODULE_TO_HREF = {
+  DASHBOARD: "/admin/index.html",
+  CATEGORY: "/admin/forms/category.html",
+  DISH: "/admin/forms/product.html",
+  TABLE: "/admin/forms/table.html",
+  RESERVATION: "/admin/forms/reservation.html",
+  ORDER: "/admin/forms/order.html",
+  PAYMENT: "/admin/forms/payment.html",
+  //USER: "/admin/forms/user.html",
+  REVIEW: "/admin/forms/review.html"
+};
+function normalizeModuleList(modules) {
+    if (!Array.isArray(modules)) return [];
+    return modules
+        .map(m => String(m || "").trim().toUpperCase())
+        .filter(Boolean);
+}
+
+function hideNavItemByHref(href) {
+    const link = document.querySelector(`#sidebar a.nav-link[href="${href}"]`);
+    const navItem = link?.closest("li.nav-item");
+    if (navItem) navItem.style.display = "none";
+}
+
+function getCurrentAdminPageName() {
+    const path = window.location.pathname;
+    return path.split("/").pop() || "index.html";
+}
+
+function redirectStaffToFirstAllowed(modulesSet) {
+    const priority = ["RESERVATION", "ORDER", "TABLE", "PAYMENT", "DASHBOARD"];
+    const first = priority.find(m => modulesSet.has(m));
+    if (!first) return;
+
+    const href = MODULE_TO_HREF[first];
+    if (!href) return;
+
+    window.location.href = href; // ✅ đi thẳng, khỏi /admin/forms/...
+}
+
+async function applyModulesUI() {
+    try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok) return;
+
+        const me = await res.json();
+        const role = me?.role || "ROLE_CUSTOMER";
+
+        // ADMIN: hiển thị hết
+        if (role === "ROLE_ADMIN") return;
+
+        // STAFF: ẩn menu theo modules
+        if (role === "ROLE_STAFF") {
+            const modules = normalizeModuleList(me?.modules);
+            const modulesSet = new Set(modules);
+
+            // Ẩn những module không được cấp
+            ALL_ADMIN_MODULES.forEach(mod => {
+                const href = MODULE_TO_HREF[mod];
+                if (!href) return;
+                if (!modulesSet.has(mod)) hideNavItemByHref(href);
+            });
+
+            // Nếu đang đứng ở trang bị cấm -> redirect sang trang được phép
+            const currentPage = getCurrentAdminPageName();
+            const allowedPages = new Set(
+                [...modulesSet]
+                    .map(m => MODULE_TO_HREF[m])
+                    .filter(Boolean)
+                    .map(h => h.split("/").pop())
+            );
+
+            if (allowedPages.size > 0 && !allowedPages.has(currentPage)) {
+                redirectStaffToFirstAllowed(modulesSet);
+            }
+        }
+    } catch (e) {
+        console.warn("applyModulesUI error:", e);
+    }
+}
+
+async function applyTopbarProfile() {
+  try {
+    const res = await fetch("/api/auth/me", { credentials: "include" });
+    if (!res.ok) return;
+
+    const me = await res.json();
+
+    const nameEl = document.getElementById("topbarName");
+    const avatarEl = document.getElementById("topbarAvatar");
+
+    const displayName = (me?.username || me?.email || "User").trim();
+
+    if (nameEl) nameEl.textContent = displayName;
+
+    if (avatarEl) {
+      avatarEl.textContent = displayName.slice(0, 2).toUpperCase();
+    }
+  } catch (e) {
+    console.warn("applyTopbarProfile error:", e);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
     const sidebar = document.getElementById("sidebar");
     const sidebarToggle = document.getElementById("sidebarToggle");
@@ -40,6 +153,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     initTooltips();
     initPopovers();
     highlightActiveNav();
+    await applyTopbarProfile();
+    // Ẩn/hiện menu theo modules của STAFF
+    await applyModulesUI();
+
     preventEmptyLinks();
     handleMobileNavClose();
     setMinDateForDateInputs();
@@ -435,7 +552,20 @@ function playNotificationSound() {
         console.log("Không thể phát âm thanh:", err);
     });
 }
+function updateTopbarUnreadBadge(reservationCount, orderCount) {
+    const badge = document.getElementById("topbarUnreadBadge");
+    if (!badge) return;
 
+    const total = (Number(reservationCount) || 0) + (Number(orderCount) || 0);
+
+    if (total > 0) {
+        badge.textContent = total > 99 ? "99+" : String(total);
+        badge.classList.remove("d-none");
+    } else {
+        badge.textContent = "0";
+        badge.classList.add("d-none");
+    }
+}
 /**
  * Refresh both sidebar badges
  */
@@ -444,6 +574,8 @@ async function refreshSidebarBadges(isFirstLoad = false) {
         loadReservationUnreadBadge(),
         loadOrderUnreadBadge()
     ]);
+
+    updateTopbarUnreadBadge(reservationCount, orderCount);
 
     if (!isFirstLoad && reservationCount > lastReservationUnreadCount) {
         pulseBadge("reservationUnreadBadge");

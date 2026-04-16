@@ -200,32 +200,91 @@ async function loadAvailableTables() {
 
     if (!tableSelect) return;
 
-    tableSelect.innerHTML = `<option value="">Tự động chọn bàn phù hợp</option>`;
+    // placeholder
+    tableSelect.innerHTML = `<option value="">Tự động chọn bàn phù hợp (ưu tiên Standard)</option>`;
 
     if (!date || !time || !guests) return;
 
     try {
         const response = await fetch(
             `${AVAILABLE_TABLES_URL}?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}&guests=${encodeURIComponent(guests)}`,
-            {
-                credentials: "include"
-            }
+            { credentials: "include" }
         );
 
-        if (response.status === 401 || response.status === 403) {
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error("Không thể tải danh sách bàn trống");
-        }
+        if (response.status === 401 || response.status === 403) return;
+        if (!response.ok) throw new Error("Không thể tải danh sách bàn trống");
 
         const tables = await response.json();
+        const guestsNum = Number(guests) || 0;
 
-        tables.forEach(table => {
+        const norm = (v) => String(v || "").toUpperCase();
+        const getType = (tb) => norm(tb.type || tb.tableType || tb.category);
+
+        const isVip = (tb) => getType(tb).includes("VIP");
+        const isPrivate = (tb) => getType(tb).includes("PRIVATE");
+        const isStandard = (tb) => getType(tb).includes("STANDARD") || (!isVip(tb) && !isPrivate(tb));
+
+        // Standard: chỉ hiện bàn đủ chỗ, ưu tiên bàn nhỏ nhất đủ chỗ
+        let standardTables = tables
+            .filter(isStandard)
+            .filter(t => (Number(t.capacity) || 0) >= guestsNum)
+            .sort((a, b) =>
+                (a.capacity || 0) - (b.capacity || 0) ||
+                (a.tableNumber || 0) - (b.tableNumber || 0)
+            );
+
+        // VIP/Private: hiện tất cả, sort cho đẹp
+        const vipPrivateTables = tables
+            .filter(t => isVip(t) || isPrivate(t))
+            .sort((a, b) => {
+                const rank = (x) => isVip(x) ? 0 : isPrivate(x) ? 1 : 2;
+                const r = rank(a) - rank(b);
+                if (r !== 0) return r;
+                return (a.capacity || 0) - (b.capacity || 0) ||
+                       (a.tableNumber || 0) - (b.tableNumber || 0);
+            });
+
+        // Nếu không có Standard đủ chỗ, vẫn show Standard (để admin tự quyết)
+        if (standardTables.length === 0) {
+            standardTables = tables
+                .filter(isStandard)
+                .sort((a, b) =>
+                    (a.capacity || 0) - (b.capacity || 0) ||
+                    (a.tableNumber || 0) - (b.tableNumber || 0)
+                );
+        }
+
+        const finalTables = [...standardTables, ...vipPrivateTables];
+
+        // reset lại option đầu
+        tableSelect.innerHTML = `<option value="">Tự động chọn bàn phù hợp (ưu tiên Standard)</option>`;
+
+        finalTables.forEach(table => {
             const option = document.createElement("option");
             option.value = table.id;
-            option.textContent = `Bàn ${table.tableNumber} - ${table.capacity} chỗ`;
+
+            const t = getType(table);
+            let labelType = "";
+            let depositHint = "";
+
+            if (t.includes("VIP")) {
+                labelType = "VIP";
+                depositHint = " (yêu cầu cọc)";
+            } else if (t.includes("PRIVATE")) {
+                labelType = "Private Room";
+                depositHint = " (yêu cầu cọc)";
+            } else if (t.includes("STANDARD")) {
+                labelType = "Standard";
+            } else {
+                // fallback nếu type lạ/không có
+                labelType = "";
+            }
+
+            option.textContent =
+                `Bàn ${table.tableNumber} - ${table.capacity} chỗ` +
+                (labelType ? ` • ${labelType}` : "") +
+                depositHint;
+
             tableSelect.appendChild(option);
         });
     } catch (error) {

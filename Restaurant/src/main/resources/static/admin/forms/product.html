@@ -8,411 +8,624 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="../assets/css/style.css" rel="stylesheet">
+
+    <style>
+        .dish-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid rgba(0,0,0,0.06);
+            background: #f3f4f6;
+        }
+        .preview-img {
+            width: 84px;
+            height: 84px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #f3f4f6;
+        }
+    </style>
 </head>
 <body>
-    <div class="wrapper">
-        <!-- Sidebar -->
-        <nav id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <i class="bi bi-shop"></i>
-                    <span>RestaurantOS</span>
-                </div>
+<div class="wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="bi bi-shop"></i>
+                <span>RestaurantOS</span>
             </div>
-            <ul class="sidebar-nav">
-                <li class="nav-item">
-                    <a href="../index.html" class="nav-link">
-                        <i class="bi bi-grid-1x2-fill"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="category.html" class="nav-link">
-                        <i class="bi bi-folder-fill"></i>
-                        <span>Danh mục</span>
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a href="product.html" class="nav-link">
-                        <i class="bi bi-cup-hot-fill"></i>
-                        <span>Món ăn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="table.html" class="nav-link">
-                        <i class="bi bi-grid-3x3-gap-fill"></i>
-                        <span>Bàn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="reservation.html" class="nav-link">
-                        <i class="bi bi-calendar-check-fill"></i>
-                        <span>Đặt bàn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="order.html" class="nav-link">
-                        <i class="bi bi-receipt"></i>
-                        <span>Đơn hàng</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="payment.html" class="nav-link">
-                        <i class="bi bi-credit-card-fill"></i>
-                        <span>Thanh toán</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="user.html" class="nav-link">
-                        <i class="bi bi-people-fill"></i>
-                        <span>Người dùng</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="review.html" class="nav-link">
-                        <i class="bi bi-star-fill"></i>
-                        <span>Đánh giá</span>
-                    </a>
-                </li>
-            </ul>
-            <div class="sidebar-footer">
-                <a href="../../auth/login.html" class="nav-link text-danger">
-                    <i class="bi bi-box-arrow-left"></i>
-                    <span>Đăng xuất</span>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a href="/admin/index.html" class="nav-link">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
                 </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/category.html" class="nav-link">
+                    <i class="bi bi-folder-fill"></i>
+                    <span>Danh mục</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/product.html" class="nav-link">
+                    <i class="bi bi-cup-hot-fill"></i>
+                    <span>Món ăn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/table.html" class="nav-link">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                    <span>Bàn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/reservation.html" class="nav-link">
+                    <i class="bi bi-calendar-check-fill"></i>
+                    <span>Đặt bàn</span>
+                    <span id="reservationUnreadBadge" class="sidebar-menu-badge d-none">0</span>
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a href="/admin/forms/order.html" class="nav-link">
+                    <i class="bi bi-receipt"></i>
+                    <span>Đơn hàng</span>
+                    <span id="orderUnreadBadge" class="sidebar-menu-badge d-none">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/payment.html" class="nav-link">
+                    <i class="bi bi-credit-card-fill"></i>
+                    <span>Thanh toán</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/user.html" class="nav-link">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Người dùng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/review.html" class="nav-link">
+                    <i class="bi bi-star-fill"></i>
+                    <span>Đánh giá</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="../../auth/login.html" class="nav-link text-danger">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Đăng xuất</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div id="content" class="content">
+        <!-- Top Bar -->
+        <nav class="topbar">
+            <button id="sidebarToggle" class="btn btn-link">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Tìm kiếm...">
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-icon position-relative" type="button" title="Thông báo">
+                    <i class="bi bi-bell"></i>
+                    <span id="topbarUnreadBadge" class="badge bg-danger position-absolute top-0 start-100 translate-middle d-none">0</span>
+                </button>
+                <div class="dropdown">
+                    <button class="btn user-dropdown" data-bs-toggle="dropdown">
+                        <div class="avatar">AD</div>
+                        <span>Admin</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Cài đặt</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="../../auth/login.html"><i class="bi bi-box-arrow-left"></i> Đăng xuất</a></li>
+                    </ul>
+                </div>
             </div>
         </nav>
 
-        <!-- Main Content -->
-        <div id="content" class="content">
-            <!-- Top Bar -->
-            <nav class="topbar">
-                <button id="sidebarToggle" class="btn btn-link">
-                    <i class="bi bi-list"></i>
+        <!-- Page Content -->
+        <div class="page-content">
+            <div class="page-title-box">
+                <div class="page-title-left">
+                    <h1>Quản lý Món ăn</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="../index.html">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Món ăn</li>
+                        </ol>
+                    </nav>
+                </div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
+                    <i class="bi bi-plus-lg me-1"></i> Thêm món ăn
                 </button>
-                <div class="search-box">
-                    <i class="bi bi-search"></i>
-                    <input type="text" placeholder="Tìm kiếm...">
-                </div>
-                <div class="topbar-right">
-                    <button class="btn btn-icon">
-                        <i class="bi bi-bell"></i>
-                        <span class="badge">3</span>
-                    </button>
-                    <div class="dropdown">
-                        <button class="btn user-dropdown" data-bs-toggle="dropdown">
-                            <div class="avatar">AD</div>
-                            <span>Admin</span>
-                            <i class="bi bi-chevron-down"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Hồ sơ</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Cài đặt</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="../../auth/login.html"><i class="bi bi-box-arrow-left"></i> Đăng xuất</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+            </div>
 
-            <!-- Page Content -->
-            <div class="page-content">
-                <div class="page-title-box">
-                    <div class="page-title-left">
-                        <h1>Quản lý Món ăn</h1>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="../index.html">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Món ăn</li>
-                            </ol>
-                        </nav>
-                    </div>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
-                        <i class="bi bi-plus-lg me-1"></i> Thêm món ăn
-                    </button>
-                </div>
-
-                <!-- Filters -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label">Danh mục</label>
-                                <select class="form-select">
-                                    <option value="">Tất cả danh mục</option>
-                                    <option>Món khai vị</option>
-                                    <option>Phở & Bún</option>
-                                    <option>Cơm</option>
-                                    <option>Đồ uống</option>
-                                    <option>Tráng miệng</option>
-                                </select>
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Danh mục</label>
+                            <select class="form-select" id="filterCategory">
+                                <option value="">Tất cả danh mục</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" id="filterStatus">
+                                <option value="">Tất cả</option>
+                                <option value="true">Còn món</option>
+                                <option value="false">Hết món</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tìm kiếm</label>
+                            <div class="search-input">
+                                <i class="bi bi-search"></i>
+                                <input type="text" class="form-control" placeholder="Tên món ăn..." onkeyup="searchTable(this, 'productTable')">
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Trạng thái</label>
-                                <select class="form-select">
-                                    <option value="">Tất cả</option>
-                                    <option>Còn món</option>
-                                    <option>Hết món</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Tìm kiếm</label>
-                                <div class="search-input">
-                                    <i class="bi bi-search"></i>
-                                    <input type="text" class="form-control" placeholder="Tên món ăn..." onkeyup="searchTable(this, 'productTable')">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <button class="btn btn-outline-primary w-100">
-                                    <i class="bi bi-funnel me-1"></i> Lọc
-                                </button>
-                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" id="btnApplyFilter">
+                                <i class="bi bi-funnel me-1"></i> Lọc
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Table Card -->
-                <div class="card">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0" id="productTable">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 60px;">ID</th>
-                                        <th style="width: 80px;">Hình</th>
-                                        <th>Tên món</th>
-                                        <th>Danh mục</th>
-                                        <th>Giá</th>
-                                        <th style="width: 100px;">Trạng thái</th>
-                                        <th style="width: 120px;">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>1</strong></td>
-                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-cup-hot text-danger"></i></div></td>
-                                        <td>
-                                            <div><strong>Phở bò tái chín</strong></div>
-                                            <small class="text-muted">Phở bò với thịt tái và chín</small>
-                                        </td>
-                                        <td>Phở & Bún</td>
-                                        <td><strong class="text-primary">65,000đ</strong></td>
-                                        <td><span class="badge bg-success">Còn món</span></td>
-                                        <td>
-                                            <div class="action-btns">
-                                                <button class="btn btn-action btn-view" data-bs-toggle="modal" data-bs-target="#viewProductModal" title="Xem">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-delete" onclick="deleteItem(1, 'Phở bò tái chín')" title="Xóa">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>2</strong></td>
-                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-grid text-success"></i></div></td>
-                                        <td>
-                                            <div><strong>Cơm tấm sườn bì</strong></div>
-                                            <small class="text-muted">Cơm tấm với sườn nướng và bì</small>
-                                        </td>
-                                        <td>Cơm</td>
-                                        <td><strong class="text-primary">55,000đ</strong></td>
-                                        <td><span class="badge bg-success">Còn món</span></td>
-                                        <td>
-                                            <div class="action-btns">
-                                                <button class="btn btn-action btn-view" title="Xem">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-delete" onclick="deleteItem(2, 'Cơm tấm sườn bì')" title="Xóa">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>3</strong></td>
-                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-cup-hot text-danger"></i></div></td>
-                                        <td>
-                                            <div><strong>Bún chả Hà Nội</strong></div>
-                                            <small class="text-muted">Bún với chả nướng kiểu Hà Nội</small>
-                                        </td>
-                                        <td>Phở & Bún</td>
-                                        <td><strong class="text-primary">60,000đ</strong></td>
-                                        <td><span class="badge bg-success">Còn món</span></td>
-                                        <td>
-                                            <div class="action-btns">
-                                                <button class="btn btn-action btn-view" title="Xem">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-delete" onclick="deleteItem(3, 'Bún chả Hà Nội')" title="Xóa">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>4</strong></td>
-                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-egg-fried text-warning"></i></div></td>
-                                        <td>
-                                            <div><strong>Gỏi cuốn tôm thịt</strong></div>
-                                            <small class="text-muted">2 cuốn với tôm và thịt heo</small>
-                                        </td>
-                                        <td>Món khai vị</td>
-                                        <td><strong class="text-primary">35,000đ</strong></td>
-                                        <td><span class="badge bg-success">Còn món</span></td>
-                                        <td>
-                                            <div class="action-btns">
-                                                <button class="btn btn-action btn-view" title="Xem">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-delete" onclick="deleteItem(4, 'Gỏi cuốn tôm thịt')" title="Xóa">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>5</strong></td>
-                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-cup-straw text-info"></i></div></td>
-                                        <td>
-                                            <div><strong>Trà đào cam sả</strong></div>
-                                            <small class="text-muted">Trà tươi với đào và cam sả</small>
-                                        </td>
-                                        <td>Đồ uống</td>
-                                        <td><strong class="text-primary">35,000đ</strong></td>
-                                        <td><span class="badge bg-danger">Hết món</span></td>
-                                        <td>
-                                            <div class="action-btns">
-                                                <button class="btn btn-action btn-view" title="Xem">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-delete" onclick="deleteItem(5, 'Trà đào cam sả')" title="Xóa">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>6</strong></td>
-                                        <td><div class="img-preview d-flex align-items-center justify-content-center"><i class="bi bi-cake text-primary"></i></div></td>
-                                        <td>
-                                            <div><strong>Chè ba màu</strong></div>
-                                            <small class="text-muted">Chè đậu xanh, đậu đỏ, thạch</small>
-                                        </td>
-                                        <td>Tráng miệng</td>
-                                        <td><strong class="text-primary">25,000đ</strong></td>
-                                        <td><span class="badge bg-success">Còn món</span></td>
-                                        <td>
-                                            <div class="action-btns">
-                                                <button class="btn btn-action btn-view" title="Xem">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-delete" onclick="deleteItem(6, 'Chè ba màu')" title="Xóa">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+            <!-- Table Card -->
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="productTable">
+                            <thead>
+                            <tr>
+                                <th style="width: 60px;">ID</th>
+                                <th style="width: 80px;">Hình</th>
+                                <th>Tên món</th>
+                                <th>Danh mục</th>
+                                <th>Giá</th>
+                                <th style="width: 110px;">Trạng thái</th>
+                                <th style="width: 120px;">Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody id="productTbody"></tbody>
+                        </table>
                     </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center" style="background: var(--dark-light); border-top: 1px solid var(--gray-800); padding: 1rem 1.25rem;">
-                        <span class="text-muted">Hiển thị 1-6 / 75 món</span>
-                        <nav>
-                            <ul class="pagination mb-0">
-                                <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
-                            </ul>
-                        </nav>
-                    </div>
+                </div>
+
+                <div class="card-footer d-flex justify-content-between align-items-center"
+                     style="background: var(--dark-light); border-top: 1px solid var(--gray-800); padding: 1rem 1.25rem;">
+                    <span class="text-muted" id="footerCount">Hiển thị 0 món</span>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Add/Edit Product Modal -->
-    <div class="modal fade" id="productModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm món ăn mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="productForm">
-                        <div class="row g-3">
-                            <div class="col-md-8">
-                                <label class="form-label">Tên món ăn <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" required placeholder="Nhập tên món">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Danh mục <span class="text-danger">*</span></label>
-                                <select class="form-select" required>
-                                    <option value="">Chọn danh mục</option>
-                                    <option>Món khai vị</option>
-                                    <option>Phở & Bún</option>
-                                    <option>Cơm</option>
-                                    <option>Đồ uống</option>
-                                    <option>Tráng miệng</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Mô tả</label>
-                                <textarea class="form-control" rows="2" placeholder="Mô tả ngắn về món ăn"></textarea>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Giá <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" required placeholder="0">
-                                    <span class="input-group-text" style="background: var(--gray-700); border-color: var(--gray-700); color: var(--gray-300);">VNĐ</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Trạng thái</label>
-                                <select class="form-select">
-                                    <option value="1">Còn món</option>
-                                    <option value="0">Hết món</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Hình ảnh</label>
-                                <input type="file" class="form-control" accept="image/*">
+<!-- Add/Edit Product Modal -->
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalTitle">Thêm món ăn mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="productForm">
+                    <input type="hidden" id="dishId">
+                    <input type="hidden" id="dishImageUrl">
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Tên món ăn <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="dishName" required placeholder="Nhập tên món">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                            <select class="form-select" id="dishCategory" required>
+                                <option value="">Chọn danh mục</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="dishDesc" rows="2" placeholder="Mô tả ngắn về món ăn"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Giá <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="dishPrice" required placeholder="0" min="0" step="0.01">
+                                <span class="input-group-text"
+                                      style="background: var(--gray-700); border-color: var(--gray-700); color: var(--gray-300);">VNĐ</span>
                             </div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="showToast('Đã lưu món ăn thành công')" data-bs-dismiss="modal">Lưu món ăn</button>
-                </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" id="dishAvailable">
+                                <option value="true">Còn món</option>
+                                <option value="false">Hết món</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Hình ảnh</label>
+                            <input type="file" class="form-control" id="dishImageFile" accept="image/*">
+                            <div class="mt-2 d-flex align-items-center gap-3">
+                                <img id="dishPreview" class="preview-img" alt="preview" style="display:none;">
+                                <div class="small text-muted">
+                                    Nếu không chọn ảnh mới, hệ thống sẽ giữ ảnh cũ.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="btnSaveDish">Lưu món ăn</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/main.js"></script>
+
+<script>
+    // Admin endpoints theo convention dự án bạn
+    const API_ADMIN_DISHES = '/admin/api/dishes';
+    const API_ADMIN_CATEGORIES = '/admin/api/categories';
+    // Nếu bạn đã có upload endpoint dish riêng thì đổi đường dẫn ở đây
+    const API_UPLOAD_DISH_IMAGE = '/admin/api/upload/dish-image';
+
+    function esc(s) {
+        return (s ?? '').toString()
+            .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;').replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
+    async function apiFetchJson(url, options = {}) {
+        const res = await fetch(url, {
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'same-origin',
+            ...options
+        });
+
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            throw new Error(`HTTP ${res.status} ${res.statusText}${text ? ' - ' + text : ''}`);
+        }
+        if (res.status === 204) return null;
+        return res.json();
+    }
+
+    function dishImgCell(url) {
+        if (url) return `<img class="dish-img" src="${esc(url)}" alt="img">`;
+        return `<img class="dish-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='100%25' height='100%25' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='10'%3Eno img%3C/text%3E%3C/svg%3E" alt="no-img">`;
+    }
+
+    function badgeAvailable(avail) {
+        return avail
+            ? '<span class="badge bg-success">Còn món</span>'
+            : '<span class="badge bg-danger">Hết món</span>';
+    }
+
+    function fmtVnd(amount) {
+        // amount có thể là number hoặc string. BigDecimal JSON thường ra number.
+        try {
+            const n = Number(amount);
+            if (Number.isNaN(n)) return (amount ?? '') + 'đ';
+            return new Intl.NumberFormat('vi-VN').format(n) + 'đ';
+        } catch {
+            return (amount ?? '') + 'đ';
+        }
+    }
+
+    async function loadCategoriesToSelects() {
+        // lấy categories admin (có cả active/inactive). Nếu muốn chỉ active thì gọi /api/categories
+        const list = await apiFetchJson(API_ADMIN_CATEGORIES, {method: 'GET'});
+
+        const filterSel = document.getElementById('filterCategory');
+        const dishSel = document.getElementById('dishCategory');
+
+        // reset
+        filterSel.innerHTML = `<option value="">Tất cả danh mục</option>`;
+        dishSel.innerHTML = `<option value="">Chọn danh mục</option>`;
+
+        (list || []).forEach(c => {
+            const opt1 = document.createElement('option');
+            opt1.value = c.id;
+            opt1.textContent = `${c.name}${c.active ? '' : ' (tạm ẩn)'}`;
+            filterSel.appendChild(opt1);
+
+            const opt2 = document.createElement('option');
+            opt2.value = c.id;
+            opt2.textContent = c.name;
+            dishSel.appendChild(opt2);
+        });
+    }
+
+    async function loadDishes() {
+        const tbody = document.getElementById('productTbody');
+        const footer = document.getElementById('footerCount');
+
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4">Đang tải...</td></tr>`;
+
+        try {
+            const list = await apiFetchJson(API_ADMIN_DISHES, {method: 'GET'});
+
+            // filter client-side theo UI filter
+            const filterCategory = document.getElementById('filterCategory').value;
+            const filterStatus = document.getElementById('filterStatus').value; // "" | "true" | "false"
+
+            let filtered = (list || []);
+
+            if (filterCategory) {
+                filtered = filtered.filter(d => String(d.categoryId ?? '') === String(filterCategory));
+            }
+            if (filterStatus !== '') {
+                const val = (filterStatus === 'true');
+                filtered = filtered.filter(d => !!d.available === val);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4">Chưa có món ăn.</td></tr>`;
+                footer.textContent = 'Hiển thị 0 món';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(d => `
+              <tr>
+                <td><strong>${esc(d.id)}</strong></td>
+                <td>${dishImgCell(d.imageUrl)}</td>
+                <td>
+                  <div><strong>${esc(d.name)}</strong></div>
+                  <small class="text-muted">${esc(d.description || '')}</small>
+                </td>
+                <td>${esc(d.categoryName || '')}</td>
+                <td><strong class="text-primary">${esc(fmtVnd(d.price))}</strong></td>
+                <td>${badgeAvailable(!!d.available)}</td>
+                <td>
+                  <div class="action-btns">
+                    <button class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#productModal" title="Sửa"
+                            data-id="${esc(d.id)}"
+                            data-name="${esc(d.name)}"
+                            data-description="${esc(d.description || '')}"
+                            data-price="${esc(d.price)}"
+                            data-imageurl="${esc(d.imageUrl || '')}"
+                            data-available="${d.available ? 'true' : 'false'}"
+                            data-categoryid="${esc(d.categoryId)}">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+
+                    ${d.available ? `
+                      <!-- đang còn món: mắt mở, bấm để hết món -->
+                      <button class="btn btn-action btn-delete" title="Đánh dấu hết món"
+                              onclick="inactiveDish(${d.id}, '${esc(d.name)}')">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    ` : `
+                      <!-- đang hết món: mắt gạch, bấm để bật lại còn món -->
+                      <button class="btn btn-action btn-delete" title="Bật lại còn món"
+                              onclick="activateDish(${d.id}, '${esc(d.name)}')">
+                        <i class="bi bi-eye-slash"></i>
+                      </button>
+                    `}
+                  </div>
+                </td>
+              </tr>
+            `).join('');
+
+            footer.textContent = `Hiển thị ${filtered.length} món`;
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger p-4">Lỗi tải món ăn: ${esc(e.message)}</td></tr>`;
+            footer.textContent = 'Không tải được món';
+            showToast(`Lỗi tải món ăn: ${e.message}`, "danger");
+        }
+    }
+
+    function resetDishModalCreate() {
+        document.getElementById('productModalTitle').textContent = 'Thêm món ăn mới';
+        document.getElementById('dishId').value = '';
+        document.getElementById('dishName').value = '';
+        document.getElementById('dishDesc').value = '';
+        document.getElementById('dishPrice').value = '';
+        document.getElementById('dishCategory').value = '';
+        document.getElementById('dishAvailable').value = 'true';
+
+        document.getElementById('dishImageUrl').value = '';
+        document.getElementById('dishImageFile').value = '';
+
+        const preview = document.getElementById('dishPreview');
+        preview.src = '';
+        preview.style.display = 'none';
+    }
+
+    function fillDishModalEdit(btn) {
+        document.getElementById('productModalTitle').textContent = 'Cập nhật món ăn';
+        document.getElementById('dishId').value = btn.dataset.id || '';
+        document.getElementById('dishName').value = btn.dataset.name || '';
+        document.getElementById('dishDesc').value = btn.dataset.description || '';
+        document.getElementById('dishPrice').value = btn.dataset.price || '';
+        document.getElementById('dishCategory').value = btn.dataset.categoryid || '';
+        document.getElementById('dishAvailable').value = btn.dataset.available || 'true';
+
+        const oldUrl = btn.dataset.imageurl || '';
+        document.getElementById('dishImageUrl').value = oldUrl;
+        document.getElementById('dishImageFile').value = '';
+
+        const preview = document.getElementById('dishPreview');
+        if (oldUrl) {
+            preview.src = oldUrl;
+            preview.style.display = 'block';
+        } else {
+            preview.src = '';
+            preview.style.display = 'none';
+        }
+    }
+
+    async function uploadDishImageIfNeeded() {
+        const fileInput = document.getElementById('dishImageFile');
+        const file = fileInput?.files?.[0];
+        if (!file) return null;
+
+        const form = new FormData();
+        form.append('file', file);
+
+        const res = await fetch(API_UPLOAD_DISH_IMAGE, {
+            method: 'POST',
+            body: form,
+            credentials: 'same-origin'
+        });
+
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            throw new Error(`Upload failed: HTTP ${res.status} ${res.statusText}${text ? ' - ' + text : ''}`);
+        }
+
+        const data = await res.json();
+        return data.url; // "/uploads/dishes/....png"
+    }
+
+    async function saveDish() {
+        const id = document.getElementById('dishId').value.trim();
+        const name = document.getElementById('dishName').value.trim();
+        const description = document.getElementById('dishDesc').value.trim();
+        const price = document.getElementById('dishPrice').value;
+        const categoryId = document.getElementById('dishCategory').value;
+        const available = document.getElementById('dishAvailable').value === 'true';
+
+        if (!name) {
+            showToast('Tên món ăn không được để trống.', 'danger');
+            return;
+        }
+        if (!categoryId) {
+            showToast('Vui lòng chọn danh mục.', 'danger');
+            return;
+        }
+        if (price === '' || price === null) {
+            showToast('Giá không được để trống.', 'danger');
+            return;
+        }
+
+        try {
+            let imageUrl = document.getElementById('dishImageUrl').value.trim();
+            const uploadedUrl = await uploadDishImageIfNeeded();
+            if (uploadedUrl) imageUrl = uploadedUrl;
+
+            const payload = {
+                name,
+                description,
+                price: Number(price),
+                imageUrl,
+                available,
+                categoryId: Number(categoryId)
+            };
+
+            if (id) {
+                await apiFetchJson(`${API_ADMIN_DISHES}/${encodeURIComponent(id)}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(payload)
+                });
+                showToast('Đã cập nhật món ăn.', 'success');
+            } else {
+                await apiFetchJson(API_ADMIN_DISHES, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                showToast('Đã thêm món ăn mới.', 'success');
+            }
+
+            const modalEl = document.getElementById('productModal');
+            bootstrap.Modal.getInstance(modalEl)?.hide();
+
+            await loadDishes();
+        } catch (e) {
+            showToast(`Lưu thất bại: ${e.message}`, 'danger');
+        }
+    }
+
+    // available=false
+    async function inactiveDish(id, name) {
+        const confirmed = await confirmDialog(`Đánh dấu "${name}" là HẾT MÓN?`);
+        if (!confirmed) return;
+
+        try {
+            await apiFetchJson(`${API_ADMIN_DISHES}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+            showToast('Đã cập nhật trạng thái: Hết món.', 'success');
+            await loadDishes();
+        } catch (e) {
+            showToast(`Cập nhật thất bại: ${e.message}`, 'danger');
+        }
+    }
+
+    // available=true
+    async function activateDish(id, name) {
+        const confirmed = await confirmDialog(`Bật lại "${name}" là CÒN MÓN?`);
+        if (!confirmed) return;
+
+        try {
+            await apiFetchJson(`${API_ADMIN_DISHES}/${encodeURIComponent(id)}/activate`, { method: 'PATCH' });
+            showToast('Đã cập nhật trạng thái: Còn món.', 'success');
+            await loadDishes();
+        } catch (e) {
+            showToast(`Cập nhật thất bại: ${e.message}`, 'danger');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        try {
+            await loadCategoriesToSelects();
+        } catch (e) {
+            showToast(`Không tải được danh mục: ${e.message}`, "danger");
+        }
+
+        await loadDishes();
+
+        document.getElementById('btnApplyFilter').addEventListener('click', async function () {
+            await loadDishes();
+        });
+
+        // preview ảnh khi chọn file mới (dùng helper trong main.js)
+        document.getElementById('dishImageFile')?.addEventListener('change', function () {
+            const preview = document.getElementById('dishPreview');
+            if (preview) preview.style.display = 'block';
+            handleImagePreview(this, 'dishPreview');
+        });
+
+        // modal open: create/edit
+        document.getElementById('productModal').addEventListener('show.bs.modal', function (event) {
+            const trigger = event.relatedTarget;
+            if (trigger && trigger.classList.contains('btn-edit')) {
+                fillDishModalEdit(trigger);
+            } else {
+                resetDishModalCreate();
+            }
+        });
+
+        document.getElementById('btnSaveDish').addEventListener('click', saveDish);
+    });
+</script>
 </body>
 </html>

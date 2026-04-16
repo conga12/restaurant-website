@@ -1,6 +1,8 @@
 package com.tt.Restaurant.controller;
 
-import com.tt.Restaurant.model.User;
+import com.tt.Restaurant.dto.StaffModulesDTO;
+import com.tt.Restaurant.dto.UserRequestDTO;
+import com.tt.Restaurant.dto.UserResponseDTO;
 import com.tt.Restaurant.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,27 +19,37 @@ public class AdminUserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
+    public UserResponseDTO getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public UserResponseDTO createUser(@RequestBody UserRequestDTO req) {
+        return userService.createUser(req);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.updateUser(id, user);
+    public UserResponseDTO updateUser(@PathVariable Long id, @RequestBody UserRequestDTO req) {
+        return userService.updateUser(id, req);
     }
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+    }
+
+    @GetMapping("/{id}/modules")
+    public StaffModulesDTO getStaffModules(@PathVariable Long id) {
+        return userService.getStaffModules(id);
+    }
+
+    @PutMapping("/{id}/modules")
+    public StaffModulesDTO updateStaffModules(@PathVariable Long id, @RequestBody StaffModulesDTO dto) {
+        return userService.updateStaffModules(id, dto);
     }
 }

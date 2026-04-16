@@ -40,55 +40,57 @@
         </div>
         <ul class="sidebar-nav">
             <li class="nav-item">
-                <a href="../index.html" class="nav-link">
+                <a href="/admin/index.html" class="nav-link">
                     <i class="bi bi-grid-1x2-fill"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
-            <li class="nav-item active">
-                <a href="category.html" class="nav-link">
+            <li class="nav-item">
+                <a href="/admin/forms/category.html" class="nav-link">
                     <i class="bi bi-folder-fill"></i>
                     <span>Danh mục</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="product.html" class="nav-link">
+                <a href="/admin/forms/product.html" class="nav-link">
                     <i class="bi bi-cup-hot-fill"></i>
                     <span>Món ăn</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="table.html" class="nav-link">
+                <a href="/admin/forms/table.html" class="nav-link">
                     <i class="bi bi-grid-3x3-gap-fill"></i>
                     <span>Bàn</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="reservation.html" class="nav-link">
+                <a href="/admin/forms/reservation.html" class="nav-link">
                     <i class="bi bi-calendar-check-fill"></i>
                     <span>Đặt bàn</span>
+                    <span id="reservationUnreadBadge" class="sidebar-menu-badge d-none">0</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="order.html" class="nav-link">
+            <li class="nav-item active">
+                <a href="/admin/forms/order.html" class="nav-link">
                     <i class="bi bi-receipt"></i>
                     <span>Đơn hàng</span>
+                    <span id="orderUnreadBadge" class="sidebar-menu-badge d-none">0</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="payment.html" class="nav-link">
+                <a href="/admin/forms/payment.html" class="nav-link">
                     <i class="bi bi-credit-card-fill"></i>
                     <span>Thanh toán</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="user.html" class="nav-link">
+                <a href="/admin/forms/user.html" class="nav-link">
                     <i class="bi bi-people-fill"></i>
                     <span>Người dùng</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="review.html" class="nav-link">
+                <a href="/admin/forms/review.html" class="nav-link">
                     <i class="bi bi-star-fill"></i>
                     <span>Đánh giá</span>
                 </a>
@@ -114,9 +116,9 @@
                 <input type="text" placeholder="Tìm kiếm...">
             </div>
             <div class="topbar-right">
-                <button class="btn btn-icon">
+                <button class="btn btn-icon position-relative" type="button" title="Thông báo">
                     <i class="bi bi-bell"></i>
-                    <span class="badge">3</span>
+                    <span id="topbarUnreadBadge" class="badge bg-danger position-absolute top-0 start-100 translate-middle d-none">0</span>
                 </button>
                 <div class="dropdown">
                     <button class="btn user-dropdown" data-bs-toggle="dropdown">
@@ -321,10 +323,18 @@
                             data-bs-toggle="modal" data-bs-target="#categoryModal">
                       <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn btn-action btn-delete" title="Xóa"
-                            onclick="deleteCategory(${c.id}, '${esc(c.name)}')">
-                      <i class="bi bi-trash"></i>
-                    </button>
+
+                    ${c.active ? `
+                      <button class="btn btn-action btn-delete" title="Tạm ẩn"
+                              onclick="inactiveCategory(${c.id}, '${esc(c.name)}')">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    ` : `
+                      <button class="btn btn-action btn-delete" title="Bật lại"
+                              onclick="activateCategory(${c.id}, '${esc(c.name)}')">
+                        <i class="bi bi-eye-slash"></i>
+                      </button>
+                    `}
                   </div>
                 </td>
               </tr>
@@ -441,16 +451,29 @@
         }
     }
 
-    async function deleteCategory(id, name) {
-        const confirmed = await confirmDialog(`Bạn có chắc chắn muốn xóa danh mục "${name}"?`);
+    async function inactiveCategory(id, name) {
+        const confirmed = await confirmDialog(`Bạn có chắc chắn muốn ẨN danh mục "${name}"?`);
         if (!confirmed) return;
 
         try {
-            await apiFetchJson(`${API_ADMIN_CATEGORIES}/${encodeURIComponent(id)}`, {method: 'DELETE'});
-            showToast('Đã xóa danh mục.', "success");
+            await apiFetchJson(`${API_ADMIN_CATEGORIES}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+            showToast('Đã tạm ẩn danh mục.', "success");
             await loadCategories();
         } catch (e) {
-            showToast(`Xóa thất bại: ${e.message}`, "danger");
+            showToast(`Ẩn thất bại: ${e.message}`, "danger");
+        }
+    }
+
+    async function activateCategory(id, name) {
+        const confirmed = await confirmDialog(`Bạn có chắc chắn muốn BẬT LẠI danh mục "${name}"?`);
+        if (!confirmed) return;
+
+        try {
+            await apiFetchJson(`${API_ADMIN_CATEGORIES}/${encodeURIComponent(id)}/activate`, { method: 'PATCH' });
+            showToast('Đã bật lại danh mục.', "success");
+            await loadCategories();
+        } catch (e) {
+            showToast(`Bật lại thất bại: ${e.message}`, "danger");
         }
     }
 

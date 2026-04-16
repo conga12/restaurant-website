@@ -38,6 +38,8 @@ public class User {
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+    @Column(name = "staff_modules", length = 255)
+    private String staffModules;
 
     public User() {
     }
@@ -97,6 +99,10 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getStaffModules() { return staffModules; }
+
+    public void setStaffModules(String staffModules) { this.staffModules = staffModules; }
 
     @Override
     public String toString() {

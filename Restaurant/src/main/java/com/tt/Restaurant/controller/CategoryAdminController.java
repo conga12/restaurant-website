@@ -55,10 +55,19 @@ public class CategoryAdminController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
-        }
-        categoryRepository.deleteById(id);
+    public void inactive(@PathVariable Long id) {
+        Category c = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+
+        c.setActive(false);
+        categoryRepository.save(c);
+    }
+    @PatchMapping("/{id}/activate")
+    public Category activate(@PathVariable Long id) {
+        Category c = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+
+        c.setActive(true);
+        return categoryRepository.save(c);
     }
 }

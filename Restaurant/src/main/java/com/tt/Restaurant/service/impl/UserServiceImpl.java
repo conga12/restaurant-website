@@ -1,9 +1,12 @@
 package com.tt.Restaurant.service.impl;
 
+import com.tt.Restaurant.dto.StaffModulesDTO;
+import com.tt.Restaurant.dto.UserRequestDTO;
+import com.tt.Restaurant.dto.UserResponseDTO;
 import com.tt.Restaurant.model.User;
 import com.tt.Restaurant.repository.UserRepository;
 import com.tt.Restaurant.service.UserService;
-import com.tt.Restaurant.util.SecurityValidator;  // ← THÊM
+import com.tt.Restaurant.util.SecurityValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,100 +27,150 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    private UserResponseDTO toDto(User u) {
+        return new UserResponseDTO(
+                u.getId(),
+                u.getUsername(),
+                u.getEmail(),
+                u.getPhone(),
+                u.getRole(),
+                u.getCreatedAt()
+        );
+    }
+
+    private String normalizeModules(List<String> modules) {
+        if (modules == null) return null;
+        return modules.stream()
+                .filter(m -> m != null && !m.isBlank())
+                .map(m -> m.trim().toUpperCase())
+                .distinct()
+                .reduce((a, b) -> a + "," + b)
+                .orElse(null);
+    }
+
+    private List<String> splitModules(String staffModules) {
+        if (staffModules == null || staffModules.isBlank()) return List.of();
+        return java.util.Arrays.stream(staffModules.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .map(String::toUpperCase)
+                .distinct()
+                .toList();
+    }
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll().stream().map(this::toDto).toList();
     }
 
     @Override
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
+    public UserResponseDTO getUserById(Long id) {
+        User u = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+        return toDto(u);
     }
 
     @Override
-    public User createUser(User user) {
-        // ← THÊM: Validate username
-        if (!SecurityValidator.isValidUsername(user.getUsername())) {
-            throw new RuntimeException(SecurityValidator.getInvalidUsernameMessage(user.getUsername()));
+    public UserResponseDTO createUser(UserRequestDTO req) {
+        if (req.getUsername() == null || req.getUsername().isBlank()) {
+            throw new RuntimeException("Username không được để trống");
         }
-
-        if (userRepository.existsByEmail(user.getEmail())) {
+        if (!SecurityValidator.isValidUsername(req.getUsername())) {
+            throw new RuntimeException(SecurityValidator.getInvalidUsernameMessage(req.getUsername()));
+        }
+        if (req.getEmail() == null || req.getEmail().isBlank()) {
+            throw new RuntimeException("Email không được để trống");
+        }
+        if (userRepository.existsByEmail(req.getEmail())) {
             throw new RuntimeException("Email đã tồn tại");
         }
-
-        if (userRepository.existsByUsername(user.getUsername())) {
+        if (userRepository.existsByUsername(req.getUsername())) {
             throw new RuntimeException("Username đã tồn tại");
         }
-
-        if (user.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (req.getPassword() == null || req.getPassword().isBlank()) {
+            throw new RuntimeException("Mật khẩu không được để trống");
         }
 
-        return userRepository.save(user);
+        User u = new User();
+        u.setUsername(req.getUsername().trim());
+        u.setEmail(req.getEmail().trim());
+        u.setPhone(req.getPhone());
+        u.setRole(req.getRole() == null ? User.Role.CUSTOMER : req.getRole());
+        u.setPassword(passwordEncoder.encode(req.getPassword()));
+
+        return toDto(userRepository.save(u));
     }
 
     @Override
-    public User updateUser(Long id, User user) {
-        // ← THÊM: Validate username
-        if (!SecurityValidator.isValidUsername(user.getUsername())) {
-            throw new RuntimeException(SecurityValidator.getInvalidUsernameMessage(user.getUsername()));
+    public UserResponseDTO updateUser(Long id, UserRequestDTO req) {
+        if (req.getUsername() == null || req.getUsername().isBlank()) {
+            throw new RuntimeException("Username không được để trống");
+        }
+        if (!SecurityValidator.isValidUsername(req.getUsername())) {
+            throw new RuntimeException(SecurityValidator.getInvalidUsernameMessage(req.getUsername()));
         }
 
         User oldUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
 
-        oldUser.setUsername(user.getUsername());
-        oldUser.setEmail(user.getEmail());
-        oldUser.setPhone(user.getPhone());
-        oldUser.setRole(user.getRole());
-
-        if (user.getPassword() != null && !user.getPassword().isBlank()) {
-            oldUser.setPassword(user.getPassword());
+        // email check nếu đổi email
+        if (req.getEmail() == null || req.getEmail().isBlank()) {
+            throw new RuntimeException("Email không được để trống");
+        }
+        if (!req.getEmail().equalsIgnoreCase(oldUser.getEmail()) && userRepository.existsByEmail(req.getEmail())) {
+            throw new RuntimeException("Email đã tồn tại");
         }
 
-        return userRepository.save(oldUser);
-    }
+        // username check nếu đổi username
+        if (!req.getUsername().equalsIgnoreCase(oldUser.getUsername()) && userRepository.existsByUsername(req.getUsername())) {
+            throw new RuntimeException("Username đã tồn tại");
+        }
 
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
+        oldUser.setUsername(req.getUsername().trim());
+        oldUser.setEmail(req.getEmail().trim());
+        oldUser.setPhone(req.getPhone());
+        oldUser.setRole(req.getRole() == null ? oldUser.getRole() : req.getRole());
 
+        // update password nếu nhập
+        if (req.getPassword() != null && !req.getPassword().isBlank()) {
+            oldUser.setPassword(passwordEncoder.encode(req.getPassword()));
+        }
+
+        return toDto(userRepository.save(oldUser));
+    }
     @Override
     public User register(User user) throws Exception {
-        System.out.println("=== REGISTER START ===");
-        System.out.println("Email: " + user.getEmail());
-        System.out.println("Username: " + user.getUsername());
-
-        // Check if email exists
-        boolean emailExists = userRepository.existsByEmail(user.getEmail());
-        System.out.println("Email exists: " + emailExists);
-
-        if (emailExists) {
-            System.out.println("Email đã tồn tại - Throwing exception");
+        // Check email exists
+        if (userRepository.existsByEmail(user.getEmail())) {
             throw new Exception("Email đã tồn tại");
         }
 
-        // Check if username exists
-        boolean usernameExists = userRepository.existsByUsername(user.getUsername());
-        System.out.println("Username exists: " + usernameExists);
-
-        if (usernameExists) {
-            System.out.println("Username đã tồn tại - Throwing exception");
+        // Check username exists
+        if (userRepository.existsByUsername(user.getUsername())) {
             throw new Exception("Username đã tồn tại");
         }
 
-        // Hash password
+        // Validate username
+        if (!SecurityValidator.isValidUsername(user.getUsername())) {
+            throw new Exception(SecurityValidator.getInvalidUsernameMessage(user.getUsername()));
+        }
+
+        // Require password
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new Exception("Mật khẩu không được để trống");
+        }
+
+        // Encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        System.out.println("Password encoded");
 
-        // Save
-        User savedUser = userRepository.save(user);
-        System.out.println("User saved, ID: " + savedUser.getId());
-        System.out.println("=== REGISTER END ===");
+        if (user.getRole() == null) {
+            user.setRole(User.Role.CUSTOMER);
+        }
 
-        return savedUser;
+        return userRepository.save(user);
+    }
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -128,5 +181,33 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public StaffModulesDTO getStaffModules(Long userId) {
+        User u = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+
+        StaffModulesDTO dto = new StaffModulesDTO();
+        dto.setModules(splitModules(u.getStaffModules()));
+        return dto;
+    }
+
+    @Override
+    public StaffModulesDTO updateStaffModules(Long userId, StaffModulesDTO dto) {
+        User u = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+
+        if (u.getRole() != User.Role.STAFF) {
+            throw new RuntimeException("Chỉ cấp modules cho nhân viên (STAFF)");
+        }
+
+        String normalized = normalizeModules(dto.getModules());
+        u.setStaffModules(normalized);
+        userRepository.save(u);
+
+        StaffModulesDTO res = new StaffModulesDTO();
+        res.setModules(splitModules(normalized));
+        return res;
     }
 }

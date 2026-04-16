@@ -63,9 +63,30 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").permitAll()
                         .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
 
-                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "STAFF")
+                        // =========================
+                        // ADMIN-ONLY APIs (cấm STAFF)
+                        // =========================
+                        .requestMatchers("/admin/api/users/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/api/dishes/**").hasRole("ADMIN")
+                        // nếu có upload ảnh danh mục/món:
+                        .requestMatchers("/admin/api/upload/**").hasRole("ADMIN")
 
+                        // =========================
+                        // STAFF + ADMIN APIs (vận hành)
+                        // bạn đổi theo đúng API thực tế của bạn
+                        // =========================
+                        .requestMatchers("/admin/api/orders/**").hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers("/admin/api/reservations/**").hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers("/admin/api/tables/**").hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers("/admin/api/payments/**").hasAnyRole("ADMIN", "STAFF")
+
+                        // =========================
+                        // Admin pages (UI) - cho cả ADMIN và STAFF
+                        // =========================
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "STAFF")
+
+                        // Public APIs
                         .requestMatchers(HttpMethod.POST, "/api/orders/from-qr").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/dishes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/customer/tables/**").permitAll()
@@ -85,7 +106,8 @@ public class SecurityConfig {
                             if (role.equals("ROLE_ADMIN")) {
                                 response.sendRedirect("/admin/index.html");
                             } else if (role.equals("ROLE_STAFF")) {
-                                response.sendRedirect("/staff/index.html");
+                                response.sendRedirect("/admin/index.html");
+                                // hoặc: response.sendRedirect("/admin/forms/order.html");
                             } else {
                                 response.sendRedirect("/user/index.html");
                             }
@@ -107,7 +129,8 @@ public class SecurityConfig {
                             if (role.equals("ROLE_ADMIN")) {
                                 response.sendRedirect("/admin/index.html");
                             } else if (role.equals("ROLE_STAFF")) {
-                                response.sendRedirect("/staff/index.html");
+                                response.sendRedirect("/admin/index.html");
+                                // hoặc: response.sendRedirect("/admin/forms/order.html");
                             } else {
                                 response.sendRedirect("/user/index.html");
                             }
