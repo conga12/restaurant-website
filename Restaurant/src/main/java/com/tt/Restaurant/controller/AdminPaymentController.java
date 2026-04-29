@@ -6,13 +6,17 @@ import com.tt.Restaurant.model.Payment;
 import com.tt.Restaurant.model.RestaurantTable;
 import com.tt.Restaurant.repository.OrderRepository;
 import com.tt.Restaurant.repository.PaymentRepository;
+import com.tt.Restaurant.repository.PromotionRepository;
 import com.tt.Restaurant.repository.RestaurantTableRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import com.tt.Restaurant.model.Promotion;
 
 @RestController
 @RequestMapping("/admin/api/payments")
@@ -21,13 +25,17 @@ public class AdminPaymentController {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final RestaurantTableRepository tableRepository;
+    private final PromotionRepository promotionRepository;
+
 
     public AdminPaymentController(OrderRepository orderRepository,
                                   PaymentRepository paymentRepository,
-                                  RestaurantTableRepository tableRepository) {
+                                  RestaurantTableRepository tableRepository,
+                                  PromotionRepository promotionRepository) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.tableRepository = tableRepository;
+        this.promotionRepository = promotionRepository;
     }
 
     @GetMapping
@@ -52,15 +60,15 @@ public class AdminPaymentController {
     public String confirmPayment(@PathVariable Long orderId,
                                  @RequestParam String paymentMethod,
                                  @RequestParam(required = false) String transactionId) {
+
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
         if (order.getStatus() == Orders.OrderStatus.CANCELLED) {
             throw new RuntimeException("Đơn đã hủy, không thể thanh toán");
         }
-
         if (order.getPaymentStatus() == Orders.PaymentStatus.PAID) {
-            throw new RuntimeException("Đơn này đã được thanh toán");
+            throw new RuntimeException("Đơn này đã được thanh to��n");
         }
 
         Payment.PaymentMethod method;
@@ -69,33 +77,60 @@ public class AdminPaymentController {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Phương thức thanh toán không hợp lệ");
         }
-
         if (method != Payment.PaymentMethod.CASH && (transactionId == null || transactionId.isBlank())) {
             throw new RuntimeException("Phải nhập mã giao dịch khi không phải tiền mặt");
         }
-
         String txn = (transactionId != null && !transactionId.isBlank())
                 ? transactionId.trim()
                 : "CASH_" + order.getId() + "_" + System.currentTimeMillis();
 
+        // ==== ÁP DỤNG KHUYẾN MÃI EVENT ====
+        List<Promotion> promotions = promotionRepository.findByIsActiveTrue();
+        LocalDateTime now = LocalDateTime.now();
+        Promotion appliedPromotion = promotions.stream()
+                .filter(p -> p.getStartDate() != null && p.getEndDate() != null)
+                .filter(p -> !now.toLocalDate().isBefore(p.getStartDate()) && !now.toLocalDate().isAfter(p.getEndDate()))
+                .filter(p -> p.getDiscountPercent() != null && p.getDiscountPercent() > 0)
+                .sorted((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
+                .findFirst()
+                .orElse(null);
+
+        BigDecimal total = order.getTotalAmount();
+        BigDecimal discount = BigDecimal.ZERO;
+
+        if (appliedPromotion != null) {
+            BigDecimal percent = BigDecimal.valueOf(appliedPromotion.getDiscountPercent()).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+            discount = total.multiply(percent).setScale(0, RoundingMode.HALF_UP);
+            total = total.subtract(discount);
+        }
+
+        // ==== PAYMENT ENTITY ====
         Payment payment = new Payment();
         payment.setOrder(order);
-        payment.setAmount(order.getTotalAmount());
+        payment.setAmount(total);
         payment.setPaymentMethod(method);
         payment.setStatus(Payment.PaymentStatus.COMPLETED);
         payment.setTransactionId(txn);
         payment.setPaidAt(LocalDateTime.now());
+        payment.setPromotion(appliedPromotion);
+        payment.setDiscountAmount(discount);
         paymentRepository.save(payment);
 
+// ==== ORDERS ENTITY (nếu muốn lưu thông tin event trên đơn) ====
+        order.setPromotion(appliedPromotion);
+        order.setDiscountAmount(discount);
         order.setPaymentStatus(Orders.PaymentStatus.PAID);
         order.setPaidAt(LocalDateTime.now());
         order.setPaymentTxnRef(txn);
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
+        // Có thể: order.setPromotionId(promotionId);
+        orderRepository.save(order);
 
         releaseTableIfNeeded(order);
 
-        return "Xác nhận thanh toán thành công";
+        return "Xác nhận thanh toán thành công" +
+                (appliedPromotion != null ? (" Áp dụng KM id = " + appliedPromotion.getId() + ", giảm " + discount + "đ.") : "");
     }
 
     @PutMapping("/{orderId}/fail")
@@ -132,36 +167,74 @@ public class AdminPaymentController {
     }
 
     private AdminPaymentDTO mapOrderToPaymentDTO(Orders order) {
+        // Lấy payment gần nhất (nếu có)
         Optional<Payment> latestPaymentOpt = paymentRepository.findTopByOrderIdOrderByCreatedAtDesc(order.getId());
 
         AdminPaymentDTO dto = new AdminPaymentDTO();
         dto.setOrderId(order.getId());
         dto.setOrderCode(order.getOrderCode());
-        dto.setAmount(order.getTotalAmount());
-        dto.setOrderStatus(order.getStatus() != null ? order.getStatus().name() : null);
 
+        // --- Thông tin table ---
         if (order.getTable() != null) {
             dto.setTableNumber(order.getTable().getTableNumber());
         } else if (order.getReservation() != null && order.getReservation().getTable() != null) {
             dto.setTableNumber(order.getReservation().getTable().getTableNumber());
         }
 
+        // --- Thông tin khách hàng ---
         if (order.getReservation() != null) {
             dto.setCustomerName(order.getReservation().getCustomerName());
         } else {
             dto.setCustomerName("Khách tại quán");
         }
 
+        // --------- Ưu tiên lấy thông tin payment nếu có ---------
         if (latestPaymentOpt.isPresent()) {
             Payment payment = latestPaymentOpt.get();
             dto.setPaymentId(payment.getId());
+            dto.setAmount(payment.getAmount());
+            dto.setDiscount(payment.getDiscountAmount());
+
+            // Giá gốc, giá cuối cùng
+            dto.setOriginAmount(order.getTotalAmount());
+            dto.setFinalAmount(payment.getAmount());
+
+            // Khuyến mãi
+            if (payment.getPromotion() != null) {
+                dto.setPromotionId(payment.getPromotion().getId());
+                dto.setPromotionTitle(payment.getPromotion().getTitle());
+                dto.setDiscountPercent(payment.getPromotion().getDiscountPercent());
+            } else if (order.getPromotion() != null) {
+                // fallback nếu payment chưa set
+                dto.setPromotionId(order.getPromotion().getId());
+                dto.setPromotionTitle(order.getPromotion().getTitle());
+                dto.setDiscountPercent(order.getPromotion().getDiscountPercent());
+            } else {
+                dto.setDiscountPercent(0);
+            }
+
             dto.setPaymentMethod(payment.getPaymentMethod() != null ? payment.getPaymentMethod().name() : null);
             dto.setPaymentStatus(payment.getStatus() != null ? payment.getStatus().name() : null);
             dto.setTransactionId(payment.getTransactionId());
             dto.setPaidAt(payment.getPaidAt() != null ? payment.getPaidAt().toString() : null);
             dto.setCreatedAt(payment.getCreatedAt() != null ? payment.getCreatedAt().toString() : null);
         } else {
+            // --- Nếu chưa có payment, lấy từ Orders ---
             dto.setPaymentId(null);
+            dto.setAmount(order.getFinalAmount() != null ? order.getFinalAmount() : order.getTotalAmount());
+            dto.setDiscount(order.getDiscountAmount() != null ? order.getDiscountAmount() : BigDecimal.ZERO);
+
+            dto.setOriginAmount(order.getTotalAmount());
+            dto.setFinalAmount(order.getFinalAmount() != null ? order.getFinalAmount() : order.getTotalAmount());
+
+            if (order.getPromotion() != null) {
+                dto.setPromotionId(order.getPromotion().getId());
+                dto.setPromotionTitle(order.getPromotion().getTitle());
+                dto.setDiscountPercent(order.getPromotion().getDiscountPercent());
+            } else {
+                dto.setDiscountPercent(0);
+            }
+
             dto.setPaymentMethod(order.getPaymentOption() != null ? order.getPaymentOption().name() : "PAY_AT_RESTAURANT");
             dto.setPaymentStatus(order.getPaymentStatus() == Orders.PaymentStatus.PAID ? "COMPLETED" : "PENDING");
             dto.setTransactionId(order.getPaymentTxnRef());
@@ -169,6 +242,7 @@ public class AdminPaymentController {
             dto.setCreatedAt(order.getOrderDate() != null ? order.getOrderDate().toString() : null);
         }
 
+        dto.setOrderStatus(order.getStatus() != null ? order.getStatus().name() : null);
         dto.setCanConfirm(order.getPaymentStatus() != Orders.PaymentStatus.PAID);
 
         return dto;

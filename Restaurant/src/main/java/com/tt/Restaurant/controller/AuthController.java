@@ -87,7 +87,14 @@ public class AuthController {
     }
 
     @PostMapping("/oauth2/login")
-    public String oauth2Login(HttpServletRequest request) {
+    public String oauth2Login(
+            @RequestParam(required = false) String redirect,
+            HttpServletRequest request
+    ) {
+        if (redirect != null && redirect.startsWith("/")) {
+            request.getSession().setAttribute("afterLoginRedirect", redirect);
+        }
+
         request.getSession().setAttribute("oauth2_mode", "login");
         return "redirect:/oauth2/authorization/google";
     }

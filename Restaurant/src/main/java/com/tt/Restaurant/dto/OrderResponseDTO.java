@@ -16,6 +16,11 @@ public class OrderResponseDTO {
     private Integer totalItems;
     private List<OrderItemResponseDTO> items;
 
+    private BigDecimal originAmount;
+    private BigDecimal finalAmount;
+    private Integer discountPercent;
+    private String promotionTitle;
+
     public OrderResponseDTO() {
     }
 
@@ -98,4 +103,17 @@ public class OrderResponseDTO {
     public void setItems(List<OrderItemResponseDTO> items) {
         this.items = items;
     }
+
+    public BigDecimal getOriginAmount() { return originAmount; }
+    public void setOriginAmount(BigDecimal originAmount) { this.originAmount = originAmount; }
+
+    public BigDecimal getFinalAmount() { return finalAmount; }
+    public void setFinalAmount(BigDecimal finalAmount) { this.finalAmount = finalAmount; }
+
+    public Integer getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(Integer discountPercent) { this.discountPercent = discountPercent; }
+
+    public String getPromotionTitle() { return promotionTitle; }
+    public void setPromotionTitle(String promotionTitle) { this.promotionTitle = promotionTitle; }
+
 }

@@ -10,6 +10,7 @@ public class ReservationRequestDTO {
     private Integer numberOfGuests;
     private Long tableId;
     private String specialRequest;
+    private String status;
 
     public ReservationRequestDTO() {
     }
@@ -76,5 +77,12 @@ public class ReservationRequestDTO {
 
     public void setSpecialRequest(String specialRequest) {
         this.specialRequest = specialRequest;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

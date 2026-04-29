@@ -112,6 +112,7 @@
 
         <!-- Login Form -->
         <form action="/login" method="post" id="loginForm">
+            <input type="hidden" name="redirect" id="redirectInput">
             <!-- Email/Username Input -->
             <div class="form-group">
                 <div class="input-wrapper">
@@ -149,6 +150,7 @@
 
         <!-- Google OAuth Form -->
         <form id="googleForm" action="/auth/oauth2/login" method="post">
+            <input type="hidden" name="redirect" id="googleRedirectInput">
             <button type="submit" class="btn-social">
                 <i class="bi bi-google"></i> Đăng nhập với Google
             </button>
@@ -210,6 +212,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const params = new URLSearchParams(window.location.search);
+        const redirect = params.get('redirect');
 
         const rawMessage = params.get('message');
         const rawError = params.get('error');
@@ -268,6 +271,17 @@
             sessionStorage.setItem(toastKey, '1');
             window.history.replaceState({}, document.title, window.location.pathname);
             return;
+        }
+
+
+        const redirectInput = document.getElementById('redirectInput');
+        if (redirect && redirectInput) {
+            redirectInput.value = redirect;
+        }
+
+        const googleRedirectInput = document.getElementById('googleRedirectInput');
+        if (redirect && googleRedirectInput) {
+            googleRedirectInput.value = redirect;
         }
     });
 </script>

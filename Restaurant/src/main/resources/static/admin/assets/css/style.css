@@ -1216,3 +1216,39 @@ a {
         min-width: 100%;
     }
 }
+th, td {
+    white-space: normal !important;
+    padding: 0.8rem 0.7rem !important;
+    /* hoặc giảm tiếp để badge nhỏ hơn */
+}
+
+.table {
+    min-width: 900px !important; /* hoặc bỏ */
+    width: 100%;
+}
+
+#reservationPagination {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 24px 0 18px 0;
+}
+/* Fix layout bị chừa cột trống / bị cắt */
+.wrapper {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.sidebar {
+  flex: 0 0 auto; /* giữ nguyên width sidebar theo template */
+}
+
+.main {
+  flex: 1 1 auto;
+  min-width: 0;          /* quan trọng: tránh tràn làm lệch layout */
+  width: auto !important;
+  margin-left: 0 !important; /* nếu template set margin-left cố định */
+  padding-left: 0;
+}
+

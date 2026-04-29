@@ -80,6 +80,12 @@
                     <span>Đánh giá</span>
                 </a>
             </li>
+            <li class="nav-item active">
+                <a href="/admin/forms/admin-promotion.html" class="nav-link">
+                    <i class="bi bi-megaphone-fill"></i>
+                    <span>Khuyến mãi</span>
+                </a>
+            </li>
         </ul>
 
         <div class="sidebar-footer">
@@ -167,7 +173,7 @@
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-outline-primary w-100" onclick="applyFilters()">
+                            <button id="filter-btn" class="btn btn-outline-primary w-100">
                                 <i class="bi bi-funnel me-1"></i> Lọc
                             </button>
                         </div>
@@ -180,7 +186,7 @@
                     <h5>Danh sách đặt bàn</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
+                    <div class="table-responsive" >
                         <table class="table table-hover mb-0" id="reservationTable">
                             <thead>
                             <tr>
@@ -191,6 +197,7 @@
                                 <th>Thời gian</th>
                                 <th>Số khách</th>
                                 <th>Bàn</th>
+                                <th>Cọc</th>
                                 <th>Trạng thái</th>
                                 <th style="width: 220px;">Thao tác</th>
                             </tr>
@@ -198,9 +205,17 @@
                             <tbody id="reservationTableBody"></tbody>
                         </table>
                     </div>
+                    <div id="reservationPagination" style="margin: 16px 0;"></div>
                 </div>
                 <div class="card-footer d-flex justify-content-between align-items-center" style="background: var(--dark-light); border-top: 1px solid var(--gray-800); padding: 1rem 1.25rem;">
-                    <span class="text-muted" id="tableSummary">Hiển thị 0 đặt bàn</span>
+                    <div id="reservationStats">Tổng <span id="totalReservations">0</span> đặt bàn</div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportReservations()">
+                            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Xuất Excel
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="printReservations()">
+                            <i class="bi bi-printer me-1"></i> In ấn
+                        </button>
                 </div>
             </div>
         </div><!-- /.page-content -->
@@ -277,13 +292,36 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                 <button type="button" class="btn btn-primary" onclick="saveReservation()">Lưu đặt bàn</button>
-            </div>
+             </div>
+         </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://unpkg.com/stompjs@2.3.3/lib/stomp.min.js"></script>
 <script src="../assets/js/main.js"></script>
 <script src="../assets/js/reservation.js"></script>
+<script>
+    async function markReservationsAllSeenIfOnReservationPage() {
+    const page = (window.location.pathname.split("/").pop() || "").toLowerCase();
+    if (page !== "reservation.html") return;
+
+    try {
+        await fetch(RESERVATION_MARK_ALL_SEEN_URL, {
+            method: "POST",
+            credentials: "include"
+        });
+
+        // Sau khi mark, refresh badge ngay (dù WS cũng sẽ bắn về 0)
+        const reservationCount = await loadReservationUnreadBadge();
+        updateTopbarUnreadBadge(reservationCount, lastOrderUnreadCount);
+        lastReservationUnreadCount = reservationCount;
+    } catch (e) {
+        console.warn("markAllSeen failed:", e);
+    }
+}
+    </script>
 </body>
 </html>

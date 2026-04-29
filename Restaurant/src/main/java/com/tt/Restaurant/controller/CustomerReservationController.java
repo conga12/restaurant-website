@@ -5,6 +5,9 @@ import com.tt.Restaurant.dto.ReservationRequestDTO;
 import com.tt.Restaurant.dto.ReservationResponseDTO;
 import com.tt.Restaurant.model.Reservation;
 import com.tt.Restaurant.service.ReservationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +18,8 @@ import java.util.List;
 public class CustomerReservationController {
 
     private final ReservationService reservationService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     public CustomerReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
@@ -23,14 +28,23 @@ public class CustomerReservationController {
     @PostMapping
     public ReservationResponseDTO createReservation(
             @RequestBody ReservationRequestDTO requestDTO,
-            Authentication authentication
+            Authentication authentication // cho phép null
     ) {
-        String email = authentication.getName();
-
         Reservation reservation = ReservationMapper.toEntity(requestDTO);
+        Reservation saved;
 
-        Reservation saved = reservationService.createReservationForCurrentUser(reservation, email);
+        if (authentication != null) {
+            String email = authentication.getName();
+            saved = reservationService.createReservationForCurrentUser(reservation, email);
+        } else {
+            // Khách vãng lai, không có user gắn vào Reservation
+            saved = reservationService.createReservation(reservation);
+        }
 
+        // Bắn websocket notify SAU khi lưu thành công
+        messagingTemplate.convertAndSend("/topic/reservation-unread", "updated");
+
+        // Trả về dữ liệu đúng
         return ReservationMapper.toResponseDTO(saved);
     }
 

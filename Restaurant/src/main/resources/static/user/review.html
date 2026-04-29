@@ -5,157 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Reviews - RestaurantOS">
   <title>Reviews - RestaurantOS</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="/user/assets/css/style.css">
+  <link rel="stylesheet" href="/user/assets/css/review-feed.css">
 </head>
 <body>
-  <!-- ============================================
-       HEADER & NAVIGATION
-       ============================================ -->
-  <header>
-    <div class="header-container">
-      <div class="logo">RestaurantOS</div>
+<!-- ============================================
+     HEADER & NAVIGATION
+     ============================================ -->
+<header>
+  <div class="header-container">
+    <div class="header-logo">
+      <div class="logo">
+        <img src="/auth/images/logo-huongviet.png" alt="Logo Hương Việt" class="logo-img">
+        <span class="logo-text">HƯƠNG VIỆT</span>
+      </div>
+    </div>
+    <div class="header-nav">
       <nav>
-        <a href="index.html">Home</a>
-        <a href="menu.html">Menu</a>
-        <a href="reservation.html">Reservations</a>
+        <a href="/user/index.html">Home</a>
+        <a href="/user/menu.html">Menu</a>
+        <a href="/user/reservation.html">Reservations</a>
         <a href="/user/reservation-history.html">My Bookings</a>
-        <a href="review.html">Reviews</a>
-        <a href="contact.html">Contact</a>
+        <a href="/user/review.html">Reviews</a>
+        <a href="/user/contact.html">Contact</a>
       </nav>
+    </div>
+    <div class="header-reserve">
       <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
-      <div class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
     </div>
-  </header>
-
-  <!-- ============================================
-       HERO SECTION
-       ============================================ -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Guest Reviews</h1>
-      <p>See what our guests have to say about their dining experience</p>
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
-  </section>
+  </div>
+</header>
 
-  <!-- ============================================
-       REVIEWS SECTION
-       ============================================ -->
-  <section class="container">
-    <!-- Review Stats -->
-    <div class="grid grid-3" style="margin-bottom: 3rem; text-align: center;">
-      <div class="card">
-        <h3 style="color: var(--color-accent); font-size: 2.5rem; margin: 0;">4.8</h3>
-        <p style="margin: 0;">Average Rating</p>
-        <div class="stars" style="justify-content: center;">
-          <span class="star">★</span>
-          <span class="star">★</span>
-          <span class="star">★</span>
-          <span class="star">★</span>
-          <span class="star">★</span>
-        </div>
-      </div>
-      <div class="card">
-        <h3 style="color: var(--color-accent); font-size: 2.5rem; margin: 0;">500+</h3>
-        <p style="margin: 0;">Total Reviews</p>
-      </div>
-      <div class="card">
-        <h3 style="color: var(--color-accent); font-size: 2.5rem; margin: 0;">98%</h3>
-        <p style="margin: 0;">Recommended</p>
+<!-- ============================================
+     HERO SECTION
+     ============================================ -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Guest Reviews</h1>
+    <p>See what our guests have to say about their dining experience</p>
+  </div>
+</section>
+
+<!-- ============================================
+     REVIEWS + REVIEW FORM (2 COLUMNS)
+     ============================================ -->
+<section class="container reviews-page">
+  <div class="grid grid-3 reviews-stats">
+
+    <div class="card">
+      <!-- Review Stats -->
+      <h3 id="avgRating" style="color: var(--color-accent); font-size: 2.5rem; margin: 0;">--</h3>
+      <p style="margin: 0;">Average Rating</p>
+      <div class="stars" style="justify-content: center;">
+        <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
       </div>
     </div>
 
-    <!-- All Reviews -->
-    <div class="section-title">
-      <h2>Recent Reviews</h2>
-      <p>Read what our guests have shared about their experience</p>
+    <div class="card">
+      <h3 id="totalReviews" style="color: var(--color-accent); font-size: 2.5rem; margin: 0;">--</h3>
+      <p style="margin: 0;">Total Reviews</p>
     </div>
+    <div class="card">
+      <h3 id="recommendedPercent" style="color: var(--color-accent); font-size: 2.5rem; margin: 0;">--%</h3>
+      <p style="margin: 0;">Recommended</p>
+    </div>
+  </div>
 
-    <div id="reviewsList" style="min-height: 300px;">
-      <!-- Reviews will be loaded here by JavaScript -->
-      <div class="grid grid-2">
-        <!-- Default reviews -->
-        <div class="testimonial-card">
-          <div class="stars">
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-          </div>
-          <p class="testimonial-text">"An absolutely exceptional dining experience. The food was exquisite, the service impeccable, and the atmosphere perfect for our anniversary celebration. We will definitely return!"</p>
-          <p class="testimonial-author">- Sarah Johnson</p>
-          <p style="font-size: 0.85rem; color: #999; margin: 0;">12/15/2024</p>
-        </div>
+      <!-- Recent Reviews -->
+  <div class="reviews-grid">
+    <!-- LEFT -->
+    <div class="reviews-left">
+      <div class="section-title">
+        <h2>Recent Reviews</h2>
+        <p>Read what our guests have shared about their experience</p>
+      </div>
 
-        <div class="testimonial-card">
-          <div class="stars">
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-          </div>
-          <p class="testimonial-text">"Every dish was a masterpiece. The chef's attention to detail is remarkable, and the wine pairings were spot-on. One of the best dining experiences we've had."</p>
-          <p class="testimonial-author">- Michael Chen</p>
-          <p style="font-size: 0.85rem; color: #999; margin: 0;">12/10/2024</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="stars">
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-          </div>
-          <p class="testimonial-text">"RestaurantOS is simply the best. The ambiance is elegant, the staff is attentive, and the food is absolutely divine. Can't wait to go back!"</p>
-          <p class="testimonial-author">- Emily Rodriguez</p>
-          <p style="font-size: 0.85rem; color: #999; margin: 0;">12/08/2024</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="stars">
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-          </div>
-          <p class="testimonial-text">"Outstanding experience from start to finish. The chef's tasting menu was innovative and delicious. The service was flawless. Worth every penny!"</p>
-          <p class="testimonial-author">- David Thompson</p>
-          <p style="font-size: 0.85rem; color: #999; margin: 0;">12/01/2024</p>
-        </div>
+      <div id="reviewsList" style="min-height: 300px;">
+        <p>Loading reviews...</p>
       </div>
     </div>
-  </section>
 
-  <!-- ============================================
-       REVIEW FORM SECTION
-       ============================================ -->
-  <section class="container" style="background-color: var(--color-light-gray); padding: 4rem 2rem; margin: 2rem 0;">
-    <div style="max-width: 600px; margin: 0 auto;">
+    <!-- RIGHT: Share review -->
+    <div class="reviews-right">
       <div class="section-title">
         <h2>Share Your Experience</h2>
         <p>We'd love to hear about your dining experience at RestaurantOS</p>
       </div>
 
       <div class="card" style="padding: 2rem;">
-        <form id="reviewForm">
-          <!-- Name -->
-          <div class="form-group">
-            <label for="reviewer-name">Your Name *</label>
-            <input type="text" id="reviewer-name" name="name" required placeholder="John Doe">
-            <div class="form-error"></div>
-          </div>
+        <div id="reviewLoginHint" class="card" style="padding: 1rem; display:none; margin-bottom: 1rem;">
+          Vui lòng <a href="/auth/login.html?redirect=/user/review.html">đăng nhập</a> để gửi đánh giá.
+        </div>
 
-          <!-- Email -->
+        <form id="reviewForm">
+          <!-- Eligible target: order/reservation -->
           <div class="form-group">
-            <label for="reviewer-email">Email Address *</label>
-            <input type="email" id="reviewer-email" name="email" required placeholder="john@example.com">
+            <label for="reviewTarget">Đánh giá cho *</label>
+            <select id="reviewTarget" required>
+              <option value="">Chọn đơn hàng/đặt bàn đã hoàn thành</option>
+            </select>
             <div class="form-error"></div>
           </div>
 
@@ -176,17 +129,26 @@
           <!-- Review Text -->
           <div class="form-group">
             <label for="review-text">Your Review *</label>
-            <textarea id="review-text" name="review" required placeholder="Tell us about your dining experience. What did you enjoy? What could be improved?" style="min-height: 150px;"></textarea>
+            <textarea id="review-text" name="review" required
+                      placeholder="Tell us about your dining experience. What did you enjoy? What could be improved?"
+                      style="min-height: 150px;"></textarea>
             <div class="form-error"></div>
           </div>
 
+          <div class="form-group">
+            <label for="reviewImages">Ảnh (tối đa 6 ảnh, jpg/png/webp)</label>
+            <input type="file" id="reviewImages" accept="image/*" multiple />
+          </div>
+
           <!-- Submit Button -->
-          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Submit Review</button>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+            Submit Review
+          </button>
         </form>
       </div>
 
       <!-- Review Guidelines -->
-      <div class="card" style="margin-top: 2rem; background-color: #f8f9fa;">
+      <div class="card reviews-guidelines">
         <h4>Review Guidelines</h4>
         <ul style="list-style: none; padding: 0; font-size: 0.95rem;">
           <li style="padding: 0.5rem 0;">✓ Be honest and fair in your review</li>
@@ -197,55 +159,59 @@
         </ul>
       </div>
     </div>
-  </section>
 
-  <!-- ============================================
-       FOOTER
-       ============================================ -->
-  <footer>
-    <div class="footer-content">
-      <div class="footer-section">
-        <h4>RestaurantOS</h4>
-        <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
-        <div class="social-links">
-          <a href="#facebook" title="Facebook">f</a>
-          <a href="#twitter" title="Twitter">𝕏</a>
-          <a href="#instagram" title="Instagram">📷</a>
-          <a href="#youtube" title="YouTube">▶️</a>
-        </div>
-      </div>
+  </div>
+</section>
 
-      <div class="footer-section">
-        <h4>Quick Links</h4>
-        <a href="index.html">Home</a>
-        <a href="menu.html">Menu</a>
-        <a href="reservation.html">Reservations</a>
-        <a href="review.html">Reviews</a>
-        <a href="contact.html">Contact</a>
-      </div>
-
-      <div class="footer-section">
-        <h4>Hours of Operation</h4>
-        <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
-        <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
-        <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
-        <p><strong>Closed:</strong> Mondays (except holidays)</p>
-      </div>
-
-      <div class="footer-section">
-        <h4>Contact Info</h4>
-        <p>📍 123 Gourmet Street, Food City, FC 12345</p>
-        <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
-        <p>✉️ <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
-        <p>🌐 www.restaurantos.com</p>
+<!-- ============================================
+     FOOTER
+     ============================================ -->
+<footer>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>RestaurantOS</h4>
+      <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+      <div class="social-links">
+        <a href="#facebook" title="Facebook">f</a>
+        <a href="#twitter" title="Twitter">𝕏</a>
+        <a href="#instagram" title="Instagram">📷</a>
+        <a href="#youtube" title="YouTube">▶️</a>
       </div>
     </div>
 
-    <div class="footer-bottom">
-      <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    <div class="footer-section">
+      <h4>Quick Links</h4>
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="reservation.html">Reservations</a>
+      <a href="review.html">Reviews</a>
+      <a href="contact.html">Contact</a>
     </div>
-  </footer>
 
-  <script src="assets/js/main.js"></script>
+    <div class="footer-section">
+      <h4>Hours of Operation</h4>
+      <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
+      <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
+      <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
+      <p><strong>Closed:</strong> Mondays (except holidays)</p>
+    </div>
+
+    <div class="footer-section">
+      <h4>Contact Info</h4>
+      <p>📍 123 Gourmet Street, Food City, FC 12345</p>
+      <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
+      <p>✉️ <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
+      <p>🌐 www.restaurantos.com</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="/user/assets/js/review.js"></script>
 </body>
 </html>

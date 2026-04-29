@@ -81,6 +81,21 @@ public class Orders {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "promotion_id")
+    private Promotion promotion;
+
+    @Column(name = "origin_amount")
+    private BigDecimal originAmount;
+
+    @Column(name = "final_amount")
+    private BigDecimal finalAmount;
+
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount;
+
+    private Integer discountPercent;
+
     public Orders() {
     }
 
@@ -206,5 +221,28 @@ public class Orders {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Promotion getPromotion() { return promotion; }
+
+    public void setPromotion(Promotion promotion) { this.promotion = promotion; }
+
+    public BigDecimal getOriginAmount() { return originAmount; }
+
+    public void setOriginAmount(BigDecimal originAmount) { this.originAmount = originAmount; }
+
+    public BigDecimal getFinalAmount() { return finalAmount; }
+
+    public void setFinalAmount(BigDecimal finalAmount) { this.finalAmount = finalAmount; }
+
+    public BigDecimal getDiscountAmount() { return discountAmount; }
+
+    public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount; }
+
+    public Integer getDiscountPercent() {
+        return discountPercent;
+    }
+    public void setDiscountPercent(Integer discountPercent) {
+        this.discountPercent = discountPercent;
     }
 }

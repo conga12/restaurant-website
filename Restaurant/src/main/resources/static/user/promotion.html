@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Khuyến Mãi & Sự kiện</title>
+    <style>
+        .promo-card {
+          background: #fff;
+          border-radius: 11px;
+          margin:1.5rem auto;
+          max-width: 680px;
+          box-shadow: 0 4px 22px #0001;
+          display: flex; gap: 1.3rem; align-items: flex-start;
+          padding: 1.1rem 1.3rem;
+        }
+        .promo-card img { width: 96px; height: 96px; object-fit:cover; border-radius: 8px;}
+        .promo-info { flex:1;}
+        .promo-title { font-size:1.25rem; font-weight:bold;}
+        .promo-discount { color: #16a34a; font-weight:700;}
+        .promo-date { color: #888; }
+        body { background: #fafaf3; font-family: Arial,sans-serif;}
+    </style>
+</head>
+<body>
+<h2 style="text-align:center; margin-top:1.5rem;">🎉 Khuyến mãi & Sự kiện nổi bật</h2>
+<div id="promo-list"></div>
+<script>
+    fetch('/api/promotions').then(r=>r.json()).then(list => {
+      promo_list.innerHTML = list.length ? list.map(p => `
+        <div class="promo-card">
+          <img src="${p.imageUrl}" alt="">
+          <div class="promo-info">
+            <div class="promo-title">${p.title}
+              ${p.discountPercent ? `- <span class="promo-discount">${p.discountPercent}% OFF</span>` : ""}
+            </div>
+            <div class="promo-date">
+              ${p.startDate} &ndash; ${p.endDate} ${p.place ? (" | " + p.place) : ""}
+            </div>
+            <div>${p.description}</div>
+            ${p.code ? `<div><b>Mã ưu đãi:</b> <code>${p.code}</code></div>` : ""}
+          </div>
+        </div>
+      `).join('') : '<p style="text-align:center">Chưa có khuyến mãi nào!</p>';
+    });
+</script>
+</body>
+</html>

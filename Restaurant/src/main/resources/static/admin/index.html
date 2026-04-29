@@ -14,492 +14,501 @@
     <link href="/admin/assets/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <div class="wrapper">
-        <!-- Sidebar -->
-        <nav id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <i class="bi bi-shop"></i>
-                    <span>RestaurantOS</span>
-                </div>
+<div class="wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="bi bi-shop"></i>
+                <span>RestaurantOS</span>
             </div>
-            <ul class="sidebar-nav">
-                <li class="nav-item active">
-                    <a href="/admin/index.html" class="nav-link">
-                        <i class="bi bi-grid-1x2-fill"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/category.html" class="nav-link">
-                        <i class="bi bi-folder-fill"></i>
-                        <span>Danh mục</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/product.html" class="nav-link">
-                        <i class="bi bi-cup-hot-fill"></i>
-                        <span>Món ăn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/table.html" class="nav-link">
-                        <i class="bi bi-grid-3x3-gap-fill"></i>
-                        <span>Bàn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/reservation.html" class="nav-link">
-                        <i class="bi bi-calendar-check-fill"></i>
-                        <span>Đặt bàn</span>
-                        <span id="reservationUnreadBadge" class="sidebar-menu-badge d-none">0</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/order.html" class="nav-link">
-                        <i class="bi bi-receipt"></i>
-                        <span>Đơn hàng</span>
-                        <span id="orderUnreadBadge" class="sidebar-menu-badge d-none">0</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/payment.html" class="nav-link">
-                        <i class="bi bi-credit-card-fill"></i>
-                        <span>Thanh toán</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/user.html" class="nav-link">
-                        <i class="bi bi-people-fill"></i>
-                        <span>Người dùng</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/review.html" class="nav-link">
-                        <i class="bi bi-star-fill"></i>
-                        <span>Đánh giá</span>
-                    </a>
-                </li>
-            </ul>
-            <div class="sidebar-footer">
-                <a href="../auth/login.html" class="nav-link text-danger">
-                    <i class="bi bi-box-arrow-left"></i>
-                    <span>Đăng xuất</span>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="nav-item active">
+                <a href="/admin/index.html" class="nav-link">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
                 </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/category.html" class="nav-link">
+                    <i class="bi bi-folder-fill"></i>
+                    <span>Danh mục</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/product.html" class="nav-link">
+                    <i class="bi bi-cup-hot-fill"></i>
+                    <span>Món ăn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/table.html" class="nav-link">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                    <span>Bàn</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/reservation.html" class="nav-link">
+                    <i class="bi bi-calendar-check-fill"></i>
+                    <span>Đặt bàn</span>
+                    <span id="reservationUnreadBadge" class="sidebar-menu-badge d-none">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/order.html" class="nav-link">
+                    <i class="bi bi-receipt"></i>
+                    <span>Đơn hàng</span>
+                    <span id="orderUnreadBadge" class="sidebar-menu-badge d-none">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/payment.html" class="nav-link">
+                    <i class="bi bi-credit-card-fill"></i>
+                    <span>Thanh toán</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/user.html" class="nav-link">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Người dùng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/forms/review.html" class="nav-link">
+                    <i class="bi bi-star-fill"></i>
+                    <span>Đánh giá</span>
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a href="/admin/forms/admin-promotion.html" class="nav-link">
+                    <i class="bi bi-megaphone-fill"></i>
+                    <span>Khuyến mãi</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="../auth/login.html" class="nav-link text-danger">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Đăng xuất</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div id="content" class="content">
+        <!-- Top Bar -->
+        <nav class="topbar">
+            <button id="sidebarToggle" class="btn btn-link">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Tìm kiếm...">
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-icon position-relative" type="button" title="Thông báo">
+                    <i class="bi bi-bell"></i>
+                    <span id="topbarUnreadBadge"
+                          class="badge bg-danger position-absolute top-0 start-100 translate-middle d-none">0</span>
+                </button>
+                <div class="dropdown">
+                    <button class="btn user-dropdown" data-bs-toggle="dropdown">
+                        <div class="avatar" id="topbarAvatar">--</div>
+                        <span id="topbarName">---</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Cài đặt</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="../auth/login.html"><i
+                                class="bi bi-box-arrow-left"></i> Đăng xuất</a></li>
+                    </ul>
+                </div>
             </div>
         </nav>
 
-        <!-- Main Content -->
-        <div id="content" class="content">
-            <!-- Top Bar -->
-            <nav class="topbar">
-                <button id="sidebarToggle" class="btn btn-link">
-                    <i class="bi bi-list"></i>
-                </button>
-                <div class="search-box">
-                    <i class="bi bi-search"></i>
-                    <input type="text" placeholder="Tìm kiếm...">
-                </div>
-                <div class="topbar-right">
-                    <button class="btn btn-icon position-relative" type="button" title="Thông báo">
-                        <i class="bi bi-bell"></i>
-                        <span id="topbarUnreadBadge" class="badge bg-danger position-absolute top-0 start-100 translate-middle d-none">0</span>
-                    </button>
-                    <div class="dropdown">
-                        <button class="btn user-dropdown" data-bs-toggle="dropdown">
-                            <div class="avatar" id="topbarAvatar">--</div>
-                            <span id="topbarName">---</span>
-                            <i class="bi bi-chevron-down"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Hồ sơ</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Cài đặt</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="../auth/login.html"><i class="bi bi-box-arrow-left"></i> Đăng xuất</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+        <!-- Page Content -->
+        <div class="page-content">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p class="text-muted">Tổng quan hoạt động nhà hàng</p>
+            </div>
 
-            <!-- Page Content -->
-            <div class="page-content">
-                <div class="page-header">
-                    <h1>Dashboard</h1>
-                    <p class="text-muted">Tổng quan hoạt động nhà hàng</p>
-                </div>
-
-                <!-- Stats Cards -->
-                <div class="row g-4 mb-4">
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card stat-card-primary">
-                            <div class="stat-icon">
-                                <i class="bi bi-currency-dollar"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>45,850,000đ</h3>
-                                <p>Doanh thu hôm nay</p>
-                            </div>
-                            <div class="stat-change positive">
-                                <i class="bi bi-arrow-up"></i> 12.5%
-                            </div>
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-primary">
+                        <div class="stat-icon">
+                            <i class="bi bi-currency-dollar"></i>
                         </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card stat-card-success">
-                            <div class="stat-icon">
-                                <i class="bi bi-bag-check"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>156</h3>
-                                <p>Đơn hàng</p>
-                            </div>
-                            <div class="stat-change positive">
-                                <i class="bi bi-arrow-up"></i> 8.2%
-                            </div>
+                        <div class="stat-info">
+                            <h3>45,850,000đ</h3>
+                            <p>Doanh thu hôm nay</p>
                         </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card stat-card-warning">
-                            <div class="stat-icon">
-                                <i class="bi bi-calendar-check"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>24</h3>
-                                <p>Đặt bàn</p>
-                            </div>
-                            <div class="stat-change negative">
-                                <i class="bi bi-arrow-down"></i> 3.1%
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card stat-card-info">
-                            <div class="stat-icon">
-                                <i class="bi bi-people"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>1,248</h3>
-                                <p>Khách hàng</p>
-                            </div>
-                            <div class="stat-change positive">
-                                <i class="bi bi-arrow-up"></i> 5.7%
-                            </div>
+                        <div class="stat-change positive">
+                            <i class="bi bi-arrow-up"></i> 12.5%
                         </div>
                     </div>
                 </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-success">
+                        <div class="stat-icon">
+                            <i class="bi bi-bag-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>156</h3>
+                            <p>Đơn hàng</p>
+                        </div>
+                        <div class="stat-change positive">
+                            <i class="bi bi-arrow-up"></i> 8.2%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-warning">
+                        <div class="stat-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>24</h3>
+                            <p>Đặt bàn</p>
+                        </div>
+                        <div class="stat-change negative">
+                            <i class="bi bi-arrow-down"></i> 3.1%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-info">
+                        <div class="stat-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>1,248</h3>
+                            <p>Khách hàng</p>
+                        </div>
+                        <div class="stat-change positive">
+                            <i class="bi bi-arrow-up"></i> 5.7%
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Charts Row -->
-                <div class="row g-4 mb-4">
-                    <div class="col-xl-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Doanh thu tuần này</h5>
-                                <div class="card-actions">
-                                    <select class="form-select form-select-sm">
-                                        <option>Tuần này</option>
-                                        <option>Tháng này</option>
-                                        <option>Năm nay</option>
-                                    </select>
-                                </div>
+            <!-- Charts Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Doanh thu tuần này</h5>
+                            <div class="card-actions">
+                                <select class="form-select form-select-sm">
+                                    <option>Tuần này</option>
+                                    <option>Tháng này</option>
+                                    <option>Năm nay</option>
+                                </select>
                             </div>
-                            <div class="card-body">
-                                <div style="height: 300px;">
-                                    <canvas id="revenueChart"></canvas>
-                                </div>
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 300px;">
+                                <canvas id="revenueChart"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Trạng thái đơn hàng</h5>
+                </div>
+                <div class="col-xl-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Trạng thái đơn hàng</h5>
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 260px;">
+                                <canvas id="orderStatusChart"></canvas>
                             </div>
-                            <div class="card-body">
-                                <div style="height: 260px;">
-                                    <canvas id="orderStatusChart"></canvas>
+                            <div class="chart-legend mt-3">
+                                <div class="legend-item">
+                                    <span class="legend-color" style="background: #10b981;"></span>
+                                    <span>Hoàn thành (65%)</span>
                                 </div>
-                                <div class="chart-legend mt-3">
-                                    <div class="legend-item">
-                                        <span class="legend-color" style="background: #10b981;"></span>
-                                        <span>Hoàn thành (65%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <span class="legend-color" style="background: #f59e0b;"></span>
-                                        <span>Đang xử lý (25%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <span class="legend-color" style="background: #ef4444;"></span>
-                                        <span>Đã hủy (10%)</span>
-                                    </div>
+                                <div class="legend-item">
+                                    <span class="legend-color" style="background: #f59e0b;"></span>
+                                    <span>Đang xử lý (25%)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color" style="background: #ef4444;"></span>
+                                    <span>Đã hủy (10%)</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Tables Row -->
-                <div class="row g-4 mb-4">
-                    <!-- Recent Orders -->
-                    <div class="col-xl-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Đơn hàng gần đây</h5>
-                                <a href="forms/order.html" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
-                            </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Mã đơn</th>
-                                                <th>Bàn</th>
-                                                <th>Tổng tiền</th>
-                                                <th>Trạng thái</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><strong>#ORD001</strong></td>
-                                                <td>Bàn 5</td>
-                                                <td>850,000đ</td>
-                                                <td><span class="badge bg-warning">Đang nấu</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>#ORD002</strong></td>
-                                                <td>Bàn 12</td>
-                                                <td>1,250,000đ</td>
-                                                <td><span class="badge bg-success">Hoàn thành</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>#ORD003</strong></td>
-                                                <td>Bàn 3</td>
-                                                <td>450,000đ</td>
-                                                <td><span class="badge bg-info">Chờ thanh toán</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>#ORD004</strong></td>
-                                                <td>Bàn 8</td>
-                                                <td>2,100,000đ</td>
-                                                <td><span class="badge bg-primary">Đã nhận</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>#ORD005</strong></td>
-                                                <td>Bàn 1</td>
-                                                <td>680,000đ</td>
-                                                <td><span class="badge bg-success">Hoàn thành</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+            <!-- Tables Row -->
+            <div class="row g-4 mb-4">
+                <!-- Recent Orders -->
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Đơn hàng gần đây</h5>
+                            <a href="forms/order.html" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Mã đơn</th>
+                                        <th>Bàn</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><strong>#ORD001</strong></td>
+                                        <td>Bàn 5</td>
+                                        <td>850,000đ</td>
+                                        <td><span class="badge bg-warning">Đang nấu</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>#ORD002</strong></td>
+                                        <td>Bàn 12</td>
+                                        <td>1,250,000đ</td>
+                                        <td><span class="badge bg-success">Hoàn thành</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>#ORD003</strong></td>
+                                        <td>Bàn 3</td>
+                                        <td>450,000đ</td>
+                                        <td><span class="badge bg-info">Chờ thanh toán</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>#ORD004</strong></td>
+                                        <td>Bàn 8</td>
+                                        <td>2,100,000đ</td>
+                                        <td><span class="badge bg-primary">Đã nhận</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>#ORD005</strong></td>
+                                        <td>Bàn 1</td>
+                                        <td>680,000đ</td>
+                                        <td><span class="badge bg-success">Hoàn thành</span></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Recent Reservations -->
-                    <div class="col-xl-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Đặt bàn hôm nay</h5>
-                                <a href="forms/reservation.html" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                <!-- Recent Reservations -->
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Đặt bàn hôm nay</h5>
+                            <a href="forms/reservation.html" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Khách hàng</th>
+                                        <th>Thời gian</th>
+                                        <th>Số khách</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar avatar-sm">NT</div>
+                                                <span>Nguyễn Văn Tùng</span>
+                                            </div>
+                                        </td>
+                                        <td>18:00</td>
+                                        <td>4 người</td>
+                                        <td><span class="badge bg-success">Đã xác nhận</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar avatar-sm">TH</div>
+                                                <span>Trần Thị Hoa</span>
+                                            </div>
+                                        </td>
+                                        <td>19:30</td>
+                                        <td>6 người</td>
+                                        <td><span class="badge bg-warning">Chờ xác nhận</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar avatar-sm">LM</div>
+                                                <span>Lê Minh</span>
+                                            </div>
+                                        </td>
+                                        <td>20:00</td>
+                                        <td>2 người</td>
+                                        <td><span class="badge bg-success">Đã xác nhận</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar avatar-sm">PD</div>
+                                                <span>Phạm Duy</span>
+                                            </div>
+                                        </td>
+                                        <td>20:30</td>
+                                        <td>8 người</td>
+                                        <td><span class="badge bg-info">VIP</span></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Khách hàng</th>
-                                                <th>Thời gian</th>
-                                                <th>Số khách</th>
-                                                <th>Trạng thái</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <div class="avatar avatar-sm">NT</div>
-                                                        <span>Nguyễn Văn Tùng</span>
-                                                    </div>
-                                                </td>
-                                                <td>18:00</td>
-                                                <td>4 người</td>
-                                                <td><span class="badge bg-success">Đã xác nhận</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <div class="avatar avatar-sm">TH</div>
-                                                        <span>Trần Thị Hoa</span>
-                                                    </div>
-                                                </td>
-                                                <td>19:30</td>
-                                                <td>6 người</td>
-                                                <td><span class="badge bg-warning">Chờ xác nhận</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <div class="avatar avatar-sm">LM</div>
-                                                        <span>Lê Minh</span>
-                                                    </div>
-                                                </td>
-                                                <td>20:00</td>
-                                                <td>2 người</td>
-                                                <td><span class="badge bg-success">Đã xác nhận</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <div class="avatar avatar-sm">PD</div>
-                                                        <span>Phạm Duy</span>
-                                                    </div>
-                                                </td>
-                                                <td>20:30</td>
-                                                <td>8 người</td>
-                                                <td><span class="badge bg-info">VIP</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row -->
+            <div class="row g-4">
+                <!-- Top Dishes -->
+                <div class="col-xl-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Món bán chạy</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="top-item">
+                                <div class="top-item-info">
+                                    <span class="rank">1</span>
+                                    <span class="name">Phở bò tái chín</span>
+                                </div>
+                                <div class="top-item-stats">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 95%"></div>
+                                    </div>
+                                    <span>156 phần</span>
+                                </div>
+                            </div>
+                            <div class="top-item">
+                                <div class="top-item-info">
+                                    <span class="rank">2</span>
+                                    <span class="name">Cơm tấm sườn bì</span>
+                                </div>
+                                <div class="top-item-stats">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 82%"></div>
+                                    </div>
+                                    <span>134 phần</span>
+                                </div>
+                            </div>
+                            <div class="top-item">
+                                <div class="top-item-info">
+                                    <span class="rank">3</span>
+                                    <span class="name">Bún chả Hà Nội</span>
+                                </div>
+                                <div class="top-item-stats">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 68%"></div>
+                                    </div>
+                                    <span>112 phần</span>
+                                </div>
+                            </div>
+                            <div class="top-item">
+                                <div class="top-item-info">
+                                    <span class="rank">4</span>
+                                    <span class="name">Bánh mì thịt nướng</span>
+                                </div>
+                                <div class="top-item-stats">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 55%"></div>
+                                    </div>
+                                    <span>89 phần</span>
+                                </div>
+                            </div>
+                            <div class="top-item">
+                                <div class="top-item-info">
+                                    <span class="rank">5</span>
+                                    <span class="name">Gỏi cuốn tôm thịt</span>
+                                </div>
+                                <div class="top-item-stats">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 42%"></div>
+                                    </div>
+                                    <span>68 phần</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bottom Row -->
-                <div class="row g-4">
-                    <!-- Top Dishes -->
-                    <div class="col-xl-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Món bán chạy</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="top-item">
-                                    <div class="top-item-info">
-                                        <span class="rank">1</span>
-                                        <span class="name">Phở bò tái chín</span>
-                                    </div>
-                                    <div class="top-item-stats">
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 95%"></div>
-                                        </div>
-                                        <span>156 phần</span>
-                                    </div>
-                                </div>
-                                <div class="top-item">
-                                    <div class="top-item-info">
-                                        <span class="rank">2</span>
-                                        <span class="name">Cơm tấm sườn bì</span>
-                                    </div>
-                                    <div class="top-item-stats">
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 82%"></div>
-                                        </div>
-                                        <span>134 phần</span>
-                                    </div>
-                                </div>
-                                <div class="top-item">
-                                    <div class="top-item-info">
-                                        <span class="rank">3</span>
-                                        <span class="name">Bún chả Hà Nội</span>
-                                    </div>
-                                    <div class="top-item-stats">
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 68%"></div>
-                                        </div>
-                                        <span>112 phần</span>
-                                    </div>
-                                </div>
-                                <div class="top-item">
-                                    <div class="top-item-info">
-                                        <span class="rank">4</span>
-                                        <span class="name">Bánh mì thịt nướng</span>
-                                    </div>
-                                    <div class="top-item-stats">
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 55%"></div>
-                                        </div>
-                                        <span>89 phần</span>
-                                    </div>
-                                </div>
-                                <div class="top-item">
-                                    <div class="top-item-info">
-                                        <span class="rank">5</span>
-                                        <span class="name">Gỏi cuốn tôm thịt</span>
-                                    </div>
-                                    <div class="top-item-stats">
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 42%"></div>
-                                        </div>
-                                        <span>68 phần</span>
-                                    </div>
-                                </div>
+                <!-- Table Status -->
+                <div class="col-xl-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Sơ đồ bàn</h5>
+                            <div class="table-legend">
+                                <span class="legend-item"><span class="dot available"></span> Trống</span>
+                                <span class="legend-item"><span class="dot occupied"></span> Có khách</span>
+                                <span class="legend-item"><span class="dot reserved"></span> Đã đặt</span>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Table Status -->
-                    <div class="col-xl-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Sơ đồ bàn</h5>
-                                <div class="table-legend">
-                                    <span class="legend-item"><span class="dot available"></span> Trống</span>
-                                    <span class="legend-item"><span class="dot occupied"></span> Có khách</span>
-                                    <span class="legend-item"><span class="dot reserved"></span> Đã đặt</span>
+                        <div class="card-body">
+                            <div class="table-grid">
+                                <div class="table-item available">
+                                    <span class="table-number">1</span>
+                                    <span class="table-capacity">4 chỗ</span>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-grid">
-                                    <div class="table-item available">
-                                        <span class="table-number">1</span>
-                                        <span class="table-capacity">4 chỗ</span>
-                                    </div>
-                                    <div class="table-item occupied">
-                                        <span class="table-number">2</span>
-                                        <span class="table-capacity">4 chỗ</span>
-                                    </div>
-                                    <div class="table-item occupied">
-                                        <span class="table-number">3</span>
-                                        <span class="table-capacity">6 chỗ</span>
-                                    </div>
-                                    <div class="table-item reserved">
-                                        <span class="table-number">4</span>
-                                        <span class="table-capacity">4 chỗ</span>
-                                    </div>
-                                    <div class="table-item available">
-                                        <span class="table-number">5</span>
-                                        <span class="table-capacity">2 chỗ</span>
-                                    </div>
-                                    <div class="table-item occupied">
-                                        <span class="table-number">6</span>
-                                        <span class="table-capacity">8 chỗ</span>
-                                    </div>
-                                    <div class="table-item available">
-                                        <span class="table-number">7</span>
-                                        <span class="table-capacity">4 chỗ</span>
-                                    </div>
-                                    <div class="table-item reserved">
-                                        <span class="table-number">8</span>
-                                        <span class="table-capacity">6 chỗ</span>
-                                    </div>
-                                    <div class="table-item available">
-                                        <span class="table-number">9</span>
-                                        <span class="table-capacity">4 chỗ</span>
-                                    </div>
-                                    <div class="table-item occupied">
-                                        <span class="table-number">10</span>
-                                        <span class="table-capacity">4 chỗ</span>
-                                    </div>
-                                    <div class="table-item available">
-                                        <span class="table-number">11</span>
-                                        <span class="table-capacity">2 chỗ</span>
-                                    </div>
-                                    <div class="table-item available">
-                                        <span class="table-number">12</span>
-                                        <span class="table-capacity">10 chỗ</span>
-                                    </div>
+                                <div class="table-item occupied">
+                                    <span class="table-number">2</span>
+                                    <span class="table-capacity">4 chỗ</span>
+                                </div>
+                                <div class="table-item occupied">
+                                    <span class="table-number">3</span>
+                                    <span class="table-capacity">6 chỗ</span>
+                                </div>
+                                <div class="table-item reserved">
+                                    <span class="table-number">4</span>
+                                    <span class="table-capacity">4 chỗ</span>
+                                </div>
+                                <div class="table-item available">
+                                    <span class="table-number">5</span>
+                                    <span class="table-capacity">2 chỗ</span>
+                                </div>
+                                <div class="table-item occupied">
+                                    <span class="table-number">6</span>
+                                    <span class="table-capacity">8 chỗ</span>
+                                </div>
+                                <div class="table-item available">
+                                    <span class="table-number">7</span>
+                                    <span class="table-capacity">4 chỗ</span>
+                                </div>
+                                <div class="table-item reserved">
+                                    <span class="table-number">8</span>
+                                    <span class="table-capacity">6 chỗ</span>
+                                </div>
+                                <div class="table-item available">
+                                    <span class="table-number">9</span>
+                                    <span class="table-capacity">4 chỗ</span>
+                                </div>
+                                <div class="table-item occupied">
+                                    <span class="table-number">10</span>
+                                    <span class="table-capacity">4 chỗ</span>
+                                </div>
+                                <div class="table-item available">
+                                    <span class="table-number">11</span>
+                                    <span class="table-capacity">2 chỗ</span>
+                                </div>
+                                <div class="table-item available">
+                                    <span class="table-number">12</span>
+                                    <span class="table-capacity">10 chỗ</span>
                                 </div>
                             </div>
                         </div>
@@ -508,13 +517,16 @@
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <!-- Custom JS -->
-    <script src="/admin/assets/js/main.js"></script>
-    <script src="/admin/assets/js/dashboard.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://unpkg.com/stompjs@2.3.3/lib/stomp.min.js"></script>
+<!-- Custom JS -->
+<script src="/admin/assets/js/main.js"></script>
+<script src="/admin/assets/js/dashboard.js"></script>
 </body>
 </html>

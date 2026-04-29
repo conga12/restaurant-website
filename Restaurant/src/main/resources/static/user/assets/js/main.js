@@ -440,3 +440,69 @@ document.addEventListener('DOMContentLoaded', function() {
     observer.observe(el);
   });
 });
+//banner hero slider
+async function showBannerHeroSlider() {
+    const heroSec = document.querySelector(".hero");
+    const overlay = document.querySelector(".hero-overlay");
+    if (!heroSec || !overlay) return;
+    let res = await fetch("/api/promotions", { credentials: "include" });
+    let promos = [];
+    try {
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            promos = await res.json();
+        } else { return; }
+    } catch (e) { return; }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const list = promos.filter(p => p.isActive && (!p.endDate || p.endDate >= today));
+    if (!list.length) return;
+
+    let idx = 0;
+    let sliderTimer = null;
+
+    // Thêm hiệu ứng fade cho overlay
+    function addFadeAnimation(elem) {
+        elem.classList.remove('hero-fade-in');
+        void elem.offsetWidth; // force reflow
+        elem.classList.add('hero-fade-in');
+    }
+
+    function showSlide(index) {
+        // Chuyển nền hero với hiệu ứng mượt
+        heroSec.style.transition = 'background-image 1.2s cubic-bezier(.77,.14,.44,.95)';
+        heroSec.style.backgroundImage = `
+            linear-gradient(135deg, rgba(44,44,44,0.65) 0%, rgba(26,26,26,0.8) 100%),
+            url('${list[index].imageUrl || "https://placehold.co/1400x400?text=Promotion"}')
+        `;
+        heroSec.style.backgroundSize = "cover";
+        heroSec.style.backgroundPosition = "center";
+
+        // Overlay khuyến mãi
+        overlay.innerHTML = `
+          <div class="promo-cta">${/* class fade-in xử lý bằng JS bên dưới */''}
+            <span class="promo-big">${list[index].title}</span>
+            ${list[index].discountPercent ? `<span class="promo-discount">GIẢM TỚI <b>${list[index].discountPercent}%</b></span>` : ''}
+            ${list[index].code ? `<span class="promo-code">Mã: <b>${list[index].code}</b></span>` : ""}
+            <div class="promo-desc">${list[index].description||""}</div>
+          </div>
+        `;
+        // Thêm hiệu ứng cho overlay
+        addFadeAnimation(overlay.querySelector('.promo-cta'));
+    }
+
+    // Auto chạy slide mỗi 2 giây
+    function startSlider() {
+        sliderTimer = setInterval(() => {
+            idx = (idx + 1) % list.length;
+            showSlide(idx);
+        }, 4000);
+    }
+
+    // Khởi động
+    showSlide(idx);
+    if(list.length > 1) startSlider();
+}
+document.addEventListener("DOMContentLoaded", showBannerHeroSlider);
+//document.addEventListener("DOMContentLoaded", showBannerPromotionSlider);
+

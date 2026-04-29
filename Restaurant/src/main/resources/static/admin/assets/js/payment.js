@@ -34,13 +34,25 @@ function renderTable(data) {
     data.forEach(p => {
         const statusBadge = getStatusBadge(p.paymentStatus);
 
+        // Khuyến mãi
+        const promoCol = (p.discountPercent && p.discountPercent > 0)
+            ? `<span class="badge bg-success">-${p.discountPercent}%</span>`
+            : `<span class="text-muted">--</span>`;
+
+        // Số tiền
+        const moneyCol = (p.originAmount && p.finalAmount && p.originAmount > p.finalAmount)
+            ? `<span style="display:block;text-decoration:line-through; color:#aaa">${formatMoney(p.originAmount)}</span>
+               <span style="font-weight:bold; color:#2e7d32;">${formatMoney(p.finalAmount)}</span>`
+            : `<span style="font-weight:bold; color:#2e7d32;">${formatMoney(p.finalAmount || p.amount)}</span>`;
+
         const row = `
             <tr>
                 <td><strong>#PAY${p.orderId}</strong></td>
                 <td><a href="#" class="text-primary">#ORD${p.orderId}</a></td>
                 <td>${p.customerName || "Khách QR"}</td>
                 <td>Bàn ${p.tableNumber || "-"}</td>
-                <td><strong>${formatMoney(p.amount)}</strong></td>
+                <td>${promoCol}</td>
+                <td>${moneyCol}</td>
                 <td>${formatMethod(p.paymentMethod)}</td>
                 <td>${formatDate(p.paidAt || p.createdAt || p.orderDate)}</td>
                 <td>${statusBadge}</td>

@@ -64,6 +64,9 @@ public class Reservation {
     @Column(name = "status", length = 20)
     private ReservationStatus status = ReservationStatus.PENDING;
 
+    @Column(name = "seen", nullable = false)
+    private boolean seen = false;
+
     @Column(name = "deposit_required")
     private Boolean depositRequired = false;
 
@@ -210,6 +213,10 @@ public class Reservation {
     public void setStatus(ReservationStatus status) {
         this.status = status;
     }
+
+    public boolean isSeen() { return seen; }
+
+    public void setSeen(boolean seen) { this.seen = seen; }
 
     public Boolean getDepositRequired() {
         return depositRequired;

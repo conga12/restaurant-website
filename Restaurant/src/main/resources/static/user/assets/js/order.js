@@ -1,6 +1,6 @@
 const VERIFY_API = "/api/customer/orders/verify-reservation";
 const CREATE_ORDER_API = "/api/customer/orders";
-const DISH_API = "/api/customer/dishes";
+const DISH_API = "/api/dishes";
 
 let verifiedReservation = null;
 let dishes = [];
@@ -29,27 +29,78 @@ const totalItems = document.getElementById("totalItems");
 const subTotal = document.getElementById("subTotal");
 const grandTotal = document.getElementById("grandTotal");
 const submitOrderBtn = document.getElementById("submitOrderBtn");
+const VERIFY_TOKEN_API = "/api/public/orders/verify-token";
+const CREATE_ORDER_PUBLIC_API = "/api/public/orders";
+let magicToken = null;
+
+/**
+ * Nếu API yêu cầu login mà user chưa login:
+ * - redirect sang trang login
+ * - kèm next để login xong quay lại đúng link email
+ */
+function redirectToLoginWithNext() {
+  const next = encodeURIComponent(window.location.href);
+  window.location.href = `/auth/login.html?next=${next}`;
+}
+
+function handleAuthRedirectIfNeeded(response) {
+  if (response.status === 401 || response.status === 403) {
+    redirectToLoginWithNext();
+    return true;
+  }
+  return false;
+}
 
 verifyBtn.addEventListener("click", verifyReservation);
 searchInput.addEventListener("input", filterMenu);
 categoryFilter.addEventListener("change", filterMenu);
 submitOrderBtn.addEventListener("click", submitOrder);
-document.addEventListener("DOMContentLoaded", function () {
-    const params = new URLSearchParams(window.location.search);
 
-    const reservationId = params.get("reservationId");
-    const phone = params.get("phone");
+document.addEventListener("DOMContentLoaded", async function () {
+  const params = new URLSearchParams(window.location.search);
 
-    const reservationInput = document.getElementById("reservationIdInput");
-    const phoneInput = document.getElementById("customerPhoneInput");
+  const token = params.get("token");
+  const reservationId = params.get("reservationId");
+  const phone = params.get("phone");
 
-    if (reservationInput && reservationId) {
-        reservationInput.value = reservationId;
+  if (token) {
+    magicToken = token;
+
+    try {
+      setVerifyMessage("Đang xác minh link...", "");
+
+      const res = await fetch(VERIFY_TOKEN_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ token: magicToken })
+      });
+
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : null;
+
+      if (!res.ok) throw new Error((data && (data.message || data.error)) || text || "Link không hợp lệ");
+      if (!data) throw new Error("Server không trả dữ liệu hợp lệ");
+
+      verifiedReservation = data;
+      showVerifiedReservation(data);
+      setVerifyMessage("Xác minh thành công. B���n có thể chọn món.", "success");
+
+      await loadDishes();
+      orderLayout.classList.remove("hidden");
+    } catch (e) {
+      console.error("verifyToken error:", e);
+      verifiedReservation = null;
+      bookingInfoPanel.classList.add("hidden");
+      orderLayout.classList.add("hidden");
+      setVerifyMessage(e.message || "Link không hợp lệ hoặc đã hết hạn.", "error");
     }
 
-    if (phoneInput && phone) {
-        phoneInput.value = phone;
-    }
+    return; // có token rồi thì không cần prefill reservationId/phone
+  }
+
+  // fallback cũ: prefill theo query
+  if (reservationIdInput && reservationId) reservationIdInput.value = reservationId;
+  if (customerPhoneInput && phone) customerPhoneInput.value = phone;
 });
 
 function formatCurrency(value) {
@@ -78,14 +129,18 @@ async function verifyReservation() {
 
     const response = await fetch(VERIFY_API, {
       method: "POST",
+      credentials: "include",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Accept": "application/json"
       },
       body: JSON.stringify({
         reservationId: Number(reservationId),
-        customerPhone: customerPhone
+        customerPhone: customerPhone // ✅ đổi key: customerPhone -> phone
       })
     });
+
+    if (handleAuthRedirectIfNeeded(response)) return;
 
     const responseText = await response.text();
     let data = null;
@@ -97,7 +152,12 @@ async function verifyReservation() {
     }
 
     if (!response.ok) {
-      throw new Error((data && data.message) || responseText || "Xác minh thất bại");
+      throw new Error((data && (data.message || data.error)) || responseText || "Xác minh thất bại");
+    }
+
+    // ✅ tránh crash nếu server trả body rỗng hoặc không phải JSON
+    if (!data) {
+      throw new Error("Server không trả dữ liệu hợp lệ khi xác minh đặt bàn.");
     }
 
     verifiedReservation = data;
@@ -116,6 +176,8 @@ async function verifyReservation() {
 }
 
 function showVerifiedReservation(data) {
+  if (!data) return; // ✅ chống null
+
   bookingInfoPanel.classList.remove("hidden");
 
   infoReservationId.textContent = "#" + (data.reservationId ?? "-");
@@ -126,7 +188,14 @@ function showVerifiedReservation(data) {
 
 async function loadDishes() {
   try {
-    const response = await fetch(DISH_API);
+    const response = await fetch(DISH_API, {
+      credentials: "include", // <-- QUAN TRỌNG nếu endpoint yêu cầu login
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    if (handleAuthRedirectIfNeeded(response)) return;
 
     if (!response.ok) {
       throw new Error("Không tải được danh sách món ăn");
@@ -320,29 +389,45 @@ async function submitOrder() {
     const paymentOption =
       document.querySelector('input[name="paymentOption"]:checked')?.value || "PAY_AT_RESTAURANT";
 
-    const payload = {
-      reservationId: verifiedReservation.reservationId,
-      customerPhone: verifiedReservation.customerPhone,
-      note: orderNote.value.trim(),
-      paymentOption: paymentOption,
-      items: cart.map(item => ({
-        dishId: item.dishId,
-        quantity: item.quantity,
-        note: item.note
-      }))
+    const endpoint = magicToken ? CREATE_ORDER_PUBLIC_API : CREATE_ORDER_API;
+
+    const payload = magicToken
+      ? {
+          token: magicToken,
+          note: orderNote.value.trim(),
+          paymentOption,
+          items: cart.map(item => ({
+            dishId: item.dishId,
+            quantity: item.quantity,
+            note: item.note
+          }))
+        }
+      : {
+          reservationId: verifiedReservation.reservationId,
+          customerPhone: verifiedReservation.customerPhone,
+          note: orderNote.value.trim(),
+          paymentOption,
+          items: cart.map(item => ({
+            dishId: item.dishId,
+            quantity: item.quantity,
+            note: item.note
+          }))
+        };
+
+    const fetchOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload)
     };
 
-    const response = await fetch(CREATE_ORDER_API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+    if (!magicToken) fetchOptions.credentials = "include";
+
+    const response = await fetch(endpoint, fetchOptions);
+
+    if (!magicToken && handleAuthRedirectIfNeeded(response)) return;
 
     const responseText = await response.text();
     let data = null;
-
     try {
       data = responseText ? JSON.parse(responseText) : null;
     } catch (e) {
@@ -350,17 +435,21 @@ async function submitOrder() {
     }
 
     if (!response.ok) {
-      throw new Error(responseText || "Tạo order thất bại");
+      throw new Error((data && (data.message || data.error)) || responseText || "Tạo order thất bại");
     }
 
+    // PAY_NOW
     if (paymentOption === "PAY_NOW") {
       const payResponse = await fetch(`/api/payment/vnpay/create?orderId=${data.orderId}`, {
-        method: "POST"
+        method: "POST",
+        credentials: "include",
+        headers: { "Accept": "application/json" }
       });
+
+      if (handleAuthRedirectIfNeeded(payResponse)) return;
 
       const payText = await payResponse.text();
       let payData = null;
-
       try {
         payData = payText ? JSON.parse(payText) : null;
       } catch (e) {
@@ -368,13 +457,14 @@ async function submitOrder() {
       }
 
       if (!payResponse.ok || !payData?.paymentUrl) {
-        throw new Error("Không tạo được link thanh toán VNPAY");
+        throw new Error((payData && (payData.message || payData.error)) || payText || "Không tạo được link thanh toán VNPAY");
       }
 
       window.location.href = payData.paymentUrl;
       return;
     }
 
+    // PAY_AT_RESTAURANT
     alert(`Gửi order thành công! Mã order: #${data.orderId}. Bạn sẽ thanh toán tại quán.`);
 
     cart = [];
@@ -385,7 +475,7 @@ async function submitOrder() {
     alert(error.message || "Không thể gửi order.");
   } finally {
     submitOrderBtn.disabled = false;
-    submitOrderBtn.textContent = "Gửi order";
+    submitOrderBtn.textContent = "GỬI ĐƠN";
   }
 }
 

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ReservationScheduler {
@@ -30,6 +31,7 @@ public class ReservationScheduler {
 
     // 1. Hủy booking đã CONFIRMED nhưng khách không đến sau 10 phút
     @Scheduled(fixedRate = 60000)
+    @Transactional
     public void autoCancelNoShowReservations() {
         LocalDate today = LocalDate.now();
         LocalDateTime now = LocalDateTime.now();
@@ -81,6 +83,7 @@ public class ReservationScheduler {
 
     // 2. Hủy booking PENDING nếu quá hạn thanh toán cọc
     @Scheduled(fixedRate = 60000)
+    @Transactional
     public void autoCancelExpiredPendingDepositReservations() {
         LocalDateTime now = LocalDateTime.now();
 

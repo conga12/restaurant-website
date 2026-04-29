@@ -132,6 +132,7 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
     private String getClientIp(HttpServletRequest request) {
+        if (request == null) return "127.0.0.1"; // Hoặc giá trị mặc định bạn muốn
         String ip = request.getHeader("X-FORWARDED-FOR");
         if (ip == null || ip.isBlank()) {
             ip = request.getRemoteAddr();

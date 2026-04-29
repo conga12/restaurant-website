@@ -6,6 +6,10 @@
 
 const RESERVATION_UNREAD_URL = "/admin/api/reservations/unread-count";
 const ORDER_UNREAD_URL = "/admin/api/orders/unread-count";
+const WS_ENDPOINT = "/ws-notify";
+const RESERVATION_MARK_ALL_SEEN_URL = "/admin/api/reservations/mark-all-seen";
+
+let stompClient = null;
 
 let lastReservationUnreadCount = 0;
 let lastOrderUnreadCount = 0;
@@ -162,6 +166,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     setMinDateForDateInputs();
 
     await refreshSidebarBadges(true);
+    await markReservationsAllSeenIfOnReservationPage();
 
     setInterval(async () => {
         if (document.visibilityState === "visible") {
@@ -216,7 +221,78 @@ function highlightActiveNav() {
         }
     });
 }
+function connectReservationWS() {
+    if (stompClient) return; // tránh connect nhiều lần
 
+    try {
+        const socket = new SockJS(WS_ENDPOINT);
+        stompClient = Stomp.over(socket);
+
+        // tắt log nếu bạn muốn: stompClient.debug = null;
+        stompClient.debug = (str) => console.log("[STOMP]", str);
+
+        stompClient.connect(
+            {},
+            function (frame) {
+                console.log("✅ WS connected:", frame);
+
+                stompClient.subscribe("/topic/reservation-unread", async function (message) {
+                    console.log("WS reservation:", message.body);
+
+                    // Realtime: refresh badge + topbar ngay lập tức
+                    const reservationCount = await loadReservationUnreadBadge();
+                    updateTopbarUnreadBadge(reservationCount, lastOrderUnreadCount);
+
+                    // Nếu muốn có hiệu ứng/sound khi tăng:
+                    if (reservationCount > lastReservationUnreadCount) {
+                        pulseBadge("reservationUnreadBadge");
+                        playNotificationSound();
+                    }
+                    lastReservationUnreadCount = reservationCount;
+                });
+            },
+            function (error) {
+                console.error("❌ WS connect error:", error);
+                stompClient = null;
+            }
+        );
+        stompClient.subscribe("/topic/review-alert", function (message) {
+          try {
+            const data = JSON.parse(message.body);
+            if (data.type === "LOW_RATING_REVIEW") {
+              showToast(`Có đánh giá thấp (${data.rating}/5). Review #${data.reviewId}`, "warning");
+              // nếu muốn: playNotificationSound();
+            }
+          } catch (e) {
+            console.warn("review-alert parse error:", e, message.body);
+          }
+        });
+    } catch (e) {
+        console.error("connectReservationWS error:", e);
+        stompClient = null;
+    }
+}
+
+async function markReservationsAllSeenIfOnReservationPage() {
+  const page = (window.location.pathname.split("/").pop() || "").toLowerCase();
+  if (page !== "reservation.html") return;
+
+  try {
+    const res = await fetch("/admin/api/reservations/mark-all-seen", {
+      method: "POST",
+      credentials: "include"
+    });
+
+    console.log("mark-all-seen status:", res.status);
+
+    // refresh badge ngay sau khi mark
+    const reservationCount = await loadReservationUnreadBadge();
+    updateTopbarUnreadBadge(reservationCount, lastOrderUnreadCount);
+    lastReservationUnreadCount = reservationCount;
+  } catch (e) {
+    console.warn("markReservationsAllSeenIfOnReservationPage error:", e);
+  }
+}
 /**
  * Prevent empty links from jumping
  */

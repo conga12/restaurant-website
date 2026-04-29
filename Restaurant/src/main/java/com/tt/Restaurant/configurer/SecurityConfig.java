@@ -59,9 +59,11 @@ public class SecurityConfig {
                         .requestMatchers("/admin/assets/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/api/ai/**").permitAll()
+                        .requestMatchers("/api/customer/orders/**").permitAll()
 
                         .requestMatchers("/user/**").permitAll()
-                        .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+                        .requestMatchers("/ws-notify/**").permitAll()
+
 
                         // =========================
                         // ADMIN-ONLY APIs (cấm STAFF)
@@ -87,17 +89,24 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN", "STAFF")
 
                         // Public APIs
+                        .requestMatchers(HttpMethod.POST, "/api/customer/reservations").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/orders/from-qr").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/dishes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/customer/tables/**").permitAll()
+                        .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/payment/**").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/recent", "/api/reviews/stats").permitAll()
+                        .requestMatchers("/api/reviews/**").hasRole("CUSTOMER")
 
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/auth/login.html")
                         .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/user/index.html", false)
                         .successHandler((request, response, authentication) -> {
+                            String redirect = request.getParameter("redirect");
                             String role = authentication.getAuthorities().stream()
                                     .findFirst()
                                     .map(a -> a.getAuthority())
@@ -109,7 +118,11 @@ public class SecurityConfig {
                                 response.sendRedirect("/admin/index.html");
                                 // hoặc: response.sendRedirect("/admin/forms/order.html");
                             } else {
-                                response.sendRedirect("/user/index.html");
+                                if (redirect != null && redirect.startsWith("/")) {
+                                    response.sendRedirect(redirect);
+                                } else {
+                                    response.sendRedirect("/user/index.html");
+                                }
                             }
                         })
                         .failureUrl("/auth/login.html?error")
@@ -119,6 +132,8 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/auth/login.html")
                         .successHandler((request, response, authentication) -> {
+                            String redirect = (String) request.getSession().getAttribute("afterLoginRedirect");
+                            request.getSession().removeAttribute("afterLoginRedirect");
                             String role = authentication.getAuthorities().stream()
                                     .findFirst()
                                     .map(a -> a.getAuthority())
@@ -132,7 +147,11 @@ public class SecurityConfig {
                                 response.sendRedirect("/admin/index.html");
                                 // hoặc: response.sendRedirect("/admin/forms/order.html");
                             } else {
-                                response.sendRedirect("/user/index.html");
+                                if (redirect != null && redirect.startsWith("/")) {
+                                    response.sendRedirect(redirect);
+                                } else {
+                                    response.sendRedirect("/user/index.html");
+                                }
                             }
                         })
                         .failureHandler((request, response, exception) -> {

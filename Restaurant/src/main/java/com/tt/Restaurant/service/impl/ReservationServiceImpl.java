@@ -1,5 +1,6 @@
 package com.tt.Restaurant.service.impl;
 
+import com.tt.Restaurant.model.OrderAccessToken;
 import com.tt.Restaurant.model.Orders;
 import com.tt.Restaurant.model.Reservation;
 import com.tt.Restaurant.model.Reservation.ReservationStatus;
@@ -10,7 +11,11 @@ import com.tt.Restaurant.repository.ReservationRepository;
 import com.tt.Restaurant.repository.RestaurantTableRepository;
 import com.tt.Restaurant.repository.UserRepository;
 import com.tt.Restaurant.service.EmailService;
+import com.tt.Restaurant.service.OrderMagicLinkService;
 import com.tt.Restaurant.service.ReservationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +24,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import org.springframework.data.jpa.domain.Specification;
+import java.time.LocalDate;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -28,19 +35,24 @@ public class ReservationServiceImpl implements ReservationService {
     private final EmailService emailService;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final OrderMagicLinkService magicLinkService;
+    @Autowired
+    private ReservationRepository ReservationRepository;
 
     public ReservationServiceImpl(
             ReservationRepository reservationRepository,
             RestaurantTableRepository tableRepository,
             EmailService emailService,
             UserRepository userRepository,
-            OrderRepository orderRepository
+            OrderRepository orderRepository,
+            OrderMagicLinkService magicLinkService
     ) {
         this.reservationRepository = reservationRepository;
         this.tableRepository = tableRepository;
         this.emailService = emailService;
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
+        this.magicLinkService = magicLinkService;
     }
 
     @Override
@@ -80,6 +92,21 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public Reservation createReservation(Reservation reservation) {
         validateReservationInput(reservation);
+
+        // Tạo user vãng lai nếu chưa có - chỉ khi reservation.getUser() == null
+        if (reservation.getUser() == null) {
+            User user = userRepository.findByEmail(reservation.getCustomerEmail()).orElse(null);
+            if (user == null && reservation.getCustomerEmail() != null) {
+                // Nếu chưa có, tạo user vãng lai luôn
+                user = new User();
+                user.setEmail(reservation.getCustomerEmail());
+                user.setUsername(reservation.getCustomerName());
+                user.setPhone(reservation.getCustomerPhone());
+                user.setRole(User.Role.CUSTOMER);  // Nếu có enum CUSTOMER
+                user = userRepository.save(user);
+            }
+            reservation.setUser(user); // gán user vào reservation
+        }
 
         if (reservation.getReservationDate().isBefore(LocalDate.now())) {
             throw new RuntimeException("Không thể đặt bàn trong quá khứ");
@@ -135,10 +162,11 @@ public class ReservationServiceImpl implements ReservationService {
             table.setStatus(RestaurantTable.TableStatus.RESERVED);
             tableRepository.save(table);
         }
-
+        reservation.setSeen(false);
         Reservation saved = reservationRepository.save(reservation);
 
         if (saved.getStatus() == ReservationStatus.CONFIRMED) {
+            // ✅ gửi magic link token 30 phút
             sendConfirmedMailIfPossible(saved);
         }
 
@@ -150,9 +178,9 @@ public class ReservationServiceImpl implements ReservationService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
 
-        if (user.getRole() != User.Role.CUSTOMER) {
-            throw new RuntimeException("Chỉ customer mới được đặt bàn");
-        }
+//        if (user.getRole() != User.Role.CUSTOMER) {
+//            throw new RuntimeException("Chỉ customer mới được đặt bàn");
+//        }
 
         if (reservation.getCustomerName() == null || reservation.getCustomerName().isBlank()) {
             throw new RuntimeException("Tên khách hàng không được để trống");
@@ -281,6 +309,8 @@ public class ReservationServiceImpl implements ReservationService {
         tableRepository.save(table);
 
         Reservation saved = reservationRepository.save(reservation);
+
+        // ✅ gửi magic link token 30 phút
         sendConfirmedMailIfPossible(saved);
 
         return saved;
@@ -321,7 +351,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new RuntimeException("Đặt bàn đã hoàn tất, không thể hủy");
         }
 
-        orderRepository.findByReservationId(id).ifPresent(order -> {
+        orderRepository.findByReservation_Id(id).ifPresent(order -> {
             if (order.getStatus() == Orders.OrderStatus.PENDING
                     || order.getStatus() == Orders.OrderStatus.PREPARING) {
                 order.setStatus(Orders.OrderStatus.CANCELLED);
@@ -371,6 +401,71 @@ public class ReservationServiceImpl implements ReservationService {
                 .toList();
     }
 
+    @Override
+    public List<RestaurantTable> getAvailableTables(LocalDate date, LocalTime time, Integer guests, Long excludeReservationId) {
+        if (date == null || time == null || guests == null || guests <= 0) {
+            throw new RuntimeException("Dữ liệu tìm bàn không hợp lệ");
+        }
+
+        List<RestaurantTable> suitableTables = tableRepository.findByCapacityGreaterThanEqual(guests);
+
+        return suitableTables.stream()
+                .filter(table -> table.getStatus() == RestaurantTable.TableStatus.AVAILABLE)
+                .filter(table -> {
+                    if (excludeReservationId != null) {
+                        return !reservationRepository.existsConflictForUpdate(excludeReservationId, table.getId(), date, time);
+                    }
+                    return !reservationRepository.existsConflict(table.getId(), date, time);
+                })
+                .toList();
+    }
+
+    @Override
+    public Page<Reservation> getAllReservations(Pageable pageable) {
+        return reservationRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Reservation> searchReservations(String date, String status, String keyword, Pageable pageable) {
+        Specification<Reservation> spec = (root, query, cb) -> cb.conjunction();
+
+        if (date != null && !date.isBlank()) {
+            try {
+                LocalDate filterDate = LocalDate.parse(date); // parse từ yyyy-MM-dd
+                spec = spec.and((root, query, cb) ->
+                        cb.equal(root.get("reservationDate"), filterDate) // đúng: LocalDate so với LocalDate
+                );
+            } catch (Exception ex) {
+                throw new RuntimeException("Ngày filter chưa đúng định dạng yyyy-MM-dd!");
+            }
+        }
+        if (status != null && !status.isBlank()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("status"), Reservation.ReservationStatus.valueOf(status))
+            );
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            String k = "%" + keyword.trim().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("customerName")), k),
+                    cb.like(cb.lower(root.get("customerPhone")), k),
+                    cb.like(cb.lower(root.get("customerEmail")), k)
+            ));
+        }
+        return reservationRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public long countUnread() {
+        return reservationRepository.countBySeenFalse();
+    }
+
+    @Override
+    @Transactional
+    public int markAllSeen() {
+        return reservationRepository.markAllSeen();
+    }
+
     private void validateReservationInput(Reservation reservation) {
         if (reservation.getCustomerName() == null || reservation.getCustomerName().isBlank()) {
             throw new RuntimeException("Tên khách hàng không được để trống");
@@ -393,17 +488,27 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
 
+    // ✅ MAGIC LINK 30 phút (dùng chung cho createReservation & confirmReservation)
     private void sendConfirmedMailIfPossible(Reservation reservation) {
-        if (reservation.getCustomerEmail() != null && !reservation.getCustomerEmail().isBlank()) {
-            emailService.sendReservationConfirmedEmail(
+        if (reservation.getCustomerEmail() == null || reservation.getCustomerEmail().isBlank()) return;
+
+        try {
+            OrderAccessToken tok = magicLinkService.createToken(reservation.getId());
+            String orderLink = "http://localhost:9090/user/order.html?token=" + tok.getToken();
+
+            emailService.sendReservationConfirmedEmailWithOrderLink(
                     reservation.getCustomerEmail(),
                     reservation.getCustomerName(),
                     reservation.getReservationDate() != null ? reservation.getReservationDate().toString() : "",
                     reservation.getReservationTime() != null ? reservation.getReservationTime().toString() : "",
                     reservation.getNumberOfGuests(),
                     Math.toIntExact(reservation.getId()),
-                    reservation.getCustomerPhone()
+                    reservation.getCustomerPhone(),
+                    orderLink
             );
+        } catch (Exception ex) {
+            System.err.println("Không gửi được email xác nhận + link đặt món: " + ex.getMessage());
         }
     }
+
 }

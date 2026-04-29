@@ -8,6 +8,11 @@ public class AdminPaymentDTO {
     private Long orderId;
     private String orderCode;
     private Integer tableNumber;
+    private BigDecimal originAmount;     // Số tiền gốc
+    private BigDecimal finalAmount;      // Tiền đã trừ KM
+    private Integer discountPercent;     // % giảm
+    private String promotionTitle;
+
     private String customerName;
     private BigDecimal amount;
     private String paymentMethod;
@@ -17,6 +22,8 @@ public class AdminPaymentDTO {
     private String paidAt;
     private String createdAt;
     private Boolean canConfirm;
+    private Long promotionId;
+    private BigDecimal discount;
 
     public AdminPaymentDTO() {
     }
@@ -52,6 +59,18 @@ public class AdminPaymentDTO {
     public void setTableNumber(Integer tableNumber) {
         this.tableNumber = tableNumber;
     }
+
+    public BigDecimal getOriginAmount() {return  originAmount;}
+
+    public void setOriginAmount(BigDecimal originAmount) {this.originAmount = originAmount;}
+
+    public BigDecimal getFinalAmount() {return finalAmount;}
+
+    public void setFinalAmount(BigDecimal finalAmount) {this.finalAmount = finalAmount;}
+
+    public Integer getDiscountPercent() {return discountPercent;}
+
+    public void setDiscountPercent(Integer discountPercent) {this.discountPercent = discountPercent;}
 
     public String getCustomerName() {
         return customerName;
@@ -123,5 +142,26 @@ public class AdminPaymentDTO {
 
     public void setCanConfirm(Boolean canConfirm) {
         this.canConfirm = canConfirm;
+    }
+
+    public java.math.BigDecimal getDiscount() {
+        return discount;
+    }
+    public void setDiscount(java.math.BigDecimal discount) {
+        this.discount = discount;
+    }
+
+    public Long getPromotionId() {
+        return promotionId;
+    }
+    public void setPromotionId(Long promotionId) {
+        this.promotionId = promotionId;
+    }
+
+    public String getPromotionTitle() {
+        return promotionTitle;
+    }
+    public void setPromotionTitle(String promotionTitle) {
+        this.promotionTitle = promotionTitle;
     }
 }

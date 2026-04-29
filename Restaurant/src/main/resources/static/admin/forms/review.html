@@ -4,373 +4,302 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Đánh giá - RestaurantOS</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="../assets/css/style.css" rel="stylesheet">
+<!--    <link href="../assets/css/admin-review-fix.css" rel="stylesheet">-->
+
+    <style>
+        .rating-bar { display: flex; align-items: center; }
+        .rating-label { width: 50px; font-size: 0.875rem; color: var(--gray-400); }
+        .rating-count { width: 40px; text-align: right; font-size: 0.875rem; color: var(--gray-400); }
+        .rating-bar .progress { height: 8px; background: var(--gray-800); border-radius: 4px; }
+    </style>
 </head>
+
 <body>
-    <div class="wrapper">
-        <nav id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <i class="bi bi-shop"></i>
-                    <span>RestaurantOS</span>
-                </div>
+<div class="wrapper">
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="bi bi-shop"></i>
+                <span>RestaurantOS</span>
             </div>
-            <ul class="sidebar-nav">
-                <li class="nav-item">
-                    <a href="/admin/index.html" class="nav-link">
-                        <i class="bi bi-grid-1x2-fill"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/category.html" class="nav-link">
-                        <i class="bi bi-folder-fill"></i>
-                        <span>Danh mục</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/product.html" class="nav-link">
-                        <i class="bi bi-cup-hot-fill"></i>
-                        <span>Món ăn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/table.html" class="nav-link">
-                        <i class="bi bi-grid-3x3-gap-fill"></i>
-                        <span>Bàn</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/reservation.html" class="nav-link">
-                        <i class="bi bi-calendar-check-fill"></i>
-                        <span>Đặt bàn</span>
-                        <span id="reservationUnreadBadge" class="sidebar-menu-badge d-none">0</span>
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a href="/admin/forms/order.html" class="nav-link">
-                        <i class="bi bi-receipt"></i>
-                        <span>Đơn hàng</span>
-                        <span id="orderUnreadBadge" class="sidebar-menu-badge d-none">0</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/payment.html" class="nav-link">
-                        <i class="bi bi-credit-card-fill"></i>
-                        <span>Thanh toán</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/user.html" class="nav-link">
-                        <i class="bi bi-people-fill"></i>
-                        <span>Người dùng</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/forms/review.html" class="nav-link">
-                        <i class="bi bi-star-fill"></i>
-                        <span>Đánh giá</span>
-                    </a>
-                </li>
-            </ul>
-            <div class="sidebar-footer">
-                <a href="../../auth/login.html" class="nav-link text-danger">
-                    <i class="bi bi-box-arrow-left"></i>
-                    <span>Đăng xuất</span>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a href="/admin/index.html" class="nav-link">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
                 </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/forms/category.html" class="nav-link">
+                    <i class="bi bi-folder-fill"></i>
+                    <span>Danh mục</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/forms/product.html" class="nav-link">
+                    <i class="bi bi-cup-hot-fill"></i>
+                    <span>Món ăn</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/forms/table.html" class="nav-link">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                    <span>Bàn</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/forms/reservation.html" class="nav-link">
+                    <i class="bi bi-calendar-check-fill"></i>
+                    <span>Đặt bàn</span>
+                    <span id="reservationUnreadBadge" class="sidebar-menu-badge d-none">0</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/forms/order.html" class="nav-link">
+                    <i class="bi bi-receipt"></i>
+                    <span>Đơn hàng</span>
+                    <span id="orderUnreadBadge" class="sidebar-menu-badge d-none">0</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/forms/payment.html" class="nav-link">
+                    <i class="bi bi-credit-card-fill"></i>
+                    <span>Thanh toán</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/forms/user.html" class="nav-link">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Người dùng</span>
+                </a>
+            </li>
+
+            <li class="nav-item active">
+                <a href="/admin/forms/review.html" class="nav-link">
+                    <i class="bi bi-star-fill"></i>
+                    <span>Đánh giá</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/admin/forms/admin-promotion.html" class="nav-link">
+                    <i class="bi bi-megaphone-fill"></i>
+                    <span>Khuyến mãi</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="../../auth/login.html" class="nav-link text-danger">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Đăng xuất</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="content">
+        <div class="container-fluid p-4">
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h3 class="mb-0">Quản lý Đánh giá</h3>
             </div>
-        </nav>
-                    </div>
-                </div>
 
-                <!-- Stats Row -->
-                <div class="row g-4 mb-4">
-                    <div class="col-md-3">
-                        <div class="stat-card stat-card-warning">
-                            <div class="stat-icon"><i class="bi bi-star-fill"></i></div>
-                            <div class="stat-info">
-                                <h3>4.6</h3>
-                                <p>Đánh giá trung bình</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card stat-card-primary">
-                            <div class="stat-icon"><i class="bi bi-chat-square-text"></i></div>
-                            <div class="stat-info">
-                                <h3>856</h3>
-                                <p>Tổng đánh giá</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card stat-card-success">
-                            <div class="stat-icon"><i class="bi bi-emoji-smile"></i></div>
-                            <div class="stat-info">
-                                <h3>78%</h3>
-                                <p>Đánh giá tích cực</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card stat-card-info">
-                            <div class="stat-icon"><i class="bi bi-clock"></i></div>
-                            <div class="stat-info">
-                                <h3>12</h3>
-                                <p>Chờ phản hồi</p>
-                            </div>
+            <!-- Stats Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card stat-card-warning">
+                        <div class="stat-icon"><i class="bi bi-star-fill"></i></div>
+                        <div class="stat-info">
+                            <h3 id="adminAvgRating">--</h3>
+                            <p>Đánh giá trung bình</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="row g-4">
-                    <!-- Rating Distribution -->
-                    <div class="col-xl-4">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h5>Phân bố đánh giá</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="text-center mb-4">
-                                    <h1 class="display-3 fw-bold text-warning mb-0">4.6</h1>
-                                    <div class="text-warning mb-2">
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-half"></i>
-                                    </div>
-                                    <p class="text-muted">856 đánh giá</p>
-                                </div>
-                                
-                                <div class="rating-bar mb-2">
-                                    <span class="rating-label">5 <i class="bi bi-star-fill text-warning"></i></span>
-                                    <div class="progress flex-grow-1 mx-2">
-                                        <div class="progress-bar bg-success" style="width: 65%"></div>
-                                    </div>
-                                    <span class="rating-count">556</span>
-                                </div>
-                                <div class="rating-bar mb-2">
-                                    <span class="rating-label">4 <i class="bi bi-star-fill text-warning"></i></span>
-                                    <div class="progress flex-grow-1 mx-2">
-                                        <div class="progress-bar bg-success" style="width: 20%"></div>
-                                    </div>
-                                    <span class="rating-count">171</span>
-                                </div>
-                                <div class="rating-bar mb-2">
-                                    <span class="rating-label">3 <i class="bi bi-star-fill text-warning"></i></span>
-                                    <div class="progress flex-grow-1 mx-2">
-                                        <div class="progress-bar bg-warning" style="width: 8%"></div>
-                                    </div>
-                                    <span class="rating-count">68</span>
-                                </div>
-                                <div class="rating-bar mb-2">
-                                    <span class="rating-label">2 <i class="bi bi-star-fill text-warning"></i></span>
-                                    <div class="progress flex-grow-1 mx-2">
-                                        <div class="progress-bar bg-danger" style="width: 4%"></div>
-                                    </div>
-                                    <span class="rating-count">34</span>
-                                </div>
-                                <div class="rating-bar">
-                                    <span class="rating-label">1 <i class="bi bi-star-fill text-warning"></i></span>
-                                    <div class="progress flex-grow-1 mx-2">
-                                        <div class="progress-bar bg-danger" style="width: 3%"></div>
-                                    </div>
-                                    <span class="rating-count">27</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Reviews List -->
-                    <div class="col-xl-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Đánh giá gần đây</h5>
-                                <div class="d-flex gap-2">
-                                    <select class="form-select form-select-sm" style="width: auto;">
-                                        <option value="">Tất cả sao</option>
-                                        <option>5 sao</option>
-                                        <option>4 sao</option>
-                                        <option>3 sao</option>
-                                        <option>2 sao</option>
-                                        <option>1 sao</option>
-                                    </select>
-                                    <select class="form-select form-select-sm" style="width: auto;">
-                                        <option>Mới nhất</option>
-                                        <option>Cũ nhất</option>
-                                        <option>Cao nhất</option>
-                                        <option>Thấp nhất</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="card-body p-0">
-                                <!-- Review Item -->
-                                <div class="review-item p-3 border-bottom" style="border-color: var(--gray-800) !important;">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="avatar avatar-sm">NT</div>
-                                            <div>
-                                                <strong>Nguyễn Văn Tùng</strong>
-                                                <div class="text-warning" style="font-size: 0.75rem;">
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">2 giờ trước</small>
-                                    </div>
-                                    <p class="mb-2 text-muted">Phở rất ngon, nước dùng đậm đà. Phục vụ nhanh và thái độ nhân viên rất nhiệt tình. Sẽ quay lại lần sau!</p>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-reply me-1"></i> Phản hồi</button>
-                                        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-flag me-1"></i> Báo cáo</button>
-                                    </div>
-                                </div>
-
-                                <div class="review-item p-3 border-bottom" style="border-color: var(--gray-800) !important;">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="avatar avatar-sm">TH</div>
-                                            <div>
-                                                <strong>Trần Thị Hoa</strong>
-                                                <div class="text-warning" style="font-size: 0.75rem;">
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">5 giờ trước</small>
-                                    </div>
-                                    <p class="mb-2 text-muted">Món ăn ngon, không gian thoáng mát. Chỉ tiếc là hơi đông nên phải chờ khá lâu. Nhưng nhìn chung vẫn hài lòng.</p>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-reply me-1"></i> Phản hồi</button>
-                                    </div>
-                                </div>
-
-                                <div class="review-item p-3 border-bottom" style="border-color: var(--gray-800) !important;">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="avatar avatar-sm">LM</div>
-                                            <div>
-                                                <strong>Lê Minh</strong>
-                                                <div class="text-warning" style="font-size: 0.75rem;">
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star"></i>
-                                                    <i class="bi bi-star"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">1 ngày trước</small>
-                                    </div>
-                                    <p class="mb-2 text-muted">Đồ ăn khá ổn nhưng giá hơi cao so với mặt bằng chung. Wifi yếu, không phù hợp để làm việc.</p>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-reply me-1"></i> Phản hồi</button>
-                                        <span class="badge bg-warning">Cần phản hồi</span>
-                                    </div>
-                                </div>
-
-                                <div class="review-item p-3 border-bottom" style="border-color: var(--gray-800) !important;">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="avatar avatar-sm">PD</div>
-                                            <div>
-                                                <strong>Phạm Duy</strong>
-                                                <span class="badge bg-warning ms-2">VIP</span>
-                                                <div class="text-warning" style="font-size: 0.75rem;">
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">2 ngày trước</small>
-                                    </div>
-                                    <p class="mb-2 text-muted">Tuyệt vời! Đã đến đây nhiều lần và chưa bao giờ thất vọng. Đặc biệt món cơm tấm rất ngon. Recommend 10/10!</p>
-                                    <div class="d-flex gap-2 align-items-center">
-                                        <span class="badge bg-success"><i class="bi bi-check me-1"></i> Đã phản hồi</span>
-                                        <small class="text-muted">Cảm ơn bạn đã ủng hộ!</small>
-                                    </div>
-                                </div>
-
-                                <div class="review-item p-3">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="avatar avatar-sm">HV</div>
-                                            <div>
-                                                <strong>Hoàng Vy</strong>
-                                                <div class="text-warning" style="font-size: 0.75rem;">
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star-fill"></i>
-                                                    <i class="bi bi-star"></i>
-                                                    <i class="bi bi-star"></i>
-                                                    <i class="bi bi-star"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">3 ngày trước</small>
-                                    </div>
-                                    <p class="mb-2 text-muted">Thất vọng với lần này. Đồ ăn nguội, phục vụ chậm. Hy vọng quán cải thiện.</p>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-reply me-1"></i> Phản hồi</button>
-                                        <span class="badge bg-danger">Cần xử lý</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between align-items-center" style="background: var(--dark-light); border-top: 1px solid var(--gray-800); padding: 1rem 1.25rem;">
-                                <span class="text-muted">Hiển thị 1-5 / 856 đánh giá</span>
-                                <nav>
-                                    <ul class="pagination mb-0">
-                                        <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
-                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                        <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
-                                    </ul>
-                                </nav>
-                            </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-card-primary">
+                        <div class="stat-icon"><i class="bi bi-chat-square-text"></i></div>
+                        <div class="stat-info">
+                            <h3 id="adminTotalReviews">--</h3>
+                            <p>Tổng đánh giá</p>
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card stat-card-success">
+                        <div class="stat-icon"><i class="bi bi-emoji-smile"></i></div>
+                        <div class="stat-info">
+                            <h3 id="adminRecommendedPercent">--%</h3>
+                            <p>Đánh giá tích cực</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card stat-card-info">
+                        <div class="stat-icon"><i class="bi bi-clock"></i></div>
+                        <div class="stat-info">
+                            <h3 id="adminPendingCount">0</h3>
+                            <p>Chờ phản hồi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Rating Distribution -->
+                <div class="col-xl-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5>Phân bố đánh giá</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <h1 id="adminDistAvg" class="display-3 fw-bold text-warning mb-0">--</h1>
+                                <div class="text-warning mb-2">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                </div>
+                                <p id="adminDistTotal" class="text-muted">-- đánh giá</p>
+                            </div>
+
+                            <!-- NOTE: API hiện tại chưa trả distribution theo sao => để 0 -->
+                            <div class="rating-bar mb-2">
+                                <span class="rating-label">5 <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1 mx-2">
+                                    <div id="adminBar5" class="progress-bar bg-success" style="width: 0%"></div>
+                                </div>
+                                <span id="adminCount5" class="rating-count">0</span>
+                            </div>
+
+                            <div class="rating-bar mb-2">
+                                <span class="rating-label">4 <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1 mx-2">
+                                    <div id="adminBar4" class="progress-bar bg-success" style="width: 0%"></div>
+                                </div>
+                                <span id="adminCount4" class="rating-count">0</span>
+                            </div>
+
+                            <div class="rating-bar mb-2">
+                                <span class="rating-label">3 <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1 mx-2">
+                                    <div id="adminBar3" class="progress-bar bg-warning" style="width: 0%"></div>
+                                </div>
+                                <span id="adminCount3" class="rating-count">0</span>
+                            </div>
+
+                            <div class="rating-bar mb-2">
+                                <span class="rating-label">2 <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1 mx-2">
+                                    <div id="adminBar2" class="progress-bar bg-danger" style="width: 0%"></div>
+                                </div>
+                                <span id="adminCount2" class="rating-count">0</span>
+                            </div>
+
+                            <div class="rating-bar">
+                                <span class="rating-label">1 <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1 mx-2">
+                                    <div id="adminBar1" class="progress-bar bg-danger" style="width: 0%"></div>
+                                </div>
+                                <span id="adminCount1" class="rating-count">0</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews List -->
+                <div class="col-xl-8">
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0">Đánh giá gần đây</h5>
+                            <div class="d-flex gap-2">
+                                <select class="form-select form-select-sm" style="width: auto;" disabled>
+                                    <option value="">Tất cả sao</option>
+                                    <option>5 sao</option>
+                                    <option>4 sao</option>
+                                    <option>3 sao</option>
+                                    <option>2 sao</option>
+                                    <option>1 sao</option>
+                                </select>
+                                <select class="form-select form-select-sm" style="width: auto;" disabled>
+                                    <option>Mới nhất</option>
+                                    <option>Cũ nhất</option>
+                                    <option>Cao nhất</option>
+                                    <option>Thấp nhất</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-0" id="adminReviewsList">
+                            <div class="p-3 text-muted">Loading...</div>
+                        </div>
+
+                        <div class="card-footer d-flex justify-content-between align-items-center"
+                             style="background: var(--dark-light); border-top: 1px solid var(--gray-800); padding: 1rem 1.25rem;">
+                            <span class="text-muted">Hiển thị danh sách đánh giá gần đây</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="replyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Phản hồi đánh giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <strong>Khách hàng:</strong> <span id="modalCustomerName" class="text-success"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Đánh giá:</strong>
+                    <div id="modalReviewContent" class="p-2 bg-light border rounded mt-1 fst-italic"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="replyText" class="form-label fw-bold">Nội dung phản hồi:</label>
+                    <textarea class="form-control" id="replyText" rows="4" placeholder="Nhập nội dung phản hồi của nhà hàng..."></textarea>
+                    <input type="hidden" id="currentReviewId">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" id="btnSubmitReply">Gửi phản hồi</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/main.js"></script>
-    <style>
-        .rating-bar {
-            display: flex;
-            align-items: center;
-        }
-        .rating-label {
-            width: 50px;
-            font-size: 0.875rem;
-            color: var(--gray-400);
-        }
-        .rating-count {
-            width: 40px;
-            text-align: right;
-            font-size: 0.875rem;
-            color: var(--gray-400);
-        }
-        .rating-bar .progress {
-            height: 8px;
-            background: var(--gray-800);
-            border-radius: 4px;
-        }
-    </style>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://unpkg.com/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/admin-reviews.js"></script>
 </body>
 </html>

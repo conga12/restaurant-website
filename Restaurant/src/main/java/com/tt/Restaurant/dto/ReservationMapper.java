@@ -65,6 +65,15 @@ public class ReservationMapper {
             table.setId(dto.getTableId());
             reservation.setTable(table);
         }
+        if (dto.getStatus() != null && !dto.getStatus().isBlank()) {
+            try {
+                reservation.setStatus(Reservation.ReservationStatus.valueOf(dto.getStatus())); // Nếu status là Enum
+            } catch (Exception e) {
+                System.out.println("[!] Lỗi mapping status: " + dto.getStatus());
+                e.printStackTrace();
+                throw new RuntimeException("Sai giá trị status: " + dto.getStatus());
+            }
+        }
 
         return reservation;
     }

@@ -51,4 +51,34 @@ public class AdminUploadController {
         String url = "/uploads/categories/" + filename;
         return Map.of("url", url);
     }
+
+    @PostMapping(value = "/upload/promotion-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Map<String, String> uploadPromotionImage(@RequestPart("file") MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new ResponseStatusException(BAD_REQUEST, "File is empty");
+        }
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ResponseStatusException(BAD_REQUEST, "Only image files are allowed");
+        }
+
+        String original = StringUtils.cleanPath(file.getOriginalFilename() == null ? "image" : file.getOriginalFilename());
+        String ext = "";
+
+        int dot = original.lastIndexOf('.');
+        if (dot >= 0 && dot < original.length() - 1) ext = original.substring(dot);
+
+        String filename = UUID.randomUUID() + ext;
+
+        Path root = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Path promoDir = root.resolve("promotions");
+        Files.createDirectories(promoDir);
+
+        Path target = promoDir.resolve(filename);
+        Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+
+        // trả về URL frontend sẽ dùng làm imageUrl
+        String url = "/uploads/promotions/" + filename;
+        return Map.of("url", url);
+    }
 }

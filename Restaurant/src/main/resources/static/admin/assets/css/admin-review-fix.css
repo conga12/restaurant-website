@@ -1,0 +1,23 @@
+/* Fix layout bị cắt ở trang review admin */
+.main, .container-fluid, .row, .col-xl-8, .col-xl-4, .card, .card-body {
+  min-width: 0 !important;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.card {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.col-xl-8, .col-xl-4 {
+  flex-basis: 0 !important;
+  flex-grow: 1 !important;
+  max-width: 100% !important;
+}
+
+/* Đảm bảo không bị overflow ngang */
+body, html {
+  overflow-x: hidden !important;
+}
+

@@ -160,4 +160,5 @@ public class ReservationResponseDTO {
     public void setExpireAt(String expireAt) {
         this.expireAt = expireAt;
     }
+
 }

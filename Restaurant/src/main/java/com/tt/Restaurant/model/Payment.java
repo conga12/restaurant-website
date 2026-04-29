@@ -44,6 +44,13 @@ public class Payment {
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "promotion_id")
+    private Promotion promotion;
+
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount;
+
     public Payment() {
     }
 
@@ -79,6 +86,10 @@ public class Payment {
         return createdAt;
     }
 
+    public Promotion getPromotion() { return promotion; }
+
+    public BigDecimal getDiscountAmount() { return discountAmount; }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -110,4 +121,8 @@ public class Payment {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public void setPromotion(Promotion promotion) { this.promotion = promotion; }
+
+    public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount; }
 }

@@ -2,11 +2,33 @@ const API_URL = "/admin/api/reservations";
 const AVAILABLE_TABLES_URL = "/admin/api/reservations/available-tables";
 const UNREAD_COUNT_URL = "/admin/api/reservations/unread-count";
 
+let lastPageData = [];
 let allReservations = [];
+let filteredReservations = [];
 let autoRefreshTimer = null;
 let isLoadingReservations = false;
 
+function formatDateToISO(dateStr) {
+    if (!dateStr) return "";
+    // Nếu là yyyy-MM-dd thì return luôn
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+
+    // Nếu là dd/MM/yyyy hoặc d/M/yyyy
+    const parts = dateStr.split("/");
+    if (parts.length === 3 && parts[2].length === 4) {
+        const day = parts[0].padStart(2, "0");
+        const month = parts[1].padStart(2, "0");
+        const year = parts[2];
+        return `${year}-${month}-${day}`;
+    }
+    // Nếu bị thiếu phần (ví dụ "21/04/", "21//2026") thì trả ""
+    return "";
+}
+
 document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById('filter-btn').onclick = function() {
+        loadReservations(0); // reset về trang đầu nếu filter
+    }
     loadReservations();
     loadReservationUnreadBadge();
     setupReservationModalEvents();
@@ -33,6 +55,7 @@ async function loadReservations() {
         }
 
         allReservations = await response.json();
+        filteredReservations = [];
         renderReservationTable(allReservations);
         updateSummary(allReservations.length, allReservations.length);
         await loadReservationUnreadBadge();
@@ -81,7 +104,9 @@ function renderReservationTable(reservations) {
                 </td>
                 <td>${safe(r.numberOfGuests)} người</td>
                 <td><span class="badge bg-secondary">${tableName}</span></td>
+                <td>${renderDepositCol(r)}</td>
                 <td>${statusBadge}</td>
+
                 <td>
                     <div class="action-btns d-flex gap-1 flex-wrap">
                         <button class="btn btn-action btn-view" onclick="viewReservation(${r.id})" title="Chi tiết">
@@ -127,7 +152,7 @@ function applyFilters() {
     const status = document.getElementById("filterStatus")?.value || "";
     const keyword = (document.getElementById("filterKeyword")?.value || "").trim().toLowerCase();
 
-    const filtered = allReservations.filter(r => {
+    filteredReservations = allReservations.filter(r => {
         const matchDate = !date || r.reservationDate === date;
         const matchStatus = !status || r.status === status;
         const matchKeyword =
@@ -139,8 +164,8 @@ function applyFilters() {
         return matchDate && matchStatus && matchKeyword;
     });
 
-    renderReservationTable(filtered);
-    updateSummary(filtered.length, allReservations.length);
+    renderReservationTable(filteredReservations);
+    updateSummary(filteredReservations.length, allReservations.length);
 }
 
 function updateSummary(current, total) {
@@ -206,9 +231,12 @@ async function loadAvailableTables() {
     if (!date || !time || !guests) return;
 
     try {
-        const response = await fetch(
-            `${AVAILABLE_TABLES_URL}?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}&guests=${encodeURIComponent(guests)}`,
-            { credentials: "include" }
+       const excludeId = document.getElementById("reservationId")?.value?.trim();
+       const extra = excludeId ? `&excludeReservationId=${encodeURIComponent(excludeId)}` : "";
+
+       const response = await fetch(
+         `${AVAILABLE_TABLES_URL}?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}&guests=${encodeURIComponent(guests)}${extra}`,
+         { credentials: "include" }
         );
 
         if (response.status === 401 || response.status === 403) return;
@@ -216,6 +244,12 @@ async function loadAvailableTables() {
 
         const tables = await response.json();
         const guestsNum = Number(guests) || 0;
+
+        // Nếu không có bàn trống
+        if (!Array.isArray(tables) || tables.length === 0) {
+            tableSelect.innerHTML = `<option value="">Không có bàn trống phù hợp</option>`;
+            return;
+        }
 
         const norm = (v) => String(v || "").toUpperCase();
         const getType = (tb) => norm(tb.type || tb.tableType || tb.category);
@@ -276,7 +310,6 @@ async function loadAvailableTables() {
             } else if (t.includes("STANDARD")) {
                 labelType = "Standard";
             } else {
-                // fallback nếu type lạ/không có
                 labelType = "";
             }
 
@@ -291,38 +324,136 @@ async function loadAvailableTables() {
         console.error("Lỗi loadAvailableTables:", error);
     }
 }
+function updateTableFooter(dataPage) {
+    // Gán tổng đặt bàn: dataPage.totalElements (từ BE Page trả về)
+    document.getElementById("totalReservations").innerText = dataPage.totalElements;
+}
+async function loadReservations(page = 0, size = 20) {
+    const date = document.getElementById("filterDate")?.value || "";
+    const status = document.getElementById("filterStatus")?.value || "";
+    const keyword = document.getElementById("filterKeyword")?.value.trim() || "";
 
-async function saveReservation() {
-    const id = document.getElementById("reservationId")?.value.trim() || "";
+    let url = `/admin/api/reservations?page=${page}&size=${size}`;
+    if (date) url += `&date=${encodeURIComponent(date)}`;
+    if (status) url += `&status=${encodeURIComponent(status)}`;
+    if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
 
-    const payload = {
-        customerName: document.getElementById("customerName")?.value.trim(),
-        customerPhone: document.getElementById("customerPhone")?.value.trim(),
-        customerEmail: document.getElementById("customerEmail")?.value.trim(),
-        reservationDate: document.getElementById("reservationDate")?.value,
-        reservationTime: document.getElementById("reservationTime")?.value,
-        numberOfGuests: parseInt(document.getElementById("numberOfGuests")?.value, 10),
-        specialRequest: document.getElementById("specialRequest")?.value.trim(),
-        status: document.getElementById("reservationStatus")?.value
-    };
+    const res = await fetch(url);
+    const data = await res.json();
 
-    const tableId = document.getElementById("tableId")?.value;
-    if (tableId) {
-        payload.tableId = Number(tableId);
-    }
+    renderReservationTable(data.content);
+    renderPagination(data.totalPages, data.number);
+    updateTableFooter(data);
+    lastPageData = data.content;
+}
 
-    if (
-        !payload.customerName ||
-        !payload.customerPhone ||
-        !payload.reservationDate ||
-        !payload.reservationTime ||
-        !payload.numberOfGuests
-    ) {
-        alert("Vui lòng nhập đầy đủ thông tin bắt buộc");
+
+function renderPagination(totalPages, page) {
+    const container = document.getElementById("reservationPagination");
+    if (totalPages <= 1) {
+        container.innerHTML = "";
         return;
     }
 
+    let html = '';
+
+    // Nút prev
+    if (page > 0)
+        html += `<button class="btn btn-sm btn-outline-secondary" onclick="gotoPage(${page-1})">«</button> `;
+
+    for (let i=0; i<totalPages; i++) {
+        html += `<button class="btn btn-sm ${i===page?'btn-primary':'btn-outline-secondary'}"
+                        style="margin:0 2px"
+                        onclick="gotoPage(${i})">${i+1}</button>`;
+    }
+    // Nút next
+    if (page < totalPages - 1)
+        html += ` <button class="btn btn-sm btn-outline-secondary" onclick="gotoPage(${page+1})">»</button>`;
+
+    container.innerHTML = html;
+}
+
+function gotoPage(page) {
+    loadReservations(page);
+}
+
+
+function exportReservations() {
+    // Xuất theo dữ liệu đang xem (sau lọc)
+    const exportData = lastPageData;
+    if (!exportData.length) {
+        alert("Không có dữ liệu để xuất!");
+        return;
+    }
+    let csv = 'Mã đặt,Khách hàng,SDT,Email,Thời gian,Số khách,Bàn,Trạng thái\n';
+    exportData.forEach(r => {
+        csv += [
+            `#RSV${r.id}`,
+            `"${(r.customerName||'').replace(/"/g, '""')}"`,
+            `'${r.customerPhone}'`,
+            `"${(r.customerEmail||'').replace(/"/g, '""')}"`,
+            `"${(r.reservationDate??'')} ${(r.reservationTime??'')}"`,
+            r.numberOfGuests,
+            r.tableNumber ?? '-',
+            r.status
+        ].join(',') + '\n';
+    });
+    const BOM = "\uFEFF";
+    const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'danh_sach_dat_ban.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function printReservations() {
+    const printContents = document.getElementById("reservationTable").outerHTML;
+    const win = window.open('', '', 'width=900,height=700');
+    win.document.write('<html><head><title>In danh sách đặt bàn</title></head><body>');
+    win.document.write('<h2>Danh sách đặt bàn</h2>');
+    win.document.write(printContents);
+    win.document.write('</body></html>');
+    win.document.close();
+    win.print();
+}
+async function saveReservation() {
+    const btn = document.querySelector("#reservationModal .btn.btn-success");
+    if (btn) btn.disabled = true;
+
     try {
+        const id = document.getElementById("reservationId")?.value.trim() || "";
+
+        const payload = {
+            customerName: document.getElementById("customerName")?.value.trim(),
+            customerPhone: document.getElementById("customerPhone")?.value.trim(),
+            customerEmail: document.getElementById("customerEmail")?.value.trim(),
+            reservationDate: formatDateToISO(document.getElementById("reservationDate")?.value),
+            reservationTime: document.getElementById("reservationTime")?.value,
+            numberOfGuests: parseInt(document.getElementById("numberOfGuests")?.value, 10),
+            specialRequest: document.getElementById("specialRequest")?.value.trim(),
+            status: document.getElementById("reservationStatus")?.value
+        };
+
+        const tableId = document.getElementById("tableId")?.value;
+        if (tableId) {
+            payload.tableId = Number(tableId);
+        }
+
+        if (
+            !payload.customerName ||
+            !payload.customerPhone ||
+            !payload.reservationDate ||
+            !payload.reservationTime ||
+            !payload.numberOfGuests ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(payload.reservationDate) // kiểm tra reservationDate hợp lệ
+        ) {
+            alert("Vui lòng nhập đầy đủ thông tin bắt buộc và chọn ngày theo định dạng yyyy-MM-dd.");
+            if (btn) btn.disabled = false;
+            return;
+        }
+
         let response;
 
         if (id) {
@@ -350,6 +481,8 @@ async function saveReservation() {
         const text = await response.text();
         console.log("saveReservation status:", response.status);
         console.log("saveReservation raw:", text);
+        const rawDate = document.getElementById("reservationDate")?.value;
+        console.log('[DEBUG] rawDate:', rawDate);
 
         if (response.status === 401 || response.status === 403) {
             alert("Bạn không có quyền thực hiện thao tác này hoặc phiên đăng nhập đã hết hạn.");
@@ -358,6 +491,10 @@ async function saveReservation() {
         }
 
         if (!response.ok) {
+            // Nếu bị trùng bàn/khung giờ => reload danh sách bàn để ẩn bàn vừa bị chiếm
+            if (response.status === 409 || (text && text.includes("Bàn đã được đặt"))) {
+                await loadAvailableTables();
+            }
             throw new Error(text || "Lưu đặt bàn thất bại");
         }
 
@@ -372,6 +509,8 @@ async function saveReservation() {
     } catch (error) {
         console.error("Lỗi saveReservation:", error);
         alert(error.message || "Có lỗi xảy ra khi lưu đặt bàn");
+    } finally {
+        if (btn) btn.disabled = false;
     }
 }
 
@@ -399,7 +538,23 @@ async function editReservation(id) {
 
         await loadAvailableTables();
 
-        document.getElementById("tableId").value = r.tableId ?? "";
+        // Nếu bàn hiện tại không còn trong list available => báo và reset
+        const tableSelect = document.getElementById("tableId");
+        const desired = String(r.tableId ?? "");
+
+        if (tableSelect) {
+            if (desired) {
+                const exists = Array.from(tableSelect.options).some(o => o.value === desired);
+                if (exists) {
+                    tableSelect.value = desired;
+                } else {
+                    tableSelect.value = "";
+                    alert(`Bàn hiện tại không còn trống ở khung giờ này. Vui lòng chọn bàn khác.`);
+                }
+            } else {
+                tableSelect.value = "";
+            }
+        }
 
         const title = document.querySelector("#reservationModal .modal-title");
         if (title) {
@@ -635,4 +790,22 @@ async function loadReservationUnreadBadge() {
         console.error("Lỗi loadReservationUnreadBadge:", error);
         badge.classList.add("d-none");
     }
+}
+function renderDepositCol(r) {
+    if (!r.depositRequired) {
+        return `<span class="badge bg-secondary">Không yêu cầu</span>`;
+    }
+    if (r.depositStatus === "PAID") {
+        return `<span class="badge bg-success">Đã nhận cọc</span>`;
+    }
+    if (r.depositStatus === "PENDING") {
+        return `<span class="badge bg-warning text-dark">Chờ cọc</span>`;
+    }
+    if (r.depositStatus === "REFUNDED") {
+        return `<span class="badge bg-info text-dark">Đã hoàn cọc</span>`;
+    }
+    if (r.depositStatus === "FORFEITED" || r.depositStatus === "EXPIRED") {
+        return `<span class="badge bg-danger">Mất/Quá hạn cọc</span>`;
+    }
+    return `<span class="badge bg-dark">${r.depositStatus || "Khác"}</span>`;
 }

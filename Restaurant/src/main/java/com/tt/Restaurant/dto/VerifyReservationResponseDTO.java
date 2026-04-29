@@ -14,6 +14,8 @@ public class VerifyReservationResponseDTO {
     private String message;
     private Long tableId;
     private Integer tableNumber;
+    private Boolean depositRequired;
+    private String depositStatus;
 
     public VerifyReservationResponseDTO() {
     }
@@ -112,5 +114,20 @@ public class VerifyReservationResponseDTO {
 
     public void setTableNumber(Integer tableNumber) {
         this.tableNumber = tableNumber;
+    }
+
+
+    public Boolean getDepositRequired() {
+        return depositRequired;
+    }
+    public void setDepositRequired(Boolean depositRequired) {
+        this.depositRequired = depositRequired;
+    }
+
+    public String getDepositStatus() {
+        return depositStatus;
+    }
+    public void setDepositStatus(String depositStatus) {
+        this.depositStatus = depositStatus;
     }
 }

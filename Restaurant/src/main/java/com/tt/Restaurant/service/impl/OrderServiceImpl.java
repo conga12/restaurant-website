@@ -1,21 +1,17 @@
 package com.tt.Restaurant.service.impl;
 
 import com.tt.Restaurant.dto.*;
-import com.tt.Restaurant.model.Dish;
-import com.tt.Restaurant.model.OrderDetail;
-import com.tt.Restaurant.model.Orders;
-import com.tt.Restaurant.model.Reservation;
-import com.tt.Restaurant.model.RestaurantTable;
-import com.tt.Restaurant.repository.DishRepository;
-import com.tt.Restaurant.repository.OrderDetailRepository;
-import com.tt.Restaurant.repository.OrderRepository;
-import com.tt.Restaurant.repository.ReservationRepository;
-import com.tt.Restaurant.repository.RestaurantTableRepository;
+import com.tt.Restaurant.model.*;
+import com.tt.Restaurant.repository.*;
 import com.tt.Restaurant.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +24,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final DishRepository dishRepository;
     private final RestaurantTableRepository restaurantTableRepository;
+    @Autowired
+    private PromotionRepository promotionRepository;
 
     public OrderServiceImpl(ReservationRepository reservationRepository,
                             OrderRepository orderRepository,
@@ -44,11 +42,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public VerifyReservationResponseDTO verifyReservation(VerifyReservationRequestDTO request) {
         if (request.getReservationId() == null) {
-            throw new RuntimeException("Mã đặt bàn không được để trống");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mã đặt bàn không được để trống");
         }
 
         if (request.getCustomerPhone() == null || request.getCustomerPhone().isBlank()) {
-            throw new RuntimeException("Số điện thoại không được để trống");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số điện thoại không được để trống");
         }
 
         Reservation reservation = reservationRepository.findById((long) request.getReservationId())
@@ -56,12 +54,16 @@ public class OrderServiceImpl implements OrderService {
 
         if (reservation.getCustomerPhone() == null ||
                 !reservation.getCustomerPhone().trim().equals(request.getCustomerPhone().trim())) {
-            throw new RuntimeException("Số điện thoại không khớp với đặt bàn");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Số điện thoại không khớp với đặt bàn");
         }
 
         if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED) {
-            throw new RuntimeException("Chỉ đặt bàn đã được xác nhận mới được order món trước");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Chỉ đặt bàn đã được xác nhận mới được order món trước");
         }
+
+        // ==== BỔ SUNG KIỂM TRA CỌC ====
+        boolean depositRequired = Boolean.TRUE.equals(reservation.getDepositRequired());
+        String depositStatus = reservation.getDepositStatus() != null ? reservation.getDepositStatus().name() : null;
 
         VerifyReservationResponseDTO response = new VerifyReservationResponseDTO();
         response.setValid(true);
@@ -73,11 +75,22 @@ public class OrderServiceImpl implements OrderService {
         response.setReservationTime(reservation.getReservationTime() != null ? reservation.getReservationTime().toString() : null);
         response.setNumberOfGuests(reservation.getNumberOfGuests());
         response.setStatus(reservation.getStatus().name());
-        response.setMessage("Xác minh đặt bàn thành công");
 
         if (reservation.getTable() != null) {
             response.setTableId(reservation.getTable().getId());
             response.setTableNumber(reservation.getTable().getTableNumber());
+        }
+        // Trả về trạng thái cọc cho FE
+        response.setDepositRequired(depositRequired);
+        response.setDepositStatus(depositStatus);
+
+        if (depositRequired && !"PAID".equals(depositStatus)) {
+            response.setValid(false);
+            response.setMessage("Bạn cần thanh toán tiền cọc trước khi đặt món!");
+            // FE có thể dùng response.valid để ẩn nút đặt món/hiện popup báo khách phải cọc mới tiếp tục.
+        } else {
+            response.setValid(true);
+            response.setMessage("Xác minh đặt bàn thành công.");
         }
 
         return response;
@@ -87,31 +100,28 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDTO createOrder(CreateOrderRequestDTO request) {
         if (request.getReservationId() == null) {
-            throw new RuntimeException("Mã đặt bàn không được để trống");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mã đặt bàn không được để trống");
         }
-
         if (request.getCustomerPhone() == null || request.getCustomerPhone().isBlank()) {
-            throw new RuntimeException("Số điện thoại không được để trống");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số điện thoại không được để trống");
         }
-
         if (request.getItems() == null || request.getItems().isEmpty()) {
-            throw new RuntimeException("Đơn hàng phải có ít nhất 1 món");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Đơn hàng phải có ít nhất 1 món");
         }
-
         Reservation reservation = reservationRepository.findById((long) request.getReservationId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt bàn"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy đặt bàn"));
 
         if (reservation.getCustomerPhone() == null ||
                 !reservation.getCustomerPhone().trim().equals(request.getCustomerPhone().trim())) {
-            throw new RuntimeException("Số điện thoại không khớp với đặt bàn");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Số điện thoại không khớp với đặt bàn");
         }
 
         if (reservation.getStatus() != Reservation.ReservationStatus.CONFIRMED) {
-            throw new RuntimeException("Chỉ đặt bàn đã xác nhận mới được tạo order");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Chỉ đặt bàn đã xác nhận mới được tạo order");
         }
 
-        if (orderRepository.existsByReservationId(reservation.getId())) {
-            throw new RuntimeException("Đặt bàn này đã có order rồi");
+        if (orderRepository.existsByReservation_Id(reservation.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Đặt bàn này đã có order rồi");
         }
 
         Orders order = new Orders();
@@ -141,18 +151,18 @@ public class OrderServiceImpl implements OrderService {
 
         for (CreateOrderItemDTO itemDTO : request.getItems()) {
             if (itemDTO.getDishId() == null) {
-                throw new RuntimeException("dishId không được để trống");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"dishId không được để trống");
             }
 
             if (itemDTO.getQuantity() == null || itemDTO.getQuantity() <= 0) {
-                throw new RuntimeException("Số lượng món không hợp lệ");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Số lượng món không hợp lệ");
             }
 
             Dish dish = dishRepository.findById(itemDTO.getDishId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy món ăn, id = " + itemDTO.getDishId()));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Không tìm thấy món ăn, id = " + itemDTO.getDishId()));
 
             if (dish.getAvailable() != null && !dish.getAvailable()) {
-                throw new RuntimeException("Món '" + dish.getName() + "' hiện không còn bán");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Món '" + dish.getName() + "' hiện không còn bán");
             }
 
             BigDecimal unitPrice = dish.getPrice();
@@ -180,6 +190,34 @@ public class OrderServiceImpl implements OrderService {
             itemResponse.setNote(itemDTO.getNote());
             itemResponses.add(itemResponse);
         }
+        // Lưu số tiền gốc
+        savedOrder.setOriginAmount(totalAmount);
+
+// Áp dụng khuyến mãi nếu có
+        LocalDateTime now = LocalDateTime.now();
+        Promotion promo = promotionRepository.findByIsActiveTrue().stream()
+                .filter(p -> p.getStartDate() != null && p.getEndDate() != null)
+                .filter(p -> !now.toLocalDate().isBefore(p.getStartDate()) && !now.toLocalDate().isAfter(p.getEndDate()))
+                .filter(p -> p.getDiscountPercent() != null && p.getDiscountPercent() > 0)
+                .findFirst().orElse(null);
+
+        if (promo != null) {
+            Integer percent = promo.getDiscountPercent();
+            BigDecimal discountAmt = totalAmount.multiply(BigDecimal.valueOf(percent))
+                    .divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
+            BigDecimal finalAmt = totalAmount.subtract(discountAmt);
+
+            savedOrder.setDiscountPercent(percent);
+            savedOrder.setPromotion(promo);
+            savedOrder.setFinalAmount(finalAmt);
+        } else {
+            savedOrder.setDiscountPercent(0);
+            savedOrder.setPromotion(null);
+            savedOrder.setFinalAmount(totalAmount);
+        }
+
+        savedOrder.setUpdatedAt(LocalDateTime.now());
+        savedOrder = orderRepository.save(savedOrder);
 
         savedOrder.setTotalAmount(totalAmount);
         savedOrder.setUpdatedAt(LocalDateTime.now());
@@ -196,6 +234,14 @@ public class OrderServiceImpl implements OrderService {
         response.setTotalAmount(savedOrder.getTotalAmount());
         response.setTotalItems(totalItems);
         response.setItems(itemResponses);
+        response.setOriginAmount(savedOrder.getOriginAmount());
+        response.setFinalAmount(savedOrder.getFinalAmount());
+        response.setDiscountPercent(savedOrder.getDiscountPercent());
+        if (savedOrder.getPromotion() != null) {
+            response.setPromotionTitle(savedOrder.getPromotion().getTitle());
+        } else {
+            response.setPromotionTitle(null);
+        }
 
         return response;
     }
@@ -204,15 +250,15 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDTO createQrOrder(CreateQrOrderRequestDTO request) {
         if (request.getTableId() == null) {
-            throw new RuntimeException("Mã bàn không được để trống");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Mã bàn không được để trống");
         }
 
         if (request.getItems() == null || request.getItems().isEmpty()) {
-            throw new RuntimeException("Đơn hàng phải có ít nhất 1 món");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Đơn hàng phải có ít nhất 1 món");
         }
 
         RestaurantTable table = restaurantTableRepository.findById(request.getTableId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy bàn"));
+                .orElseThrow(() ->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Không tìm thấy bàn"));
         table.setStatus(RestaurantTable.TableStatus.OCCUPIED);
         restaurantTableRepository.save(table);
 
@@ -237,18 +283,18 @@ public class OrderServiceImpl implements OrderService {
 
         for (CreateOrderItemDTO itemDTO : request.getItems()) {
             if (itemDTO.getDishId() == null) {
-                throw new RuntimeException("dishId không được để trống");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"dishId không được để trống");
             }
 
             if (itemDTO.getQuantity() == null || itemDTO.getQuantity() <= 0) {
-                throw new RuntimeException("Số lượng món không hợp lệ");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Số lượng món không hợp lệ");
             }
 
             Dish dish = dishRepository.findById(itemDTO.getDishId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy món ăn, id = " + itemDTO.getDishId()));
 
             if (dish.getAvailable() != null && !dish.getAvailable()) {
-                throw new RuntimeException("Món '" + dish.getName() + "' hiện không còn bán");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Món '" + dish.getName() + "' hiện không còn bán");
             }
 
             BigDecimal unitPrice = dish.getPrice();
@@ -276,6 +322,33 @@ public class OrderServiceImpl implements OrderService {
             itemResponse.setNote(itemDTO.getNote());
             itemResponses.add(itemResponse);
         }
+        // Lưu số tiền gốc
+        savedOrder.setOriginAmount(totalAmount);
+        // Áp dụng khuyến mãi nếu có
+        LocalDateTime now = LocalDateTime.now();
+        Promotion promo = promotionRepository.findByIsActiveTrue().stream()
+                .filter(p -> p.getStartDate() != null && p.getEndDate() != null)
+                .filter(p -> !now.toLocalDate().isBefore(p.getStartDate()) && !now.toLocalDate().isAfter(p.getEndDate()))
+                .filter(p -> p.getDiscountPercent() != null && p.getDiscountPercent() > 0)
+                .findFirst().orElse(null);
+
+        if (promo != null) {
+            Integer percent = promo.getDiscountPercent();
+            BigDecimal discountAmt = totalAmount.multiply(BigDecimal.valueOf(percent))
+                    .divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
+            BigDecimal finalAmt = totalAmount.subtract(discountAmt);
+
+            savedOrder.setDiscountPercent(percent);
+            savedOrder.setPromotion(promo);
+            savedOrder.setFinalAmount(finalAmt);
+        } else {
+            savedOrder.setDiscountPercent(0);
+            savedOrder.setPromotion(null);
+            savedOrder.setFinalAmount(totalAmount);
+        }
+
+        savedOrder.setUpdatedAt(LocalDateTime.now());
+        savedOrder = orderRepository.save(savedOrder);
 
         savedOrder.setTotalAmount(totalAmount);
         savedOrder.setUpdatedAt(LocalDateTime.now());
@@ -294,12 +367,14 @@ public class OrderServiceImpl implements OrderService {
         response.setItems(itemResponses);
 
         return response;
+
+
     }
 
     @Override
     public OrderResponseDTO getOrderByReservation(Integer reservationId) {
-        Orders order = orderRepository.findByReservationId((long) reservationId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy order cho đặt bàn này"));
+        Orders order = orderRepository.findByReservation_Id((long) reservationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Không tìm thấy order cho đặt bàn này"));
 
         List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(order.getId());
         List<OrderItemResponseDTO> itemResponses = new ArrayList<>();
