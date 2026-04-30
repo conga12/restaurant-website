@@ -7,6 +7,7 @@ public class CreateOrderByTokenRequestDTO {
     private String token;
     private String note;
     private String paymentOption;
+    private String couponCode;
     private List<CreateOrderItemDTO> items;
 
     public CreateOrderByTokenRequestDTO() {
@@ -35,6 +36,12 @@ public class CreateOrderByTokenRequestDTO {
     public void setPaymentOption(String paymentOption) {
         this.paymentOption = paymentOption;
     }
+
+    public String getCouponCode() {
+        return couponCode;
+    }
+
+    public void setCouponCode(String couponCode) {this.couponCode = couponCode;}
 
     public List<CreateOrderItemDTO> getItems() {
         return items;

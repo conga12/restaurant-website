@@ -40,10 +40,13 @@ function renderTable(data) {
             : `<span class="text-muted">--</span>`;
 
         // Số tiền
-        const moneyCol = (p.originAmount && p.finalAmount && p.originAmount > p.finalAmount)
-            ? `<span style="display:block;text-decoration:line-through; color:#aaa">${formatMoney(p.originAmount)}</span>
-               <span style="font-weight:bold; color:#2e7d32;">${formatMoney(p.finalAmount)}</span>`
-            : `<span style="font-weight:bold; color:#2e7d32;">${formatMoney(p.finalAmount || p.amount)}</span>`;
+        const origin = Number(p.originAmount || p.amount || 0);
+        const final = Number(p.finalAmount || p.amount || 0);
+
+        const moneyCol = (origin > final)
+            ? `<span style="display:block;text-decoration:line-through; color:#aaa">${formatMoney(origin)}</span>
+               <span style="font-weight:bold; color:#2e7d32;">${formatMoney(final)}</span>`
+            : `<span style="font-weight:bold; color:#2e7d32;">${formatMoney(final)}</span>`;
 
         const row = `
             <tr>

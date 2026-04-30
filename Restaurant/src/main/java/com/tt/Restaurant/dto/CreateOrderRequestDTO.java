@@ -8,6 +8,7 @@ public class CreateOrderRequestDTO {
     private String customerPhone;
     private String note;
     private String paymentOption;
+    private String couponCode;
     private List<CreateOrderItemDTO> items;
 
     public CreateOrderRequestDTO() {
@@ -43,6 +44,14 @@ public class CreateOrderRequestDTO {
 
     public void setPaymentOption(String paymentOption) {
         this.paymentOption = paymentOption;
+    }
+
+    public String getCouponCode() {
+        return couponCode;
+    }
+
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
     }
 
     public List<CreateOrderItemDTO> getItems() {

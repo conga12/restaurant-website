@@ -84,25 +84,14 @@ public class AdminPaymentController {
                 ? transactionId.trim()
                 : "CASH_" + order.getId() + "_" + System.currentTimeMillis();
 
-        // ==== ÁP DỤNG KHUYẾN MÃI EVENT ====
-        List<Promotion> promotions = promotionRepository.findByIsActiveTrue();
-        LocalDateTime now = LocalDateTime.now();
-        Promotion appliedPromotion = promotions.stream()
-                .filter(p -> p.getStartDate() != null && p.getEndDate() != null)
-                .filter(p -> !now.toLocalDate().isBefore(p.getStartDate()) && !now.toLocalDate().isAfter(p.getEndDate()))
-                .filter(p -> p.getDiscountPercent() != null && p.getDiscountPercent() > 0)
-                .sorted((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
-                .findFirst()
-                .orElse(null);
+        // ==== DÙNG SỐ TIỀN ĐÃ TÍNH SẴN TRÊN ORDER ====
+        BigDecimal total = order.getFinalAmount() != null
+                ? order.getFinalAmount()
+                : order.getTotalAmount();
 
-        BigDecimal total = order.getTotalAmount();
-        BigDecimal discount = BigDecimal.ZERO;
-
-        if (appliedPromotion != null) {
-            BigDecimal percent = BigDecimal.valueOf(appliedPromotion.getDiscountPercent()).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
-            discount = total.multiply(percent).setScale(0, RoundingMode.HALF_UP);
-            total = total.subtract(discount);
-        }
+        BigDecimal discount = order.getDiscountAmount() != null
+                ? order.getDiscountAmount()
+                : BigDecimal.ZERO;
 
         // ==== PAYMENT ENTITY ====
         Payment payment = new Payment();
@@ -112,12 +101,14 @@ public class AdminPaymentController {
         payment.setStatus(Payment.PaymentStatus.COMPLETED);
         payment.setTransactionId(txn);
         payment.setPaidAt(LocalDateTime.now());
-        payment.setPromotion(appliedPromotion);
+
+// ❗ GIỮ nguyên KM từ order
+        payment.setPromotion(order.getPromotion());
         payment.setDiscountAmount(discount);
+
         paymentRepository.save(payment);
 
 // ==== ORDERS ENTITY (nếu muốn lưu thông tin event trên đơn) ====
-        order.setPromotion(appliedPromotion);
         order.setDiscountAmount(discount);
         order.setPaymentStatus(Orders.PaymentStatus.PAID);
         order.setPaidAt(LocalDateTime.now());
@@ -129,8 +120,7 @@ public class AdminPaymentController {
 
         releaseTableIfNeeded(order);
 
-        return "Xác nhận thanh toán thành công" +
-                (appliedPromotion != null ? (" Áp dụng KM id = " + appliedPromotion.getId() + ", giảm " + discount + "đ.") : "");
+        return "Xác nhận thanh toán thành công";
     }
 
     @PutMapping("/{orderId}/fail")

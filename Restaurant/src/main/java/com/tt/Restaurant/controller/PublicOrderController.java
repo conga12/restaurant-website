@@ -79,6 +79,7 @@ public class PublicOrderController {
         mapped.setCustomerPhone(r.getCustomerPhone());
         mapped.setNote(req.getNote());
         mapped.setPaymentOption(req.getPaymentOption());
+        mapped.setCouponCode(req.getCouponCode());
         mapped.setItems(req.getItems());
 
         return orderService.createOrder(mapped);

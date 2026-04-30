@@ -8,4 +8,5 @@ public interface OrderService {
     OrderResponseDTO createQrOrder(CreateQrOrderRequestDTO request);
     OrderResponseDTO getOrderByReservation(Integer reservationId);
     OrderResponseDTO getOrderById(Long orderId);
+
 }

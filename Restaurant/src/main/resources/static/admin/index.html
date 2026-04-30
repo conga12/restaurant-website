@@ -146,11 +146,11 @@
                             <i class="bi bi-currency-dollar"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>45,850,000đ</h3>
+                            <h3 id="todayRevenue">0đ</h3>
                             <p>Doanh thu hôm nay</p>
                         </div>
-                        <div class="stat-change positive">
-                            <i class="bi bi-arrow-up"></i> 12.5%
+                        <div class="stat-change positive" id="revenueChange">
+
                         </div>
                     </div>
                 </div>
@@ -160,11 +160,10 @@
                             <i class="bi bi-bag-check"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>156</h3>
+                            <h3 id="totalOrders">0</h3>
                             <p>Đơn hàng</p>
                         </div>
-                        <div class="stat-change positive">
-                            <i class="bi bi-arrow-up"></i> 8.2%
+                        <div class="stat-change positive" id="orderChange">
                         </div>
                     </div>
                 </div>
@@ -174,11 +173,10 @@
                             <i class="bi bi-calendar-check"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>24</h3>
+                            <h3 id="todayReservations">0</h3>
                             <p>Đặt bàn</p>
                         </div>
-                        <div class="stat-change negative">
-                            <i class="bi bi-arrow-down"></i> 3.1%
+                        <div class="stat-change negative" id="reservationChange">
                         </div>
                     </div>
                 </div>
@@ -188,11 +186,10 @@
                             <i class="bi bi-people"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>1,248</h3>
+                            <h3 id="totalCustomers">0</h3>
                             <p>Khách hàng</p>
                         </div>
-                        <div class="stat-change positive">
-                            <i class="bi bi-arrow-up"></i> 5.7%
+                        <div class="stat-change positive" id="customerChange">
                         </div>
                     </div>
                 </div>
@@ -267,38 +264,7 @@
                                         <th>Trạng thái</th>
                                     </tr>
                                     </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td><strong>#ORD001</strong></td>
-                                        <td>Bàn 5</td>
-                                        <td>850,000đ</td>
-                                        <td><span class="badge bg-warning">Đang nấu</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>#ORD002</strong></td>
-                                        <td>Bàn 12</td>
-                                        <td>1,250,000đ</td>
-                                        <td><span class="badge bg-success">Hoàn thành</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>#ORD003</strong></td>
-                                        <td>Bàn 3</td>
-                                        <td>450,000đ</td>
-                                        <td><span class="badge bg-info">Chờ thanh toán</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>#ORD004</strong></td>
-                                        <td>Bàn 8</td>
-                                        <td>2,100,000đ</td>
-                                        <td><span class="badge bg-primary">Đã nhận</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>#ORD005</strong></td>
-                                        <td>Bàn 1</td>
-                                        <td>680,000đ</td>
-                                        <td><span class="badge bg-success">Hoàn thành</span></td>
-                                    </tr>
-                                    </tbody>
+                                    <tbody id="recentOrdersBody"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -323,52 +289,7 @@
                                         <th>Trạng thái</th>
                                     </tr>
                                     </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="avatar avatar-sm">NT</div>
-                                                <span>Nguyễn Văn Tùng</span>
-                                            </div>
-                                        </td>
-                                        <td>18:00</td>
-                                        <td>4 người</td>
-                                        <td><span class="badge bg-success">Đã xác nhận</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="avatar avatar-sm">TH</div>
-                                                <span>Trần Thị Hoa</span>
-                                            </div>
-                                        </td>
-                                        <td>19:30</td>
-                                        <td>6 người</td>
-                                        <td><span class="badge bg-warning">Chờ xác nhận</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="avatar avatar-sm">LM</div>
-                                                <span>Lê Minh</span>
-                                            </div>
-                                        </td>
-                                        <td>20:00</td>
-                                        <td>2 người</td>
-                                        <td><span class="badge bg-success">Đã xác nhận</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="avatar avatar-sm">PD</div>
-                                                <span>Phạm Duy</span>
-                                            </div>
-                                        </td>
-                                        <td>20:30</td>
-                                        <td>8 người</td>
-                                        <td><span class="badge bg-info">VIP</span></td>
-                                    </tr>
-                                    </tbody>
+                                    <tbody id="todayReservationsBody"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -384,67 +305,8 @@
                         <div class="card-header">
                             <h5>Món bán chạy</h5>
                         </div>
-                        <div class="card-body">
-                            <div class="top-item">
-                                <div class="top-item-info">
-                                    <span class="rank">1</span>
-                                    <span class="name">Phở bò tái chín</span>
-                                </div>
-                                <div class="top-item-stats">
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: 95%"></div>
-                                    </div>
-                                    <span>156 phần</span>
-                                </div>
-                            </div>
-                            <div class="top-item">
-                                <div class="top-item-info">
-                                    <span class="rank">2</span>
-                                    <span class="name">Cơm tấm sườn bì</span>
-                                </div>
-                                <div class="top-item-stats">
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: 82%"></div>
-                                    </div>
-                                    <span>134 phần</span>
-                                </div>
-                            </div>
-                            <div class="top-item">
-                                <div class="top-item-info">
-                                    <span class="rank">3</span>
-                                    <span class="name">Bún chả Hà Nội</span>
-                                </div>
-                                <div class="top-item-stats">
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: 68%"></div>
-                                    </div>
-                                    <span>112 phần</span>
-                                </div>
-                            </div>
-                            <div class="top-item">
-                                <div class="top-item-info">
-                                    <span class="rank">4</span>
-                                    <span class="name">Bánh mì thịt nướng</span>
-                                </div>
-                                <div class="top-item-stats">
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: 55%"></div>
-                                    </div>
-                                    <span>89 phần</span>
-                                </div>
-                            </div>
-                            <div class="top-item">
-                                <div class="top-item-info">
-                                    <span class="rank">5</span>
-                                    <span class="name">Gỏi cuốn tôm thịt</span>
-                                </div>
-                                <div class="top-item-stats">
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: 42%"></div>
-                                    </div>
-                                    <span>68 phần</span>
-                                </div>
-                            </div>
+                        <div class="card-body" id="topDishesBox">
+
                         </div>
                     </div>
                 </div>
@@ -461,55 +323,8 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="table-grid">
-                                <div class="table-item available">
-                                    <span class="table-number">1</span>
-                                    <span class="table-capacity">4 chỗ</span>
-                                </div>
-                                <div class="table-item occupied">
-                                    <span class="table-number">2</span>
-                                    <span class="table-capacity">4 chỗ</span>
-                                </div>
-                                <div class="table-item occupied">
-                                    <span class="table-number">3</span>
-                                    <span class="table-capacity">6 chỗ</span>
-                                </div>
-                                <div class="table-item reserved">
-                                    <span class="table-number">4</span>
-                                    <span class="table-capacity">4 chỗ</span>
-                                </div>
-                                <div class="table-item available">
-                                    <span class="table-number">5</span>
-                                    <span class="table-capacity">2 chỗ</span>
-                                </div>
-                                <div class="table-item occupied">
-                                    <span class="table-number">6</span>
-                                    <span class="table-capacity">8 chỗ</span>
-                                </div>
-                                <div class="table-item available">
-                                    <span class="table-number">7</span>
-                                    <span class="table-capacity">4 chỗ</span>
-                                </div>
-                                <div class="table-item reserved">
-                                    <span class="table-number">8</span>
-                                    <span class="table-capacity">6 chỗ</span>
-                                </div>
-                                <div class="table-item available">
-                                    <span class="table-number">9</span>
-                                    <span class="table-capacity">4 chỗ</span>
-                                </div>
-                                <div class="table-item occupied">
-                                    <span class="table-number">10</span>
-                                    <span class="table-capacity">4 chỗ</span>
-                                </div>
-                                <div class="table-item available">
-                                    <span class="table-number">11</span>
-                                    <span class="table-capacity">2 chỗ</span>
-                                </div>
-                                <div class="table-item available">
-                                    <span class="table-number">12</span>
-                                    <span class="table-capacity">10 chỗ</span>
-                                </div>
+                            <div class="table-grid" id="tableGrid">
+
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 const VERIFY_API = "/api/customer/orders/verify-reservation";
 const CREATE_ORDER_API = "/api/customer/orders";
 const DISH_API = "/api/dishes";
+//const couponCodeInput = document.getElementById("couponCodeInput");
 
 let verifiedReservation = null;
 let dishes = [];
@@ -390,12 +391,14 @@ async function submitOrder() {
       document.querySelector('input[name="paymentOption"]:checked')?.value || "PAY_AT_RESTAURANT";
 
     const endpoint = magicToken ? CREATE_ORDER_PUBLIC_API : CREATE_ORDER_API;
+    const couponCode = document.getElementById("couponCodeInput")?.value?.trim() || null;
 
     const payload = magicToken
       ? {
           token: magicToken,
           note: orderNote.value.trim(),
           paymentOption,
+          couponCode,
           items: cart.map(item => ({
             dishId: item.dishId,
             quantity: item.quantity,
@@ -407,6 +410,7 @@ async function submitOrder() {
           customerPhone: verifiedReservation.customerPhone,
           note: orderNote.value.trim(),
           paymentOption,
+          couponCode,
           items: cart.map(item => ({
             dishId: item.dishId,
             quantity: item.quantity,

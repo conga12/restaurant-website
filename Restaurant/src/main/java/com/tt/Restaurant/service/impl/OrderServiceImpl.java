@@ -24,6 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final DishRepository dishRepository;
     private final RestaurantTableRepository restaurantTableRepository;
+    private final ReviewRepository reviewRepository;
     @Autowired
     private PromotionRepository promotionRepository;
 
@@ -31,12 +32,14 @@ public class OrderServiceImpl implements OrderService {
                             OrderRepository orderRepository,
                             OrderDetailRepository orderDetailRepository,
                             DishRepository dishRepository,
-                            RestaurantTableRepository restaurantTableRepository) {
+                            RestaurantTableRepository restaurantTableRepository,
+                            ReviewRepository reviewRepository) {
         this.reservationRepository = reservationRepository;
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.dishRepository = dishRepository;
         this.restaurantTableRepository = restaurantTableRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     @Override
@@ -201,10 +204,45 @@ public class OrderServiceImpl implements OrderService {
                 .filter(p -> p.getDiscountPercent() != null && p.getDiscountPercent() > 0)
                 .findFirst().orElse(null);
 
-        if (promo != null) {
-            Integer percent = promo.getDiscountPercent();
+        String couponCode = request.getCouponCode();
+
+        if (couponCode != null && !couponCode.isBlank()) {
+            Review couponReview = reviewRepository.findByCouponCodeIgnoreCase(couponCode.trim())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mã giảm giá không tồn tại"));
+
+            if (couponReview.isCouponUsed()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mã giảm giá đã được sử dụng");
+            }
+
+            if (couponReview.getCouponExpiresAt() == null || couponReview.getCouponExpiresAt().isBefore(LocalDateTime.now())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mã giảm giá đã hết hạn");
+            }
+
+//            if (couponReview.getUser() == null || reservation.getUser() == null ||
+//                    !couponReview.getUser().getId().equals(reservation.getUser().getId())) {
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mã giảm giá không thuộc tài khoản này");
+//            }
+
+            Integer percent = couponReview.getCouponDiscountPercent() == null ? 0 : couponReview.getCouponDiscountPercent();
+
             BigDecimal discountAmt = totalAmount.multiply(BigDecimal.valueOf(percent))
                     .divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
+
+            BigDecimal finalAmt = totalAmount.subtract(discountAmt);
+
+            savedOrder.setDiscountPercent(percent);
+            savedOrder.setPromotion(null);
+            savedOrder.setFinalAmount(finalAmt);
+
+            couponReview.setCouponUsed(true);
+            reviewRepository.save(couponReview);
+
+        } else if (promo != null) {
+            Integer percent = promo.getDiscountPercent();
+
+            BigDecimal discountAmt = totalAmount.multiply(BigDecimal.valueOf(percent))
+                    .divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
+
             BigDecimal finalAmt = totalAmount.subtract(discountAmt);
 
             savedOrder.setDiscountPercent(percent);

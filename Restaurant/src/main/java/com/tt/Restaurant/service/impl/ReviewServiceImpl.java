@@ -1,5 +1,6 @@
 package com.tt.Restaurant.service.impl;
 
+import com.tt.Restaurant.dto.ReviewAIResult;
 import com.tt.Restaurant.dto.ReviewRequestDTO;
 import com.tt.Restaurant.model.*;
 import com.tt.Restaurant.repository.OrderRepository;
@@ -7,6 +8,7 @@ import com.tt.Restaurant.repository.ReservationRepository;
 import com.tt.Restaurant.repository.ReviewRepository;
 import com.tt.Restaurant.repository.UserRepository;
 import com.tt.Restaurant.service.EmailService;
+import com.tt.Restaurant.service.GeminiService;
 import com.tt.Restaurant.service.ReviewService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final EmailService emailService;
     private final SimpMessagingTemplate messagingTemplate;
     private final AiService aiService;
+    private final GeminiService geminiService;
 
     public ReviewServiceImpl(
             ReviewRepository reviewRepository,
@@ -36,7 +39,8 @@ public class ReviewServiceImpl implements ReviewService {
             ReservationRepository reservationRepository,
             EmailService emailService,
             SimpMessagingTemplate messagingTemplate,
-            AiService aiService
+            AiService aiService,
+            GeminiService geminiService
     ) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
@@ -45,6 +49,7 @@ public class ReviewServiceImpl implements ReviewService {
         this.emailService = emailService;
         this.messagingTemplate = messagingTemplate;
         this.aiService = aiService;
+        this.geminiService = geminiService;
     }
 
     @Override
@@ -69,6 +74,20 @@ public class ReviewServiceImpl implements ReviewService {
         review.setUser(user);
         review.setRating(dto.getRating());
         review.setComment(dto.getComment());
+        try {
+            ReviewAIResult ai = geminiService.analyzeReview(dto.getComment(), dto.getRating());
+
+            review.setAiSentiment(ai.getSentiment());
+            review.setAiSummary(ai.getSummary());
+
+            if (dto.getRating() != null && dto.getRating() <= 2) {
+                review.setOwnerReply(ai.getOwnerReply());
+                review.setAutoReplyMessage(ai.getOwnerReply());
+            }
+        } catch (Exception e) {
+            review.setAiSentiment("NEUTRAL");
+            review.setAiSummary(dto.getComment());
+        }
 
         if (hasOrder) {
             Orders order = orderRepository.findById(dto.getOrderId())

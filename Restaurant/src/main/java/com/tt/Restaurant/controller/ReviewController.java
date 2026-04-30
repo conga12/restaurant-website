@@ -6,7 +6,6 @@ import com.tt.Restaurant.model.Reservation;
 import com.tt.Restaurant.model.Review;
 import com.tt.Restaurant.model.User;
 import com.tt.Restaurant.repository.*;
-import com.tt.Restaurant.service.GeminiService;
 import com.tt.Restaurant.service.ReviewService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +33,6 @@ public class ReviewController {
     private final OrderRepository orderRepository;
     private final ReservationRepository reservationRepository;
     private final ReviewMediaRepository reviewMediaRepository;
-    private GeminiService geminiService;
     private final SimpMessagingTemplate messagingTemplate;
 
     public ReviewController(
@@ -226,19 +224,7 @@ public class ReviewController {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
         }
     }
-    public Review createNewReview(Review review) {
-        // Các logic khác của bạn (set user, order, rating...)
 
-        // Gọi AI phân tích cảm xúc
-        if (review.getComment() != null && !review.getComment().trim().isEmpty()) {
-            String sentiment = geminiService.analyzeSentiment(review.getComment());
-            review.setAiSentiment(sentiment); // Lưu chữ POSITIVE/NEGATIVE/NEUTRAL vào cột ai_sentiment
-        } else {
-            review.setAiSentiment("NEUTRAL");
-        }
-
-        return reviewRepository.save(review);
-    }
     @PostMapping(value = "/media", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadMedia(
             @RequestParam("files") java.util.List<org.springframework.web.multipart.MultipartFile> files,
