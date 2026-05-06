@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface RestaurantTableRepository extends JpaRepository<RestaurantTable, Long> {
     List<RestaurantTable> findByCapacityGreaterThanEqual(Integer capacity);
+    List<RestaurantTable> findByCapacityGreaterThanEqualOrderByCapacityAscTableNumberAsc(Integer capacity);
 }

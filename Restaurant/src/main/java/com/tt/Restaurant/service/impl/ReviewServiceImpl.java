@@ -13,12 +13,11 @@ import com.tt.Restaurant.service.ReviewService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.tt.Restaurant.dto.AiApologyResponse;
-import com.tt.Restaurant.service.AiService;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+import java.util.Base64;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -29,7 +28,6 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReservationRepository reservationRepository;
     private final EmailService emailService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final AiService aiService;
     private final GeminiService geminiService;
 
     public ReviewServiceImpl(
@@ -39,7 +37,6 @@ public class ReviewServiceImpl implements ReviewService {
             ReservationRepository reservationRepository,
             EmailService emailService,
             SimpMessagingTemplate messagingTemplate,
-            AiService aiService,
             GeminiService geminiService
     ) {
         this.reviewRepository = reviewRepository;
@@ -48,7 +45,6 @@ public class ReviewServiceImpl implements ReviewService {
         this.reservationRepository = reservationRepository;
         this.emailService = emailService;
         this.messagingTemplate = messagingTemplate;
-        this.aiService = aiService;
         this.geminiService = geminiService;
     }
 
@@ -66,39 +62,46 @@ public class ReviewServiceImpl implements ReviewService {
         boolean hasReservation = dto.getReservationId() != null;
 
         if (hasOrder == hasReservation) {
-            // hoặc cả hai cùng true, hoặc cả hai cùng false
             throw new RuntimeException("Review phải gắn với Order hoặc Reservation (chỉ chọn 1)");
         }
 
+        // ===== 1) MODERATION + ANALYSIS bằng Gemini (không phụ thuộc số sao) =====
+        ReviewAIResult ai = geminiService.analyzeAndModerateReview(dto.getComment(), dto.getRating());
+
+        if (ai != null && Boolean.TRUE.equals(ai.getShouldBlock())) {
+            String reason = (ai.getBlockReason() == null || ai.getBlockReason().isBlank())
+                    ? "Nội dung không phù hợp"
+                    : ai.getBlockReason();
+            throw new RuntimeException("Đánh giá bị từ chối: " + reason);
+        }
+
+        // ===== 2) Tạo review entity =====
         Review review = new Review();
         review.setUser(user);
         review.setRating(dto.getRating());
         review.setComment(dto.getComment());
-        try {
-            ReviewAIResult ai = geminiService.analyzeReview(dto.getComment(), dto.getRating());
 
-            review.setAiSentiment(ai.getSentiment());
-            review.setAiSummary(ai.getSummary());
-
-            if (dto.getRating() != null && dto.getRating() <= 2) {
+        // set AI fields
+        if (ai != null) {
+            if (ai.getSentiment() != null) review.setAiSentiment(ai.getSentiment());
+            if (ai.getSummary() != null) review.setAiSummary(ai.getSummary());
+            if (ai.getOwnerReply() != null && !ai.getOwnerReply().isBlank()) {
+                // ownerReply public (không nhắc coupon)
                 review.setOwnerReply(ai.getOwnerReply());
-                review.setAutoReplyMessage(ai.getOwnerReply());
             }
-        } catch (Exception e) {
-            review.setAiSentiment("NEUTRAL");
-            review.setAiSummary(dto.getComment());
         }
 
+        // ===== 3) Validate order/reservation + quyền =====
         if (hasOrder) {
             Orders order = orderRepository.findById(dto.getOrderId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy order"));
 
-// check đúng chủ order
+            // check đúng chủ order
             if (order.getUser() == null || order.getUser().getId() == null || !order.getUser().getId().equals(user.getId())) {
                 throw new RuntimeException("Bạn không có quyền đánh giá đơn hàng này");
             }
 
-// check đã hoàn thành
+            // check đã hoàn thành
             if (order.getStatus() != Orders.OrderStatus.SERVED) {
                 throw new RuntimeException("Chỉ có thể đánh giá khi đơn hàng đã hoàn thành (SERVED)");
             }
@@ -119,20 +122,26 @@ public class ReviewServiceImpl implements ReviewService {
             review.setReservation(reservation);
         }
 
+        // ===== 4) Save review trước để có reviewId =====
         Review saved = reviewRepository.save(review);
+
+        // ===== 5) Save media URLs (ảnh đã upload) =====
         if (dto.getMediaUrls() != null) {
             for (String url : dto.getMediaUrls()) {
                 if (url == null || url.isBlank()) continue;
+
+                // NOTE: Chặn ảnh thô tục nên làm ở endpoint upload (trước khi trả url).
+                // Ở đây chỉ lưu URL đã được upload/duyệt.
                 saved.getMedia().add(new ReviewMedia(saved, url.trim()));
             }
             saved = reviewRepository.save(saved);
         }
 
-        // Nếu rating thấp (<=2) => auto-message
-        // Nếu rating thấp (<=2) => auto-message + coupon -20% + ownerReply
-        if (saved.getRating() != null && saved.getRating() <= 2 && !saved.isAutoReplySent()) {
+        // ===== 6) Auto coupon theo (C): rating <=2 OR ai.negative==true =====
+        boolean negativeByAi = ai != null && Boolean.TRUE.equals(ai.getNegative());
+        boolean negative = (saved.getRating() != null && saved.getRating() <= 2) || negativeByAi;
 
-            // 1) coupon -20%
+        if (negative && !saved.isAutoReplySent()) {
             String couponCode = generateCouponCode();
             saved.setCouponCode(couponCode);
             saved.setCouponDiscountPercent(20);
@@ -142,30 +151,26 @@ public class ReviewServiceImpl implements ReviewService {
             String expiresText = saved.getCouponExpiresAt()
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
-            // 2) AI generate (fallback nếu lỗi)
-            AiApologyResponse ai = null;
-            try {
-                ai = aiService.generateLowRatingReply(
-                        user.getUsername(),
-                        saved.getRating(),
-                        saved.getComment(),
-                        couponCode,
-                        20,
-                        expiresText
-                );
-            } catch (Exception ignored) {}
+            // Gemini generate emailBody
+            ReviewAIResult emailAi = geminiService.generateLowRatingReplyEmail(
+                    user.getUsername(),
+                    saved.getRating(),
+                    saved.getComment(),
+                    couponCode,
+                    20,
+                    expiresText
+            );
 
-            String ownerReply = (ai != null && ai.getOwnerReply() != null && !ai.getOwnerReply().isBlank())
-                    ? ai.getOwnerReply()
-                    : buildOwnerReplyFallback(saved);
-
-            String emailBody = (ai != null && ai.getEmailBody() != null && !ai.getEmailBody().isBlank())
-                    ? ai.getEmailBody()
+            String emailBody = (emailAi != null && emailAi.getEmailBody() != null && !emailAi.getEmailBody().isBlank())
+                    ? emailAi.getEmailBody()
                     : buildLowRatingEmailFallback(saved, couponCode, 20, expiresText);
 
-            saved.setOwnerReply(ownerReply);
+            // ownerReply: ưu tiên cái đã set từ analyzeAndModerateReview; nếu rỗng thì fallback
+            if (saved.getOwnerReply() == null || saved.getOwnerReply().isBlank()) {
+                saved.setOwnerReply(buildOwnerReplyFallback(saved));
+            }
 
-            // 3) Email cho khách
+            // gửi email
             try {
                 String toEmail = user.getEmail();
                 if (toEmail != null && !toEmail.isBlank()) {
@@ -175,17 +180,18 @@ public class ReviewServiceImpl implements ReviewService {
                 System.err.println("Send low rating email failed: " + e.getMessage());
             }
 
-            // 4) Notification realtime cho admin (JSON)
+            // notify realtime cho admin
             messagingTemplate.convertAndSend(
                     "/topic/review-alert",
                     java.util.Map.of(
                             "type", "LOW_RATING_REVIEW",
                             "reviewId", saved.getId(),
-                            "rating", saved.getRating()
+                            "rating", saved.getRating(),
+                            "negativeByAi", negativeByAi
                     )
             );
 
-            // 5) Mark sent
+            // mark sent
             saved.setAutoReplySent(true);
             saved.setAutoReplySentAt(LocalDateTime.now());
             saved.setAutoReplyMessage(emailBody);
@@ -194,17 +200,6 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return saved;
-    }
-
-    private String buildLowRatingAutoReply(Review review) {
-        String name = review.getUser() != null ? review.getUser().getUsername() : "bạn";
-        int rating = review.getRating() != null ? review.getRating() : 0;
-
-        return "Chào " + (name == null ? "bạn" : name) + ",\n\n"
-                + "Cảm ơn bạn đã để lại đánh giá. Rất tiếc vì trải nghiệm của bạn chưa tốt ("
-                + rating + "/5).\n"
-                + "Bạn có thể chia sẻ thêm chi tiết (món ăn/phục vụ/thời gian chờ/không gian) để bên mình kiểm tra và cải thiện không?\n\n"
-                + "Trân trọng,\nRestaurantOS";
     }
 
     private String generateCouponCode() {
@@ -228,4 +223,6 @@ public class ReviewServiceImpl implements ReviewService {
                 + "Khi thanh toán, bạn nhập mã ở ô 'Mã giảm giá'.\n\n"
                 + "Trân trọng,\nHƯƠNG VIỆT";
     }
+
+
 }

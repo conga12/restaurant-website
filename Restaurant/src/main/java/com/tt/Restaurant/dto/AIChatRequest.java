@@ -2,6 +2,7 @@ package com.tt.Restaurant.dto;
 
 public class AIChatRequest {
     private String message;
+    private String sessionId;
 
     public AIChatRequest() {}
 
@@ -12,4 +13,7 @@ public class AIChatRequest {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public String getSessionId() { return sessionId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
 }

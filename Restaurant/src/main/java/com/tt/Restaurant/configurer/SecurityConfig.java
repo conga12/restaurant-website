@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/assets/**").permitAll()
                         .requestMatchers("/admin/assets/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/api/chat/**").permitAll()
                         .requestMatchers("/api/ai/**").permitAll()
                         .requestMatchers("/api/customer/orders/**").permitAll()
 
@@ -201,5 +202,10 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public com.tt.Restaurant.chat.ChatSessionStore chatSessionStore() {
+        return new com.tt.Restaurant.chat.ChatSessionStore();
     }
 }

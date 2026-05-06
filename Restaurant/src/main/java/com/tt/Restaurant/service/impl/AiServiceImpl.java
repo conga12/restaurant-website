@@ -39,7 +39,7 @@ public class AiServiceImpl implements AiService {
         // Fallback không dùng AI
         if (!enabled || apiKey == null || apiKey.isBlank()) {
             AiApologyResponse fallback = new AiApologyResponse();
-            fallback.setOwnerReply("Nhà hàng rất tiếc vì trải nghiệm của bạn chưa tốt. Chúng tôi đã ghi nhận góp ý và s�� cải thiện trong thời gian sớm nhất.");
+            fallback.setOwnerReply("Nhà hàng rất tiếc vì trải nghiệm của bạn chưa tốt. Chúng tôi đã ghi nhận góp ý và sẽ cải thiện trong thời gian sớm nhất.");
             fallback.setEmailBody(
                     "Cảm ơn bạn đã phản hồi. Rất tiếc vì trải nghiệm chưa tốt.\n\n" +
                             "Để xin lỗi, nhà hàng gửi bạn mã giảm giá " + discountPercent + "% cho order online:\n" +

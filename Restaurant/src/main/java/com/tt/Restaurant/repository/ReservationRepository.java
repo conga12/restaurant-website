@@ -79,4 +79,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
       AND r.expireAt <= :now
     """)
     List<Reservation> findExpiredPendingReservations(LocalDateTime now);
+
+    @Query("""
+        select r.table.id
+        from Reservation r
+        where r.reservationDate = :date
+          and r.reservationTime = :time
+          and r.table is not null
+          and r.status in :activeStatuses
+    """)
+    List<Long> findBookedTableIds(LocalDate date, LocalTime time, List<ReservationStatus> activeStatuses);
 }

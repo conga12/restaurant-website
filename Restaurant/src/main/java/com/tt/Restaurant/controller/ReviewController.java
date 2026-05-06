@@ -6,6 +6,7 @@ import com.tt.Restaurant.model.Reservation;
 import com.tt.Restaurant.model.Review;
 import com.tt.Restaurant.model.User;
 import com.tt.Restaurant.repository.*;
+import com.tt.Restaurant.service.GeminiService;
 import com.tt.Restaurant.service.ReviewService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -34,6 +36,9 @@ public class ReviewController {
     private final ReservationRepository reservationRepository;
     private final ReviewMediaRepository reviewMediaRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final GeminiService geminiService;
+    @Value("${app.upload-dir:uploads}")
+    private String uploadDir;
 
     public ReviewController(
             ReviewService reviewService,
@@ -42,7 +47,8 @@ public class ReviewController {
             OrderRepository orderRepository,
             ReservationRepository reservationRepository,
             ReviewMediaRepository reviewMediaRepository,
-            SimpMessagingTemplate messagingTemplate
+            SimpMessagingTemplate messagingTemplate,
+            GeminiService geminiService
     ) {
         this.reviewService = reviewService;
         this.reviewRepository = reviewRepository;
@@ -51,6 +57,7 @@ public class ReviewController {
         this.reservationRepository = reservationRepository;
         this.reviewMediaRepository = reviewMediaRepository;
         this.messagingTemplate = messagingTemplate;
+        this.geminiService = geminiService;
     }
 
 
@@ -225,6 +232,8 @@ public class ReviewController {
         }
     }
 
+    // Chỉ hiển thị phần cần sửa/chen vào uploadMedia và constructor
+
     @PostMapping(value = "/media", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadMedia(
             @RequestParam("files") java.util.List<org.springframework.web.multipart.MultipartFile> files,
@@ -251,13 +260,25 @@ public class ReviewController {
         java.time.LocalDate now = java.time.LocalDate.now();
         String subDir = "reviews/" + now.getYear() + "/" + String.format("%02d", now.getMonthValue());
 
-        java.nio.file.Path root = java.nio.file.Path.of("uploads").toAbsolutePath().normalize();
+        java.nio.file.Path root = java.nio.file.Path.of(uploadDir).toAbsolutePath().normalize();
         java.nio.file.Path dir = root.resolve(subDir);
         java.nio.file.Files.createDirectories(dir);
 
         java.util.List<String> urls = new java.util.ArrayList<>();
         for (var f : files) {
-            String ext = switch (f.getContentType()) {
+            String ct = f.getContentType();
+
+            // ===== NEW: Gemini moderation image BEFORE saving =====
+            byte[] bytes = f.getBytes();
+            var mod = geminiService.moderateReviewImage(bytes, ct);
+            if (mod != null && Boolean.TRUE.equals(mod.getShouldBlock())) {
+                String reason = (mod.getBlockReason() == null || mod.getBlockReason().isBlank())
+                        ? "Hình ảnh không phù hợp"
+                        : mod.getBlockReason();
+                return ResponseEntity.badRequest().body("Ảnh bị từ chối: " + reason);
+            }
+
+            String ext = switch (ct) {
                 case "image/png" -> "png";
                 case "image/webp" -> "webp";
                 default -> "jpg";

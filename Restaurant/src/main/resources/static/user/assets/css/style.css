@@ -41,7 +41,7 @@ html {
 }
 
 body {
-  font-family: 'Georgia', 'Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   line-height: 1.7;
   color: var(--color-dark-text);
   background-color: var(--color-white);
@@ -51,7 +51,7 @@ body {
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
-  font-family: 'Georgia', 'Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   line-height: 1.2;
   margin-bottom: 1.5rem;
   letter-spacing: -0.5px;

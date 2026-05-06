@@ -248,7 +248,7 @@ console.log("REVIEW.JS ĐÃ NẠP! " + new Date());
 
       await fetchJson("/api/reviews", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify(payload)
       });
 
