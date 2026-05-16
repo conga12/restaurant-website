@@ -38,6 +38,8 @@ function renderStats(tables) {
 
 function renderTableGrid(tables) {
     const grid = document.getElementById("tableGrid");
+    if (!grid) return;
+
     grid.innerHTML = "";
 
     if (!tables || tables.length === 0) {
@@ -45,12 +47,14 @@ function renderTableGrid(tables) {
         return;
     }
 
+    // Render each table card; add class 'hidden' when table.active === false
     tables.forEach(table => {
         const statusClass = getTableStatusClass(table.status);
         const tableTypeClass = getTableTypeClass(table.tableType);
+        const isHidden = table.active === false || table.active === 'false';
 
         grid.innerHTML += `
-            <div class="table-item ${statusClass}" onclick="openTableAction(${table.id})" style="cursor: pointer;">
+            <div class="table-item ${statusClass} ${tableTypeClass} ${isHidden ? 'hidden' : ''}" onclick="${isHidden ? 'void(0)' : `openTableAction(${table.id})`}">
                 <span class="table-number">${table.tableNumber}</span>
                 <span class="table-type-badge ${tableTypeClass}">
                     ${getTableTypeLabel(table.tableType)}
@@ -75,21 +79,33 @@ function renderTableList(tables) {
     }
 
     tables.forEach(table => {
+        // status badge: nếu đã ẩn => Tạm ẩn, ngược lại dùng getStatusBadge
+        const statusHtml = (table.active === false || table.active === 'false')
+            ? '<span class="badge bg-secondary">Tạm ẩn</span>'
+            : getStatusBadge(table.status);
+
         tbody.innerHTML += `
-            <tr>
+            <tr class="${(table.active === false || table.active === 'false') ? 'row-hidden' : ''}">
                 <td><strong>Bàn ${table.tableNumber}</strong></td>
                 <td>${getTableTypeBadge(table.tableType)}</td>
                 <td>${table.capacity} chỗ</td>
                 <td>${safe(table.location)}</td>
-                <td>${getStatusBadge(table.status)}</td>
+                <td>${statusHtml}</td>
                 <td>
                     <div class="action-btns">
                         <button class="btn btn-action btn-edit" onclick="editTable(${table.id})" title="Sửa">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-action btn-delete" onclick="deleteTable(${table.id})" title="Xóa">
-                            <i class="bi bi-trash"></i>
-                        </button>
+
+                        ${ (table.active === false || table.active === 'false') ? `
+                          <button class="btn btn-action btn-activate" title="Bật lại" onclick="activateTable(${table.id}, '${safe('Bàn ' + table.tableNumber)}')">
+                            <i class="bi bi-eye-slash"></i>
+                          </button>
+                        ` : `
+                          <button class="btn btn-action btn-hide" title="Ẩn" onclick="inactiveTable(${table.id}, '${safe('Bàn ' + table.tableNumber)}')">
+                            <i class="bi bi-eye"></i>
+                          </button>
+                        ` }
                     </div>
                 </td>
             </tr>
@@ -195,10 +211,10 @@ async function saveTable() {
         if (modalInstance) modalInstance.hide();
 
         await loadTables();
-        alert(id ? "Cập nhật bàn thành công" : "Thêm bàn thành công");
+        showToast(id ? "Cập nhật bàn thành công" : "Thêm bàn thành công", "success");
     } catch (error) {
         console.error("Lỗi saveTable:", error);
-        alert(error.message || "Có lỗi xảy ra khi lưu bàn");
+        showToast(error.message || "Có lỗi xảy ra khi lưu bàn", "danger");
     }
 }
 
@@ -229,7 +245,7 @@ async function editTable(id) {
 }
 
 async function deleteTable(id) {
-    const confirmed = confirm("Bạn có chắc muốn xóa bàn này không?");
+    const confirmed = confirm("Bạn có chắc muốn ẩn bàn này không?");
     if (!confirmed) return;
 
     try {
@@ -239,15 +255,15 @@ async function deleteTable(id) {
 
         if (!response.ok) {
             const text = await response.text();
-            throw new Error(text || "Xóa bàn thất bại");
+            throw new Error(text || "Ẩn bàn thất bại");
         }
 
         await loadTables();
-        alert("Xóa bàn thành công");
+        showToast("Ẩn bàn thành công", "success");
     } catch (error) {
-        console.error("Lỗi deleteTable:", error);
-        alert(error.message || "Không thể xóa bàn");
-    }
+          console.error("Lỗi deleteTable:", error);
+          showToast(error.message || "Không thể ẩn bàn", "danger");
+     }
 }
 
 async function openTableAction(id) {
@@ -288,4 +304,31 @@ function resetTableForm() {
 
 function safe(value) {
     return value ?? "";
+}
+// Ẩn bàn (soft-delete)
+async function inactiveTable(id, name) {
+    const confirmed = await confirmDialog(`Bạn có chắc chắn muốn ẨN ${name}?`);
+    if (!confirmed) return;
+
+    try {
+        await apiFetchJson(`/admin/api/tables/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        showToast('Đã ẩn bàn.', 'success');
+        await loadTables(); // hãy chắc chắn loadTables() là hàm tải lại danh sách bàn
+    } catch (e) {
+        showToast(`Ẩn thất bại: ${e.message}`, 'danger');
+    }
+}
+
+// Bật lại bàn (activate)
+async function activateTable(id, name) {
+    const confirmed = await confirmDialog(`Bạn có chắc chắn muốn BẬT LẠI ${name}?`);
+    if (!confirmed) return;
+
+    try {
+        await apiFetchJson(`/admin/api/tables/${encodeURIComponent(id)}/activate`, { method: 'PATCH' });
+        showToast('Đã bật lại bàn.', 'success');
+        await loadTables();
+    } catch (e) {
+        showToast(`Bật lại thất bại: ${e.message}`, 'danger');
+    }
 }

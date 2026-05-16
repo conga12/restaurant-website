@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="My Reservations - RestaurantOS">
-  <title>My Bookings - RestaurantOS</title>
+  <title>My Bookings - HuongVietRes</title>
   <link rel="stylesheet" href="/user/assets/css/style.css">
 
   <style>
@@ -223,16 +223,19 @@
     </div>
     <div class="header-nav">
       <nav>
-        <a href="index.html">Home</a>
-        <a href="menu.html">Menu</a>
-        <a href="reservation.html">Reservations</a>
-        <a href="/user/reservation-history.html">My Bookings</a>
-        <a href="review.html">Reviews</a>
-        <a href="contact.html">Contact</a>
+        <a href="index.html">TRANG CHỦ</a>
+        <a href="menu.html">MÓN ĂN</a>
+        <a href="reservation.html">ĐẶT BÀN</a>
+        <a href="/user/reservation-history.html">BÀN ĐÃ ĐẶT</a>
+        <a href="/user/review.html">ĐÁNH GIÁ</a>
+        <a href="contact.html">LIÊN HỆ</a>
       </nav>
     </div>
     <div class="header-reserve">
-      <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
+      <button class="btn btn-reserve"
+              onclick="window.location.href='/auth/login.html?redirect=' + encodeURIComponent(window.location.pathname)">
+        Login
+      </button>
     </div>
     <div class="hamburger">
       <span></span>
@@ -244,15 +247,29 @@
 
 <section class="hero">
   <div class="hero-content">
-    <h1>My Bookings</h1>
-    <p>View and manage your reservations</p>
+    <h1>Bàn đã đặt</h1>
+    <p>Xem và quản lý các đặt bàn của bạn</p>
   </div>
 </section>
 
 <section class="container">
-  <div class="section-title">
-    <h2>Your Reservations</h2>
-    <p>All your upcoming and past reservations</p>
+  <!-- Guest lookup (hiện khi chưa đăng nhập) -->
+  <div id="guestLookup" class="card" style="display:none; margin-bottom: 1.25rem; border-left: 4px solid var(--color-accent);">
+    <h3>Tra cứu đặt bàn </h3>
+    <p>Nhập <strong>Email</strong> hoặc <strong>Số điện thoại</strong> bạn đã dùng khi đặt bàn để xem lịch sử.</p>
+
+    <div style="margin-top: 0.75rem;">
+      <input id="lookupIdentity" type="text"
+             placeholder="Nhập Email hoặc Số điện thoại (vd: abc@gmail.com hoặc 09xxxxxxxx)"
+             class="form-control" />
+    </div>
+
+    <div style=" margin-top: 0.9rem; display:flex; justify-content: center; gap:0.75rem; flex-wrap:wrap;">
+      <button class="btn btn-reserve" onclick="lookupReservations()">Tra cứu</button>
+      <button class="btn btn-outline" onclick="switchToLogin()">Đăng nhập để quản lý đặt bàn</button>
+    </div>
+
+<!--    <div id="lookupHint" class="lookup-alert" style="display:none;"></div>-->
   </div>
 
   <div id="reservationHistory" class="history-grid">
@@ -260,49 +277,78 @@
   </div>
 
   <div style="text-align: center; margin-top: 2rem;">
-    <button class="btn btn-secondary" onclick="window.location.href='reservation.html'">Make a New Reservation</button>
-    <button class="btn btn-outline" onclick="loadReservations()">Refresh List</button>
+    <button class="btn btn-secondary" onclick="window.location.href='reservation.html'">Đặt bàn</button>
+<!--    <button class="btn btn-outline" onclick="loadReservations()">Refresh List</button>-->
   </div>
 </section>
 
 <section class="container">
+
   <div class="card" style="background-color: #f8f9fa;">
-    <h3>Reservation Management Tips</h3>
+
+    <h3>Hướng Dẫn Quản Lý Đặt Bàn</h3>
+
     <ul style="list-style: none; padding: 0;">
+
       <li style="padding: 0.75rem 0; border-bottom: 1px solid #ddd;">
-        <strong>✓ Modify:</strong> To modify an existing reservation, please cancel and create a new one
+        <strong>✓ Chỉnh sửa:</strong>
+        Để thay đổi thông tin đặt bàn, vui lòng hủy đặt bàn hiện tại và tạo đặt bàn mới
       </li>
+
       <li style="padding: 0.75rem 0; border-bottom: 1px solid #ddd;">
-        <strong>✓ Cancel:</strong> Cancellations must be made at least 24 hours in advance
+        <strong>✓ Hủy bàn:</strong>
+        Việc hủy bàn phải được thực hiện trước ít nhất 24 giờ
       </li>
+
       <li style="padding: 0.75rem 0; border-bottom: 1px solid #ddd;">
-        <strong>✓ Arrival:</strong> Please arrive 10-15 minutes before your reservation time
+        <strong>✓ Đến đúng giờ:</strong>
+        Vui lòng đến trước giờ đặt bàn khoảng 10–15 phút
       </li>
+
       <li style="padding: 0.75rem 0; border-bottom: 1px solid #ddd;">
-        <strong>✓ Contact:</strong> For changes or questions, call us at <a href="tel:+1234567890">(123) 456-7890</a>
+        <strong>✓ Liên hệ:</strong>
+        Nếu cần thay đổi hoặc có câu hỏi, vui lòng gọi
+        <a href="tel:+1234567890">(123) 456-7890</a>
       </li>
+
       <li style="padding: 0.75rem 0;">
-        <strong>✓ Late Tables:</strong> Tables held for 15 minutes past reservation time
+        <strong>✓ Giữ bàn:</strong>
+        Bàn sẽ được giữ trong vòng 15 phút sau giờ đặt
       </li>
+
     </ul>
   </div>
 
   <div class="card" style="margin-top: 2rem; border-left: 4px solid var(--color-accent);">
-    <h3>Need Help?</h3>
-    <p>If you need assistance with your reservations or have any questions:</p>
+
+    <h3>Cần Hỗ Trợ?</h3>
+
     <p>
-      <strong>📞 Phone:</strong> <a href="tel:+1234567890">(123) 456-7890</a><br>
-      <strong>✉️ Email:</strong> <a href="mailto:reservations@restaurantos.com">reservations@restaurantos.com</a><br>
-      <strong>⏰ Hours:</strong> Monday - Sunday, 5:00 PM - 10:00 PM
+      Nếu bạn cần hỗ trợ về đặt bàn hoặc có bất kỳ câu hỏi nào:
     </p>
+
+    <p>
+      <strong>📞 Điện thoại:</strong>
+      <a href="tel:+1234567890">(123) 456-7890</a><br>
+
+      <strong>✉️ Email:</strong>
+      <a href="mailto:reservations@restaurantos.com">
+        reservations@restaurantos.com
+      </a><br>
+
+      <strong>⏰ Thời gian hoạt động:</strong>
+      Thứ Hai - Chủ Nhật, 5:00 PM - 10:00 PM
+    </p>
+
   </div>
+
 </section>
 
 <footer>
   <div class="footer-content">
     <div class="footer-section">
-      <h4>RestaurantOS</h4>
-      <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+      <h4>Hương Việt</h4>
+      <p>Trải nghiệm ẩm thực cao cấp với dịch vụ tận tâm và tinh hoa ẩm thực Việt.</p>
       <div class="social-links">
         <a href="#facebook" title="Facebook">f</a>
         <a href="#twitter" title="Twitter">𝕏</a>
@@ -313,41 +359,110 @@
 
     <div class="footer-section">
       <h4>Quick Links</h4>
-      <a href="index.html">Home</a>
-      <a href="menu.html">Menu</a>
-      <a href="reservation.html">Reservations</a>
-      <a href="review.html">Reviews</a>
-      <a href="contact.html">Contact</a>
+      <a href="index.html">Trang chủ</a>
+      <a href="menu.html">Món ăn</a>
+      <a href="reservation.html">Đặt bàn</a>
+      <a href="review.html">Bàn đã đặt</a>
+      <a href="contact.html">Liên hệ</a>
     </div>
 
     <div class="footer-section">
-      <h4>Hours of Operation</h4>
-      <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
-      <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
-      <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
-      <p><strong>Closed:</strong> Mondays (except holidays)</p>
+      <h4>Giờ mở cửa</h4>
+      <p><strong>Thứ 2 - Thứ 5:</strong> 5:00 PM - 10:00 PM</p>
+      <p><strong>Thứ 6 - Thứ 7:</strong> 5:00 PM - 11:00 PM</p>
+      <p><strong>Chủ nhật:</strong> 5:00 PM - 9:00 PM</p>
+      <p><strong>Đóng cửa:</strong> Nếu có nghỉ lễ</p>
     </div>
 
     <div class="footer-section">
-      <h4>Contact Info</h4>
+      <h4>Thông tin liên lạc</h4>
       <p>📍 123 Gourmet Street, Food City, FC 12345</p>
       <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
-      <p>✉️ <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
-      <p>🌐 www.restaurantos.com</p>
+      <p>✉️ <a href="mailto:info@restaurantos.com">info@huongviet.com</a></p>
+      <p>🌐 www.HuongViet.com</p>
     </div>
   </div>
 
   <div class="footer-bottom">
-    <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    <p>&copy; 2020 HuongViet. Bảo lưu mọi quyền. | <a href="#">Chính sách bảo mật</a> | <a href="#">Điều khoản dịch vụ</a></p>
   </div>
 </footer>
-
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>bạn
 <script>
   const RESERVATION_HISTORY_API = "/api/customer/reservations";
+  const PUBLIC_LOOKUP_API = "/api/public/reservations/history";
   const DEPOSIT_PAYMENT_API = "/api/payment/deposit/create";
 
   const reservationHistory = document.getElementById("reservationHistory");
+  const guestLookup = document.getElementById("guestLookup");
+  const lookupIdentity = document.getElementById("lookupIdentity");
+  const lookupHint = document.getElementById("lookupHint");
 
+  const toastContainer = document.getElementById("toastContainer");
+
+function toast(message, type = "info", title, opts = {}) {
+  if (!toastContainer) return;
+
+  const duration = Number(opts.duration ?? 3200);
+  const t = document.createElement("div");
+  t.className = `toast toast--${type}`;
+
+  const icon =
+    type === "success" ? "✓" :
+    type === "error" ? "!" :
+    type === "warning" ? "!" : "i";
+
+  const defaultTitle =
+    title || (
+      type === "success" ? "Thành công" :
+      type === "error" ? "Có lỗi" :
+      type === "warning" ? "Cảnh báo" : "Thông báo"
+    );
+
+  t.innerHTML = `
+    <div class="toast__icon">${icon}</div>
+    <div>
+      <div class="toast__title">${defaultTitle}</div>
+      <div class="toast__msg">${String(message || "")}</div>
+    </div>
+    <button class="toast__close" aria-label="Close">×</button>
+  `;
+
+  const closeBtn = t.querySelector(".toast__close");
+  closeBtn.addEventListener("click", () => hideToast(t));
+
+  // Click vào toast cũng đóng (tuỳ bạn thích)
+  t.addEventListener("click", (e) => {
+    // tránh click vào nút bị trigger 2 lần
+    if (e.target && e.target.closest(".toast__close")) return;
+    if (opts.closeOnClick) hideToast(t);
+  });
+
+  // Giới hạn số lượng toast trên màn hình
+  const maxToasts = Number(opts.maxToasts ?? 4);
+  while (toastContainer.children.length >= maxToasts) {
+    toastContainer.lastElementChild?.remove();
+  }
+
+  toastContainer.prepend(t);
+
+  let timer = setTimeout(() => hideToast(t), duration);
+
+  // Hover thì pause
+  t.addEventListener("mouseenter", () => clearTimeout(timer));
+  t.addEventListener("mouseleave", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => hideToast(t), 1200);
+  });
+
+  return t;
+}
+
+function hideToast(el) {
+  if (!el || el.classList.contains("is-hiding")) return;
+  el.classList.add("is-hiding");
+  setTimeout(() => el.remove(), 200);
+}
   function formatMoney(v) {
     return Number(v || 0).toLocaleString("vi-VN") + " đ";
   }
@@ -356,6 +471,104 @@
     if (!date) return "-";
     return `${date} ${time || ""}`.trim();
   }
+  function switchToLogin() {
+    window.location.href = "/auth/login.html?redirect=/user/reservation-history.html";
+  }
+  function showGuestLookup(message) {
+    if (guestLookup) guestLookup.style.display = "block";
+    if (message) showLookupMessage(message, "warning");
+  }
+
+  function showLookupMessage(message, type = "warning") {
+    if (!lookupHint) return;
+
+    lookupHint.classList.remove("success", "warning", "error");
+    lookupHint.classList.add(type);
+    lookupHint.textContent = message || "";
+    lookupHint.style.display = message ? "block" : "none";
+  }
+  async function lookupReservations() {
+  const identityRaw = (lookupIdentity?.value || "").trim();
+
+  if (!identityRaw) {
+    showLookupMessage("Vui lòng nhập Email hoặc số điện thoại.", "warning");
+    return;
+  }
+
+  const normalized = identityRaw.replace(/\s+/g, "");
+  const isEmail = normalized.includes("@");
+
+  const email = isEmail ? normalized : "";
+  const phone = isEmail ? "" : normalized;
+
+  reservationHistory.innerHTML = `<div class="loading-state">Đang tra cứu...</div>`;
+  showLookupMessage("Đang tra cứu lịch sử đặt bàn...", "warning");
+
+  try {
+    const response = await fetch(PUBLIC_LOOKUP_API, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, phone })
+    });
+
+    const rawText = await response.text();
+
+    if (!response.ok) {
+      // Nếu bạn có làm backend trả 404 khi không có dữ liệu
+      if (response.status === 404) {
+        reservationHistory.innerHTML = `
+          <div class="empty-state">
+            <div style="font-size:1.05rem; font-weight:800; color:#fff; margin-bottom:0.35rem;">
+              Không tìm thấy lịch sử đặt bàn
+            </div>
+            <div style="color:#94a3b8;">
+              Email/SĐT này chưa có đặt bàn nào hoặc bạn nhập chưa đúng.
+            </div>
+          </div>
+        `;
+        showLookupMessage("Không tìm thấy lịch sử đặt bàn với thông tin bạn nhập.", "warning");
+        return;
+      }
+
+      throw new Error(rawText || "Tra cứu thất bại");
+    }
+
+    if (rawText.trim().startsWith("<")) {
+      throw new Error("Server trả về HTML (không phải JSON). Kiểm tra endpoint /api/public/reservations/history");
+    }
+
+    const data = rawText ? JSON.parse(rawText) : [];
+
+    if (!data || data.length === 0) {
+      reservationHistory.innerHTML = `
+        <div class="empty-state">
+          <div style="font-size:1.05rem; font-weight:800; color:#fff; margin-bottom:0.35rem;">
+            Không tìm thấy lịch sử đặt bàn
+          </div>
+          <div style="color:#94a3b8;">
+            Email/SĐT này chưa có đặt bàn nào hoặc bạn nhập chưa đúng.
+          </div>
+        </div>
+      `;
+      showLookupMessage("Không tìm thấy lịch sử đặt bàn với thông tin bạn nhập.", "warning");
+      return;
+    }
+
+    renderReservations(data);
+    showLookupMessage(`Đã tìm thấy ${data.length} đặt bàn.`, "success");
+  } catch (error) {
+    console.error("Lookup reservations error:", error);
+    reservationHistory.innerHTML = `
+      <div class="empty-state">
+        Không thể tra cứu đặt bàn. ${error.message || ""}
+      </div>
+    `;
+    showLookupMessage(error.message || "Tra cứu thất bại.", "error");
+  }
+}
 
   function getStatusBadge(status) {
     const s = String(status || "").toUpperCase();
@@ -541,45 +754,81 @@
   }
 
   async function loadReservations() {
-    reservationHistory.innerHTML = `<div class="loading-state">Loading your reservations...</div>`;
+  reservationHistory.innerHTML = `<div class="loading-state">Loading your reservations...</div>`;
 
-    try {
-      const response = await fetch(RESERVATION_HISTORY_API, {
-        method: "GET",
-        headers: {
-          "Accept": "application/json"
-        },
-        credentials: "include"
-      });
-
-      if (response.status === 401 || response.status === 403) {
-        window.location.href = "/auth/login.html";
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("Không tải được danh sách đặt bàn");
-      }
-
-      const data = await response.json();
-      renderReservations(data);
-    } catch (error) {
-      console.error("Load reservations error:", error);
+  try {
+    const response = await fetch(RESERVATION_HISTORY_API, {
+      method: "GET",
+      headers: { "Accept": "application/json" },
+      credentials: "include"
+    });
+    // Nếu chưa login / không có ROLE_CUSTOMER -> server trả 403 JSON
+    if (response.status === 401 || response.status === 403) {
+      showGuestLookup(); // chỉ hiện form tra cứu
+      toast("Bạn chưa đăng nhập. Hãy nhập Email hoặc SĐT để tra cứu lịch sử đặt bàn.", "warning");
+      return;
+    }
+    // 1) Nếu bị redirect sang login page (Spring Security formLogin)
+    if (response.redirected || (response.url && response.url.includes("/auth/login.html"))) {
       reservationHistory.innerHTML = `
         <div class="empty-state">
-          Không thể tải danh sách đặt bàn.
+          Bạn có thể tra cứu lịch sử đặt bàn bằng Email hoặc SĐT ở bên trên.
         </div>
       `;
+      showGuestLookup("Bạn chưa đăng nhập. Hãy nhập Email hoặc SĐT để tra cứu lịch sử đặt bàn.");
+      return;
     }
+
+    // 2) Nếu không OK -> đọc text để lấy message lỗi
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText || "Không tải được danh sách đặt bàn");
+    }
+
+    // 3) Kiểm tra Content-Type, tránh parse nhầm HTML
+    const contentType = response.headers.get("content-type") || "";
+    const rawText = await response.text();
+
+    // Nếu server trả về HTML (thường là login page hoặc error page)
+    if (rawText.trim().startsWith("<") || contentType.includes("text/html")) {
+      reservationHistory.innerHTML = `
+        <div class="empty-state">
+          Bạn chưa đăng nhập. Bạn có thể tra cứu lịch sử đặt bàn bằng Email hoặc SĐT ở bên trên.
+        </div>
+      `;
+      showGuestLookup("Bạn chưa đăng nhập (hoặc server trả về trang HTML). Hãy nhập Email hoặc SĐT để tra cứu.");
+      return;
+    }
+
+    // 4) Parse JSON an toàn
+    let data = [];
+    try {
+      data = rawText ? JSON.parse(rawText) : [];
+    } catch (e) {
+      console.error("JSON parse error:", e, rawText);
+      throw new Error("Dữ liệu trả về không hợp lệ (không phải JSON).");
+    }
+
+    renderReservations(data);
+  } catch (error) {
+    console.error("Load reservations error:", error);
+    reservationHistory.innerHTML = `
+      <div class="empty-state">
+        Không thể tải danh sách đặt bàn.
+      </div>
+    `;
   }
+}
 
   window.payDeposit = payDeposit;
   window.cancelReservation = cancelReservation;
   window.loadReservations = loadReservations;
+  window.lookupReservations = lookupReservations;
+  window.switchToLogin = switchToLogin;
 
   loadReservations();
-</script>
 
+</script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

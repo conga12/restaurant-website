@@ -5,7 +5,14 @@ let paymentsData = [];
 document.addEventListener("DOMContentLoaded", () => {
     loadPayments();
 });
-
+// Notification helper: dùng showToast nếu tồn tại, fallback alert
+function notify(message, type = "info") {
+  if (typeof showToast === "function") {
+    showToast(message, type);
+  } else {
+    alert(message);
+  }
+}
 async function loadPayments() {
     try {
         const res = await fetch(API_URL);
@@ -243,7 +250,7 @@ async function submitConfirmPayment() {
             throw new Error(text || "Lỗi xác nhận");
         }
 
-        alert(text || "Thanh toán thành công");
+        notify( "Thanh toán thành công", "success");
 
         if (confirmPaymentModalInstance) {
             confirmPaymentModalInstance.hide();
@@ -253,6 +260,6 @@ async function submitConfirmPayment() {
 
     } catch (e) {
         console.error(e);
-        alert(e.message || "Lỗi thanh toán");
+        notify("Lỗi thanh toán", "error");
     }
 }

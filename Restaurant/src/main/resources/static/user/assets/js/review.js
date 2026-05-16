@@ -1,3 +1,86 @@
+const PUBLIC_ELIGIBLE_API = "/api/public/reviews/eligible";
+const PUBLIC_CREATE_API = "/api/public/reviews";
+
+let guestIdentity = { email: "", phone: "" };
+
+function normalizeIdentity(raw) {
+  const normalized = String(raw || "").trim().replace(/\s+/g, "");
+  const isEmail = normalized.includes("@");
+  return { email: isEmail ? normalized : "", phone: isEmail ? "" : normalized };
+}
+
+async function lookupEligibleForReview(autoOpen = false) {
+  const raw = document.getElementById("reviewLookupIdentity")?.value || "";
+  const id = normalizeIdentity(raw);
+
+  const target = document.getElementById("reviewTarget");
+
+  // validate nhẹ
+  if (!id.email && !id.phone) {
+    hideEligibleWrap();
+    setEligibleStatus("Nhập Email/SĐT để hiện danh sách.");
+    return;
+  }
+
+  guestIdentity = id;
+
+  if (target) target.innerHTML = `<option value="">Đang tra cứu...</option>`;
+  hideEligibleWrap();
+  setEligibleStatus("Đang tra cứu...");
+
+  try {
+    const res = await fetch(PUBLIC_ELIGIBLE_API, {
+      method: "POST",
+      headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(id),
+    });
+
+    const text = await res.text();
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        if (target) target.innerHTML = `<option value="">Không có đặt bàn đủ điều kiện</option>`;
+        hideEligibleWrap();
+        setEligibleStatus("Không tìm thấy đặt bàn COMPLETED chưa đánh giá.");
+        return;
+      }
+      throw new Error(text || `HTTP ${res.status}`);
+    }
+
+    const data = text ? JSON.parse(text) : null;
+    const items = Array.isArray(data?.items) ? data.items : [];
+
+    if (!target) return;
+
+    target.innerHTML = `<option value="">Chọn đặt bàn đã hoàn thành</option>`;
+    for (const it of items) {
+      const opt = document.createElement("option");
+      opt.value = it.value; // reservation:<id>
+      opt.textContent = it.label;
+      target.appendChild(opt);
+    }
+
+    if (items.length === 0) {
+      hideEligibleWrap();
+      setEligibleStatus("Không có đặt bàn đủ điều kiện để đánh giá.");
+      return;
+    }
+
+    showEligibleWrap();
+    setEligibleStatus(`Đã tìm thấy ${items.length} mục. Hãy chọn bên dưới.`);
+
+    if (autoOpen) {
+      setTimeout(() => openSelectDropdown(target), 0);
+    }
+  } catch (e) {
+    console.error(e);
+    if (target) target.innerHTML = `<option value="">Lỗi tra cứu</option>`;
+    hideEligibleWrap();
+    setEligibleStatus("Tra cứu thất bại: " + (e.message || ""));
+  }
+}
+
+window.lookupEligibleForReview = lookupEligibleForReview;
 console.log("REVIEW.JS ĐÃ NẠP! " + new Date());
 (function () {
   const page = (location.pathname.split("/").pop() || "").toLowerCase();
@@ -36,7 +119,7 @@ console.log("REVIEW.JS ĐÃ NẠP! " + new Date());
   }
 
   async function fetchJson(url, opt) {
-    const res = await fetch(url, { credentials: "include", ...(opt || {}) });
+    const res = await fetch(url, { ...(opt || {}) });
     if (!res.ok) {
       const text = await res.text().catch(() => "");
       throw new Error(`HTTP ${res.status} - ${text}`);
@@ -235,18 +318,25 @@ console.log("REVIEW.JS ĐÃ NẠP! " + new Date());
     const rating = Number(ratingVal);
     if (!rating || rating < 1 || rating > 5) return alert("Rating không hợp lệ.");
     if (!commentVal || !commentVal.trim()) return alert("Vui lòng nhập nội dung đánh giá.");
-
+    if (!guestIdentity.email && !guestIdentity.phone) {
+      return alert("Vui lòng nhập Email/SĐT để hệ thống tra cứu trước khi gửi đánh giá.");
+    }
     try {
+      const { orderId, reservationId } = parseTarget(targetVal);
+
+      if (!reservationId) return alert("Vui lòng chọn đặt bàn (Reservation) để đánh giá.");
+      if (orderId) return alert("Hiện tại chỉ hỗ trợ đánh giá theo đặt bàn (Reservation).");
+
       const payload = {
-        orderId,
+        email: guestIdentity.email,
+        phone: guestIdentity.phone,
         reservationId,
         rating,
         comment: commentVal.trim(),
         mediaUrls: []
       };
-      console.log("Sắp fetch /api/reviews với payload:", payload);
 
-      await fetchJson("/api/reviews", {
+      await fetchJson(PUBLIC_CREATE_API, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify(payload)
@@ -263,7 +353,6 @@ console.log("REVIEW.JS ĐÃ NẠP! " + new Date());
 
       await loadRecent();
       await loadStats();
-      await tryLoadEligibleAndGateForm();
     } catch (e) {
       alert("Gửi đánh giá thất bại: " + e.message);
       console.error("LỖI GỬI REVIEW:", e);
@@ -280,7 +369,6 @@ console.log("REVIEW.JS ĐÃ NẠP! " + new Date());
         console.log("New review event received:", message.body);
         await loadRecent();
         await loadStats();
-        await tryLoadEligibleAndGateForm();
       });
     }, function (err) {
       console.error("Review socket error", err);
@@ -290,7 +378,6 @@ console.log("REVIEW.JS ĐÃ NẠP! " + new Date());
   document.addEventListener("DOMContentLoaded", async () => {
     try { await loadStats(); } catch (e) { console.warn("loadStats", e); }
     try { await loadRecent(); } catch (e) { console.warn("loadRecent", e); }
-    await tryLoadEligibleAndGateForm();
     connectReviewSocket();
     const form = $("reviewForm");
     if (form) form.addEventListener("submit", onSubmit);
@@ -319,6 +406,38 @@ async function uploadReviewImages(files) {
   return (data && Array.isArray(data.urls)) ? data.urls : [];
 }
 
+let __lookupTimer = null;
 
+function showEligibleWrap() {
+  const wrap = document.getElementById("eligibleWrap");
+  if (wrap) wrap.style.display = "block";
+}
+function hideEligibleWrap() {
+  const wrap = document.getElementById("eligibleWrap");
+  if (wrap) wrap.style.display = "none";
+}
+function setEligibleStatus(msg) {
+  const st = document.getElementById("eligibleStatus");
+  if (st) st.textContent = msg || "";
+}
 
+function openSelectDropdown(selectEl) {
+  if (!selectEl) return;
+  // focus + click thường sẽ mở dropdown ở đa số browser
+  selectEl.focus();
+  selectEl.click();
+}
+
+window.autoLookupDebounced = function () {
+  clearTimeout(__lookupTimer);
+  __lookupTimer = setTimeout(() => {
+    const v = document.getElementById("reviewLookupIdentity")?.value?.trim() || "";
+    if (v.length < 6) {
+      hideEligibleWrap();
+      setEligibleStatus("Nhập Email/SĐT để hiện danh sách.");
+      return;
+    }
+    window.lookupEligibleForReview?.(true); // true = autoOpen
+  }, 450);
+};
 

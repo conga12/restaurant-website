@@ -43,6 +43,9 @@ public class RestaurantTable {
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
+
     public RestaurantTable() {
     }
 
@@ -97,4 +100,8 @@ public class RestaurantTable {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
+    public Boolean getActive() { return active; }
+
+    public void setActive(Boolean active) { this.active = active; }
 }

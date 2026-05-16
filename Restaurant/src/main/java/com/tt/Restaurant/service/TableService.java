@@ -10,4 +10,6 @@ public interface TableService {
     RestaurantTable createTable(RestaurantTable table);
     RestaurantTable updateTable(Integer id, RestaurantTable table);
     void deleteTable(Integer id);
+    void inactiveTable(Integer id);
+    RestaurantTable activateTable(Integer id);
 }

@@ -1252,3 +1252,168 @@ th, td {
   padding-left: 0;
 }
 
+/* Toast custom */
+.toast-custom {
+  min-width: 300px;
+  max-width: 420px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(23, 23, 23, 0.12);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Make Bootstrap bg utility classes a bit softer for our toast text */
+.toast-custom .toast-body {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding: 0.8rem 1rem;
+  font-size: 0.95rem;
+}
+
+/* Icon circle */
+.toast-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 18px;
+  flex: 0 0 44px;
+  color: #fff;
+}
+
+/* Progress bar at bottom */
+.toast-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 100%;
+  background: rgba(0,0,0,0.06);
+}
+.toast-progress > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
+  width: 100%;
+  transform-origin: left;
+  animation-name: toastProgress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  animation-duration: var(--toast-duration, 4000ms);
+}
+@keyframes toastProgress {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(-100%); }
+}
+
+/* types (override Bootstrap's text-bg classes for nicer icon background) */
+.toast-type-success .toast-icon { background: #28a745; }
+.toast-type-danger  .toast-icon { background: #dc3545; }
+.toast-type-info    .toast-icon { background: #0d6efd; }
+.toast-type-warning .toast-icon { background: #ffc107; color: #222; }
+
+/* small responsive tweak */
+@media (max-width: 576px) {
+  .toast-custom { min-width: 240px; max-width: 92vw; }
+}
+.action-btns .btn-action { margin-left: 6px; }
+.btn-action.btn-delete i { color: #e74c3c; } /* tùy chỉnh màu */
+/* Bàn bị ẩn (grid) — làm xám, border nhạt */
+.table-grid .table-item.hidden {
+  background: #f2f4f6; /* nhạt hơn */
+  border-color: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.5);
+  opacity: 0.7;
+  box-shadow: none;
+  cursor: default;
+}
+
+/* Nếu muốn đánh dấu viên nhỏ loại bàn cũng mờ */
+.table-grid .table-item.hidden .table-type-badge,
+.table-grid .table-item.hidden .table-capacity,
+.table-grid .table-item.hidden .table-number {
+  color: rgba(0,0,0,0.5);
+}
+
+/* Hàng trong bảng (list) bị ẩn */
+#tableListBody tr.row-hidden {
+  opacity: 0.6;
+  background: #fbfcfd; /* hoặc nhẹ hơn */
+}
+
+/* Button màu cho ẩn / bật lại giống product */
+.btn-action .bi-eye {
+  color: #e67e7e; /* màu đỏ hồng cho action ẩn (tuỳ chọn) */
+}
+.btn-action.btn-activate .bi-eye-slash {
+  color: #e74c3c; /* bật lại - đỏ nhạt */
+}
+.btn-action.btn-hide .bi-eye {
+  color: #ff6b6b;
+}
+
+/* Badge tạm ẩn */
+.badge.bg-secondary {
+  background: #cbd5e1 !important; /* nhẹ, tương tự product "Tạm ẩn" */
+  color: #1f2937 !important;
+  font-weight: 500;
+}
+/* Modal card visuals: light background, subtle shadow */
+.order-info-card, .order-summary-card {
+  background: #f8f9fa !important;       /* light */
+  color: #111827 !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(15,23,42,0.03);
+  padding: 1rem !important;
+}
+
+/* Ensure modal dialog responsive and not wider than viewport */
+#viewOrderModal .modal-dialog,
+#orderModal .modal-dialog {
+  max-width: calc(100% - 2rem) !important;
+  margin: 1.25rem auto !important;
+}
+
+/* Keep modal content boxed so inner wide content won't push page */
+#viewOrderModal .modal-content,
+#orderModal .modal-content {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Wrap the items table so it scrolls inside modal instead of expanding the page */
+.order-items-container {
+  max-height: 360px;
+  overflow: auto;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+/* Make thead sticky inside the scrollable area and keep white background */
+.order-items-container thead th {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 3;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Force table in modal to wrap and not expand page */
+#viewOrderModal table {
+  width: 100% !important;
+  table-layout: fixed !important;      /* lets columns wrap instead of stretching page */
+  word-wrap: break-word;
+}
+#viewOrderModal th, #viewOrderModal td {
+  white-space: normal !important;
+}
+
+/* Prevent page horizontal overflow if there are wide children (safe fallback) */
+html, body { overflow-x: hidden; }
+
+/* Ensure modal is above overlays */
+.modal { z-index: 1060; }
+.modal-backdrop { z-index: 1050; }

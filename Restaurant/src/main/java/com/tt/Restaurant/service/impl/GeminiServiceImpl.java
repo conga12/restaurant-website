@@ -11,6 +11,9 @@ import org.springframework.http.*;
 
 import java.util.Locale;
 import java.util.Base64;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 
 @Service
 public class GeminiServiceImpl implements GeminiService {
@@ -124,7 +127,6 @@ public class GeminiServiceImpl implements GeminiService {
         String aiText = generateContent(prompt);
 
         // ===== AI-first + fail-safe =====
-        // AI trả rỗng => block (vì bạn muốn AI làm cơ và muốn chặn chắc)
         if (aiText == null || aiText.isBlank()) {
             ReviewAIResult fb = new ReviewAIResult();
             fb.setShouldBlock(true);
@@ -386,62 +388,124 @@ public class GeminiServiceImpl implements GeminiService {
     }
 
     private String generateContent(String prompt) {
-        RestTemplate restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory f = new SimpleClientHttpRequestFactory();
+        f.setConnectTimeout(5000);
+        f.setReadTimeout(15000);
+        RestTemplate restTemplate = new RestTemplate(f);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        try {
-            // Build request body safely (no manual escaping)
-            var body = java.util.Map.of(
-                    "contents", java.util.List.of(
-                            java.util.Map.of(
-                                    "parts", java.util.List.of(
-                                            java.util.Map.of("text", prompt == null ? "" : prompt)
-                                    )
-                            )
-                    )
-            );
+        String url = textUrl + apiKey; // nếu visionUrl đã có ?key= ở cuối như config bạn
 
-            String requestJson = objectMapper.writeValueAsString(body);
-            HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+        int maxAttempts = 4;
 
-            ResponseEntity<String> response = restTemplate.exchange(
-                    visionUrl + apiKey,
-                    HttpMethod.POST,
-                    entity,
-                    String.class
-            );
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                var body = java.util.Map.of(
+                        "contents", java.util.List.of(
+                                java.util.Map.of(
+                                        "parts", java.util.List.of(
+                                                java.util.Map.of("text", prompt == null ? "" : prompt)
+                                        )
+                                )
+                        )
+                );
 
-            if (response.getBody() == null || response.getBody().isBlank()) {
-                System.err.println("Gemini response body is empty");
+                String requestJson = objectMapper.writeValueAsString(body);
+                HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+
+                ResponseEntity<String> response = restTemplate.exchange(
+                        url,
+                        HttpMethod.POST,
+                        entity,
+                        String.class
+                );
+
+                String respBody = response.getBody();
+                if (respBody == null || respBody.isBlank()) {
+                    System.err.println("Gemini empty body. attempt=" + attempt);
+                    // empty body coi như transient -> retry
+                    if (attempt < maxAttempts) {
+                        sleepBackoff(attempt);
+                        continue;
+                    }
+                    return "";
+                }
+
+                JsonNode rootNode = objectMapper.readTree(respBody);
+                JsonNode candidates = rootNode.path("candidates");
+                if (!candidates.isArray() || candidates.isEmpty()) {
+                    System.err.println("Gemini no candidates. attempt=" + attempt + " body=" + respBody);
+                    // thường không phải transient, nhưng có thể do spike -> retry 1-2 lần
+                    if (attempt < maxAttempts) {
+                        sleepBackoff(attempt);
+                        continue;
+                    }
+                    return "";
+                }
+
+                JsonNode parts = candidates.get(0).path("content").path("parts");
+                if (!parts.isArray() || parts.isEmpty()) {
+                    System.err.println("Gemini no parts. attempt=" + attempt + " body=" + respBody);
+                    if (attempt < maxAttempts) {
+                        sleepBackoff(attempt);
+                        continue;
+                    }
+                    return "";
+                }
+
+                // join parts
+                StringBuilder sb = new StringBuilder();
+                for (JsonNode p : parts) {
+                    String t = p.path("text").asText("");
+                    if (!t.isBlank()) {
+                        if (!sb.isEmpty()) sb.append("\n");
+                        sb.append(t);
+                    }
+                }
+                return sb.toString().trim();
+
+            } catch (HttpStatusCodeException e) {
+                int code = e.getStatusCode().value();
+                System.err.println("Gemini HTTP error attempt=" + attempt + " code=" + code);
+                System.err.println("Gemini error body: " + e.getResponseBodyAsString());
+
+                // retry chỉ cho transient
+                if ((code == 503 || code == 429) && attempt < maxAttempts) {
+                    sleepBackoff(attempt);
+                    continue;
+                }
+                return "";
+
+            } catch (ResourceAccessException e) {
+                // timeout / connection reset -> transient
+                System.err.println("Gemini network/timeout attempt=" + attempt + " err=" + e.getMessage());
+                if (attempt < maxAttempts) {
+                    sleepBackoff(attempt);
+                    continue;
+                }
+                return "";
+
+            } catch (Exception e) {
+                System.err.println("Gemini exception attempt=" + attempt + " err=" + e.getMessage());
                 return "";
             }
-
-            JsonNode rootNode = objectMapper.readTree(response.getBody());
-
-            JsonNode candidates = rootNode.path("candidates");
-            if (!candidates.isArray() || candidates.isEmpty()) {
-                System.err.println("Gemini returned no candidates. Full response: " + response.getBody());
-                return "";
-            }
-
-            JsonNode parts = candidates.get(0).path("content").path("parts");
-            if (!parts.isArray() || parts.isEmpty()) {
-                System.err.println("Gemini returned no parts. Full response: " + response.getBody());
-                return "";
-            }
-
-            return parts.get(0).path("text").asText("").trim();
-
-        } catch (org.springframework.web.client.HttpStatusCodeException e) {
-            System.err.println("Gemini HTTP error: " + e.getStatusCode());
-            System.err.println("Gemini error body: " + e.getResponseBodyAsString());
-            return "";
-        } catch (Exception e) {
-            System.err.println("Gemini exception: " + e);
-            return "";
         }
+
+        return "";
+    }
+
+    private void sleepBackoff(int attempt) {
+        // backoff: 300ms, 700ms, 1500ms, ...
+        long base = switch (attempt) {
+            case 1 -> 300L;
+            case 2 -> 700L;
+            case 3 -> 1500L;
+            default -> 2500L;
+        };
+        long jitter = java.util.concurrent.ThreadLocalRandom.current().nextLong(0, 200);
+        try { Thread.sleep(base + jitter); } catch (InterruptedException ignored) {}
     }
 
     /**

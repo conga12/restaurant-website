@@ -217,7 +217,7 @@
                 <div class="modal-body">
                     <div class="row g-4">
                         <div class="col-md-6">
-                            <div class="p-3 rounded" style="background: var(--gray-800);">
+                            <div class="order-info-card">
                                 <h6 class="mb-3">Thông tin đơn hàng</h6>
                                 <p class="mb-2"><strong>Bàn:</strong> <span id="viewOrderTable">-</span></p>
                                 <p class="mb-2"><strong>Khách hàng:</strong> <span id="viewOrderCustomer">-</span></p>
@@ -226,7 +226,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="p-3 rounded" style="background: var(--gray-800);">
+                            <div class="order-summary-card">
                                 <h6 class="mb-3">Thanh toán</h6>
                                 <p class="mb-2"><strong>Tạm tính:</strong> <span id="viewOrderSubTotal">0đ</span></p>
                                 <p class="mb-2"><strong>Thuế (5%):</strong> <span id="viewOrderTax">0đ</span></p>
@@ -236,17 +236,19 @@
                         </div>
                         <div class="col-12">
                             <h6 class="mb-3">Danh sách món</h6>
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Món ăn</th>
-                                        <th class="text-center">SL</th>
-                                        <th class="text-end">Đơn giá</th>
-                                        <th class="text-end">Thành tiền</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="viewOrderItemsBody"></tbody>
-                            </table>
+                            <div class="order-items-container">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Món ăn</th>
+                                            <th class="text-center">SL</th>
+                                            <th class="text-end">Đơn giá</th>
+                                            <th class="text-end">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="viewOrderItemsBody"></tbody>
+                                </table>
+                                </div>
                         </div>
                     </div>
                 </div>

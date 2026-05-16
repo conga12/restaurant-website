@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
@@ -29,4 +30,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("select count(r) from Review r where r.rating >= 4")
     Long getRecommendedCount();
+
+    boolean existsByReservation_Id(Long reservationId);
+
+    boolean existsByReservation_IdAndCreatedAtGreaterThanEqual(Long reservationId, LocalDateTime cutoff);
 }

@@ -95,11 +95,6 @@ function renderOrders(orders) {
     });
 }
 
-function formatMoney(amount) {
-    if (amount == null) return "0đ";
-    return Number(amount).toLocaleString("vi-VN") + "đ";
-}
-
 function formatDateTime(dateTime) {
     if (!dateTime) return "";
     const date = new Date(dateTime);
@@ -114,34 +109,89 @@ function renderStatusBadge(status) {
     return `<span class="badge bg-secondary">${status ?? ""}</span>`;
 }
 
-async function viewOrder(id) {
+function formatMoneyVND(amount) {
+  return Number(amount || 0).toLocaleString('vi-VN') + " đ";
+}
+function formatMoney(amount) {
+  return formatMoneyVND(amount);
+}
+function fmtDateTime(dtStr) {
+    if (!dtStr)
+        return "-";
     try {
-        const response = await fetch(`${ORDER_API}/${id}`, {
-            credentials: "include"
+        const d = new Date(dtStr);
+        return d.toLocaleString('vi-VN', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        } catch (e) { return dtStr; }
+}
+
+async function viewOrder(id) {
+  try {
+    const resp = await fetch(`${ORDER_API}/${id}`, { credentials: 'include' });
+    if (!resp.ok) throw new Error('Không lấy được chi tiết đơn hàng');
+    const order = await resp.json();
+
+    // helper setText
+    const setText = (elId, text) => {
+      const el = document.getElementById(elId);
+      if (el) el.textContent = text ?? '-';
+    };
+
+    // populate header info (IDs tồn tại trong viewOrderModal)
+    setText('viewOrderTable', order.tableNumber ? `Bàn ${order.tableNumber}` : 'Chưa có bàn');
+    setText('viewOrderCustomer', order.customerName ? `${order.customerName}${order.customerPhone ? ' - ' + order.customerPhone : ''}` : '-');
+    setText('viewOrderTime', order.createdAt ? fmtDateTime(order.createdAt) : (order.orderDate ? fmtDateTime(order.orderDate) : '-'));
+    // status badge (innerHTML): kiểm tra element tồn tại trước khi innerHTML
+    const statusEl = document.getElementById('viewOrderStatus');
+    if (statusEl) statusEl.innerHTML = renderStatusBadge(order.status);
+
+    // payment
+    setText('viewOrderSubTotal', formatMoney(order.subtotal ?? order.totalAmount ?? 0));
+    setText('viewOrderTax', formatMoney(order.tax ?? 0));
+    setText('viewOrderDiscount', formatMoney(order.discount ?? 0));
+    setText('viewOrderTotal', formatMoney(order.total ?? order.totalAmount ?? 0));
+
+    // items list
+    const itemsBody = document.getElementById('viewOrderItemsBody');
+    if (itemsBody) {
+      itemsBody.innerHTML = '';
+      const items = Array.isArray(order.items) ? order.items : (order.orderItems || []);
+      if (items.length === 0) {
+        itemsBody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Không có món nào</td></tr>`;
+      } else {
+        items.forEach(it => {
+          const qty = it.quantity ?? it.qty ?? 1;
+          const unit = it.unitPrice ?? it.price ?? 0;
+          const subtotal = (Number(qty) * Number(unit)) || 0;
+          itemsBody.innerHTML += `
+            <tr>
+              <td>
+                <div class="fw-semibold">${escapeHtml(it.name ?? it.dishName ?? '')}</div>
+                <small class="text-muted">${it.note ? escapeHtml(it.note) : 'Không có ghi chú'}</small>
+              </td>
+              <td class="text-center">${qty}</td>
+              <td class="text-end">${formatMoney(unit)}</td>
+              <td class="text-end">${formatMoney(subtotal)}</td>
+            </tr>
+          `;
         });
-
-        if (!response.ok) {
-            throw new Error("Không thể tải chi tiết đơn hàng");
-        }
-
-        const order = await response.json();
-        console.log("Chi tiết order:", order);
-
-        renderOrderDetail(order);
-
-        const modalEl = document.getElementById("viewOrderModal");
-        if (!modalEl) {
-            throw new Error("Không tìm thấy modal #viewOrderModal trong HTML");
-        }
-
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        modal.show();
-
-        await loadOrders();
-    } catch (error) {
-        console.error("Lỗi viewOrder:", error);
-        alert(error.message || "Không thể tải chi tiết đơn hàng");
+      }
     }
+    // scroll items container to top so header visible
+    const itemsContainer = document.querySelector('#viewOrderModal .order-items-container');
+    if (itemsContainer) itemsContainer.scrollTop = 0;
+    // show modal (id viewOrderModal hiện có trong HTML)
+    const modalEl = document.getElementById('viewOrderModal');
+    if (!modalEl) {
+      console.warn('viewOrderModal not found in DOM');
+      return;
+    }
+    const bs = new bootstrap.Modal(modalEl);
+    bs.show();
+  } catch (err) {
+    console.error('viewOrder error', err);
+    if (typeof showToast === 'function') showToast('Không thể lấy chi tiết đơn hàng', 'danger');
+    else alert('Không thể lấy chi tiết đơn hàng');
+  }
 }
 
 function renderOrderDetail(order) {
@@ -234,23 +284,26 @@ function escapeHtml(text) {
 }
 
 async function updateOrderStatus(id, status) {
-    try {
-        const response = await fetch(`/admin/api/orders/${id}/status?status=${status}`, {
-            method: "PUT",
-            credentials: "include"
-        });
+  try {
+    const response = await fetch(`/admin/api/orders/${id}/status?status=${encodeURIComponent(status)}`, {
+      method: "PUT",
+      credentials: "include"
+    });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || "Không thể cập nhật trạng thái");
-        }
-
-        alert("Cập nhật trạng thái thành công");
-        await loadOrders();
-    } catch (error) {
-        console.error("Lỗi updateOrderStatus:", error);
-        alert(error.message || "Cập nhật trạng thái thất bại");
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Không thể cập nhật trạng thái");
     }
+
+    if (typeof showToast === 'function') showToast("Cập nhật trạng thái thành công", "success");
+    else alert("Cập nhật trạng thái thành công");
+
+    await loadOrders();
+  } catch (error) {
+    console.error("Lỗi updateOrderStatus:", error);
+    if (typeof showToast === 'function') showToast(error.message || "Cập nhật trạng thái thất bại", "danger");
+    else alert(error.message || "Cập nhật trạng thái thất bại");
+  }
 }
 
 function renderActionButtons(order) {

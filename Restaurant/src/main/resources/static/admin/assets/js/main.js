@@ -364,7 +364,20 @@ function formatTime(date) {
         minute: "2-digit"
     }).format(new Date(date));
 }
+async function apiFetchJson(url, options = {}) {
+    const res = await fetch(url, {
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'same-origin',
+        ...options
+    });
 
+    if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`HTTP ${res.status} ${res.statusText}${text ? ' - ' + text : ''}`);
+    }
+    if (res.status === 204) return null;
+    return res.json();
+}
 /**
  * Show toast notification
  */

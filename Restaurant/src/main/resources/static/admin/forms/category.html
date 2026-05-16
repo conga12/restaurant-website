@@ -292,10 +292,24 @@
             ? '<span class="badge bg-success">Hoạt động</span>'
             : '<span class="badge bg-secondary">Tạm ẩn</span>';
     }
+    function normalizeImageUrl(url) {
+      const raw = (url || '').trim();
+      if (!raw) return '';
+
+      // URL đầy đủ
+      if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+
+      // Đã là path tuyệt đối trên server
+      if (raw.startsWith('/images/') || raw.startsWith('/uploads/')) return raw;
+
+      // Nếu DB chỉ lưu filename (vd: soup.jpg, drinks.jpg)
+      return '/images/' + raw;
+    }
 
     function imgCell(url) {
-        if (url) return `<img class="cat-img" src="${esc(url)}" alt="img">`;
-        return `<img class="cat-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='100%25' height='100%25' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='10'%3Eno img%3C/text%3E%3C/svg%3E" alt="no-img">`;
+      const src = normalizeImageUrl(url);
+      if (src) return `<img class="cat-img" src="${esc(src)}" alt="img">`;
+      return `<img class="cat-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='100%25' height='100%25' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='10'%3Eno img%3C/text%3E%3C/svg%3E" alt="no-img">`;
     }
 
     async function loadCategories() {
@@ -381,15 +395,15 @@
         // image (giữ ảnh cũ nếu không upload mới)
         const oldUrl = btn.dataset.imageurl || '';
         document.getElementById('catImageUrl').value = oldUrl;
-        document.getElementById('catImageFile').value = '';
 
         const preview = document.getElementById('catPreview');
-        if (oldUrl) {
-            preview.src = oldUrl;
-            preview.style.display = 'block';
+        const previewUrl = normalizeImageUrl(oldUrl);
+        if (previewUrl) {
+          preview.src = previewUrl;
+          preview.style.display = 'block';
         } else {
-            preview.src = '';
-            preview.style.display = 'none';
+          preview.src = '';
+          preview.style.display = 'none';
         }
     }
 
@@ -484,6 +498,93 @@
             showToast(`Bật lại thất bại: ${e.message}`, "danger");
         }
     }
+    /**
+ * showToast(message, type = 'success', options = { duration: 4000 })
+ * type: 'success' | 'danger' | 'info' | 'warning'
+ */
+function showToast(message, type = 'success', options = {}) {
+  const duration = options.duration ?? 4000;
+  const container = document.getElementById('globalToastContainer');
+  if (!container) {
+    console.warn('Missing toast container (#globalToastContainer).');
+    return;
+  }
+
+  // Create toast element
+  const toastEl = document.createElement('div');
+  toastEl.className = `toast align-items-center text-bg-transparent border-0 toast-custom toast-type-${type}`;
+  toastEl.setAttribute('role', 'alert');
+  toastEl.setAttribute('aria-live', 'assertive');
+  toastEl.setAttribute('aria-atomic', 'true');
+
+  // Choose icon (Bootstrap icons used in your page)
+  const icons = {
+    success: '<i class="bi bi-check2-lg"></i>',
+    danger:  '<i class="bi bi-exclamation-triangle-fill"></i>',
+    info:    '<i class="bi bi-info-circle-fill"></i>',
+    warning: '<i class="bi bi-exclamation-circle-fill"></i>'
+  };
+  const iconHtml = icons[type] || icons.info;
+
+  toastEl.innerHTML = `
+    <div class="toast-body">
+      <div class="toast-icon" aria-hidden="true">${iconHtml}</div>
+      <div class="toast-content">
+        <div class="toast-message">${escapeHtml(message)}</div>
+      </div>
+      <button type="button" class="btn-close ms-auto me-0" aria-label="Close"></button>
+    </div>
+    <div class="toast-progress"><i style="animation-duration: ${duration}ms;"></i></div>
+  `;
+
+  // Helper escape
+  function escapeHtml(s) {
+    return (s ?? '').toString()
+      .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;').replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  // Append and initialize bootstrap Toast
+  container.appendChild(toastEl);
+
+  // Hook up the close button
+  const closeBtn = toastEl.querySelector('.btn-close');
+  closeBtn.addEventListener('click', () => {
+    bsToast.hide();
+  });
+
+  // Use Bootstrap Toast API
+  const bsToast = new bootstrap.Toast(toastEl, { autohide: true, delay: duration });
+
+  // Pause progress animation and autohide on hover
+  const progressBar = toastEl.querySelector('.toast-progress > i');
+  toastEl.addEventListener('mouseenter', () => {
+    if (progressBar) progressBar.style.animationPlayState = 'paused';
+    // pause autohide by clearing timer: bootstrap doesn't expose timer, so we hide/reshow trick
+    // as workable fallback we simply keep it visible until mouse leaves
+    bsToast._config.autohide = false;
+  });
+  toastEl.addEventListener('mouseleave', () => {
+    if (progressBar) {
+      // resume progress with remaining time: easiest is to restart animation and autohide
+      progressBar.style.animationPlayState = 'running';
+      // restart animation to match remaining time is complex; we will hide after 'duration' more ms
+      bsToast._config.autohide = true;
+      bsToast.hide(); // ensure it's scheduled; bootstrap will respect autohide
+    }
+  });
+
+  // When hidden remove from DOM
+  toastEl.addEventListener('hidden.bs.toast', () => {
+    toastEl.remove();
+  });
+
+  // Start toast
+  bsToast.show();
+
+  return bsToast;
+}
 
     document.addEventListener('DOMContentLoaded', async function () {
         await loadCategories();
@@ -509,5 +610,8 @@
     });
 
 </script>
+
+<!-- Toast container (thêm 1 lần vào layout admin chung) -->
+<div id="globalToastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 10850;"></div>
 </body>
 </html>

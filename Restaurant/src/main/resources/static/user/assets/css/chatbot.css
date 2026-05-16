@@ -183,3 +183,48 @@
     max-height: 70vh;
   }
 }
+/* ===== Minimized chatbot (icon only) ===== */
+.chatbot-widget.is-minimized {
+  width: 56px;
+  height: 56px;
+  max-height: 56px;
+  border-radius: 999px;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  box-shadow: var(--shadow-xl);
+}
+
+/* Ẩn body + input khi minimized */
+.chatbot-widget.is-minimized .chatbot-body,
+.chatbot-widget.is-minimized .chatbot-input-area {
+  display: none;
+}
+
+/* Header biến thành icon tròn */
+.chatbot-widget.is-minimized .chatbot-header {
+  border-radius: 999px;
+  padding: 0;
+  width: 56px;
+  height: 56px;
+  justify-content: center;
+}
+
+/* Ẩn chữ "Support" khi minimized */
+.chatbot-widget.is-minimized .chatbot-name {
+  display: none;
+}
+
+/* Đổi nút "-" thành icon chat khi minimized */
+.chatbot-widget.is-minimized .chatbot-close-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 22px;
+}
+
+/* Ẩn icon 💬 bên trái để chỉ còn 1 nút */
+.chatbot-widget.is-minimized .chatbot-title {
+  display: none;
+}

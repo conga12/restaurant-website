@@ -89,4 +89,28 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
           and r.status in :activeStatuses
     """)
     List<Long> findBookedTableIds(LocalDate date, LocalTime time, List<ReservationStatus> activeStatuses);
+
+    @Query("""
+          select r from Reservation r
+          where (:email is not null and :email <> '' and lower(r.customerEmail) = lower(:email))
+             or (:phone is not null and :phone <> '' and r.customerPhone = :phone)
+          order by r.createdAt desc
+        """)
+    List<Reservation> findHistoryByEmailOrPhone(String email, String phone);
+
+    @Query("""
+          select r from Reservation r
+          where r.status = :status
+            and (
+              (:email <> '' and lower(r.customerEmail) = lower(:email))
+              or
+              (:phone <> '' and r.customerPhone = :phone)
+            )
+          order by r.id desc
+        """)
+    List<Reservation> findByEmailOrPhoneAndStatus(
+            @Param("email") String email,
+            @Param("phone") String phone,
+            @Param("status") Reservation.ReservationStatus status
+    );
 }

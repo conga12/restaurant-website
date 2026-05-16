@@ -48,8 +48,22 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public void deleteTable(Integer id) {
+        inactiveTable(id);
+    }
+    @Override
+    public void inactiveTable(Integer id) {
         RestaurantTable existing = tableRepository.findById(id.longValue())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bàn"));
-        tableRepository.delete(existing);
+        existing.setActive(false); // cần field active trên entity
+        tableRepository.save(existing);
     }
+
+    @Override
+    public RestaurantTable activateTable(Integer id) {
+        RestaurantTable existing = tableRepository.findById(id.longValue())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bàn"));
+        existing.setActive(true);
+        return tableRepository.save(existing);
+    }
+
 }

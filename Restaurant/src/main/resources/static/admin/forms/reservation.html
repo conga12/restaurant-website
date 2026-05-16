@@ -297,7 +297,78 @@
         </div>
     </div>
 </div>
+<!-- Reservation Detail Modal -->
+<div class="modal fade" id="reservationDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết đặt bàn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 text-muted">Mã đặt</dt>
+                            <dd class="col-sm-8" id="detailReservationCode">-</dd>
 
+                            <dt class="col-sm-4 text-muted">Khách hàng</dt>
+                            <dd class="col-sm-8" id="detailCustomerName">-</dd>
+
+                            <dt class="col-sm-4 text-muted">SĐT</dt>
+                            <dd class="col-sm-8" id="detailCustomerPhone">-</dd>
+
+                            <dt class="col-sm-4 text-muted">Email</dt>
+                            <dd class="col-sm-8" id="detailCustomerEmail">-</dd>
+                        </dl>
+                    </div>
+
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 text-muted">Ngày — Giờ</dt>
+                            <dd class="col-sm-8" id="detailDateTime">-</dd>
+
+                            <dt class="col-sm-4 text-muted">Số khách</dt>
+                            <dd class="col-sm-8" id="detailGuests">-</dd>
+
+                            <dt class="col-sm-4 text-muted">Bàn</dt>
+                            <dd class="col-sm-8" id="detailTable">-</dd>
+
+                            <dt class="col-sm-4 text-muted">Trạng thái</dt>
+                            <dd class="col-sm-8" id="detailStatus"><span class="badge bg-secondary">-</span></dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div>
+                    <h6>Ghi chú</h6>
+                    <p id="detailNote" class="mb-0 text-muted">—</p>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Yêu cầu cọc:</strong> <span id="detailDepositRequired">Không</span></p>
+                        <p class="mb-0"><strong>Số tiền cọc:</strong> <span id="detailDepositAmount">0 đ</span></p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <small class="text-muted">Tạo lúc: <span id="detailCreatedAt">-</span></small>
+                        <br>
+                        <small class="text-muted">Hết hạn cọc: <span id="detailExpireAt">-</span></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="btnOpenEditFromDetail">Sửa đặt</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://unpkg.com/stompjs@2.3.3/lib/stomp.min.js"></script>

@@ -34,7 +34,8 @@ public class CustomerTableController {
                         table.getCapacity(),
                         table.getTableType() != null ? table.getTableType().name() : "STANDARD",
                         table.getLocation(),
-                        table.getStatus() != null ? table.getStatus().name() : "AVAILABLE"
+                        table.getStatus() != null ? table.getStatus().name() : "AVAILABLE",
+                        table.getActive() != null ? table.getActive() : true
                 ))
                 .toList();
     }

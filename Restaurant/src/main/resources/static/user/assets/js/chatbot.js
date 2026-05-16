@@ -1,21 +1,13 @@
 // Chatbot functionality
 
 function toggleChatbot() {
-  const chatbotBody = document.getElementById('chatbot-body');
-  const chatbotInput = document.querySelector('.chatbot-input-area');
-  const toggleBtn = document.getElementById('chatbot-toggle');
+  const widget = document.getElementById("chatbot-widget");
+  if (!widget) return;
 
-  if (!chatbotBody || !chatbotInput || !toggleBtn) return;
+  widget.classList.toggle("is-minimized");
 
-  if (chatbotBody.style.display === 'none' || chatbotBody.style.display === '') {
-    chatbotBody.style.display = 'flex';
-    chatbotInput.style.display = 'flex';
-    toggleBtn.textContent = '−';
-  } else {
-    chatbotBody.style.display = 'none';
-    chatbotInput.style.display = 'none';
-    toggleBtn.textContent = '+';
-  }
+  const btn = document.getElementById("chatbot-toggle");
+  if (btn) btn.textContent = widget.classList.contains("is-minimized") ? "💬" : "−";
 }
 
 async function sendChatMessage() {
@@ -96,3 +88,9 @@ function handleChatInput(event) {
     sendChatMessage();
   }
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const widget = document.getElementById("chatbot-widget");
+  const btn = document.getElementById("chatbot-toggle");
+  if (widget) widget.classList.add("is-minimized");
+  if (btn) btn.textContent = "💬";
+});

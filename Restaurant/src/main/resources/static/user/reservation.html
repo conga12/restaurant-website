@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Book your table at RestaurantOS">
-  <title>Reservations - RestaurantOS</title>
+  <title>Reservations - HuongVietRes</title>
   <link rel="stylesheet" href="assets/css/style.css">
 
   <style>
@@ -266,16 +266,19 @@
     </div>
     <div class="header-nav">
       <nav>
-        <a href="index.html">Home</a>
-        <a href="menu.html">Menu</a>
-        <a href="reservation.html">Reservations</a>
-        <a href="/user/reservation-history.html">My Bookings</a>
-        <a href="review.html">Reviews</a>
-        <a href="contact.html">Contact</a>
+        <a href="index.html">TRANG CHỦ</a>
+        <a href="menu.html">MÓN ĂN</a>
+        <a href="reservation.html">ĐẶT BÀN</a>
+        <a href="/user/reservation-history.html">BÀN ĐÃ ĐẶT</a>
+        <a href="/user/review.html">ĐÁNH GIÁ</a>
+        <a href="contact.html">LIÊN HỆ</a>
       </nav>
     </div>
     <div class="header-reserve">
-      <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
+      <button class="btn btn-reserve"
+              onclick="window.location.href='/auth/login.html?redirect=' + encodeURIComponent(window.location.pathname)">
+        Login
+      </button>
     </div>
     <div class="hamburger">
       <span></span>
@@ -287,49 +290,49 @@
 
 <section class="hero">
   <div class="hero-content">
-    <h1>Reserve Your Table</h1>
-    <p>Choose your ideal table and enjoy your dining experience</p>
+    <h1>Đặt bàn ngày</h1>
+    <p>Chọn bàn phù hợp và tận hưởng trải nghiệm dùng bữa của bạn</p>
   </div>
 </section>
 
 <section class="container">
   <div class="section-title">
-    <h2>Book Your Reservation</h2>
-    <p>Pick your date, time, guests and select an available table</p>
+    <h2>Đặt bàn</h2>
+    <p>Chọn ngày, giờ, số khách và chọn bàn còn trống</p>
   </div>
 
   <div class="reservation-layout">
     <div class="reservation-panel">
-      <h3>Reservation Form</h3>
-      <p>Fill in your details and choose a green table from the table map.</p>
+      <h3>From đặt bàn</h3>
+      <p>Vui lòng nhập thông tin và chọn bàn màu xanh trên sơ đồ bàn.</p>
 
       <form id="reservationForm">
         <div class="form-group">
-          <label for="name">Full Name *</label>
-          <input type="text" id="name" name="name" required placeholder="John Doe">
+          <label for="name">Họ và tên *</label>
+          <input type="text" id="name" name="name" required placeholder="Vui lòng nhập họ tên">
           <div class="form-error"></div>
         </div>
 
         <div class="form-group">
-          <label for="email">Email Address *</label>
-          <input type="email" id="email" name="email" required placeholder="john@example.com">
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" required placeholder="Vui lòng nhập email">
           <div class="form-error"></div>
         </div>
 
         <div class="form-group">
-          <label for="phone">Phone Number *</label>
-          <input type="tel" id="phone" name="phone" required placeholder="0901234567">
+          <label for="phone">Số điện thoại *</label>
+          <input type="tel" id="phone" name="phone" required placeholder="Vui lòng nhập số điện thoại">
           <div class="form-error"></div>
         </div>
 
         <div class="form-group">
-          <label for="date">Reservation Date *</label>
+          <label for="date">Ngày đến *</label>
           <input type="date" id="date" name="date" required>
           <div class="form-error"></div>
         </div>
 
         <div class="form-group">
-          <label for="time">Reservation Time *</label>
+          <label for="time">Thời gian đến *</label>
           <select id="time" name="time" required>
             <option value="">Select a time</option>
             <option value="17:00">5:00 PM</option>
@@ -347,25 +350,25 @@
         </div>
 
         <div class="form-group">
-          <label for="guests">Number of Guests *</label>
+          <label for="guests">Số lượng *</label>
           <select id="guests" name="guests" required>
-            <option value="">Select number of guests</option>
-            <option value="1">1 Guest</option>
-            <option value="2">2 Guests</option>
-            <option value="3">3 Guests</option>
-            <option value="4">4 Guests</option>
-            <option value="5">5 Guests</option>
-            <option value="6">6 Guests</option>
-            <option value="7">7 Guests</option>
-            <option value="8">8 Guests</option>
-            <option value="9">9 Guests</option>
-            <option value="10">10 Guests</option>
+            <option value="">Vui lòng chọn số khác</option>
+            <option value="1">1 Người</option>
+            <option value="2">2 Người</option>
+            <option value="3">3 Người</option>
+            <option value="4">4 Người</option>
+            <option value="5">5 Người</option>
+            <option value="6">6 Người</option>
+            <option value="7">7 Người</option>
+            <option value="8">8 Người</option>
+            <option value="9">9 Người</option>
+            <option value="10">10 Người</option>
           </select>
           <div class="form-error"></div>
         </div>
 
         <div class="form-group">
-          <label for="specialRequests">Special Requests (Optional)</label>
+          <label for="specialRequests">Ghi chú </label>
           <textarea id="specialRequests" name="specialRequests" placeholder="Any allergies, birthday, near window..."></textarea>
         </div>
 
@@ -373,63 +376,63 @@
         <input type="hidden" id="selectedTableNumber" name="selectedTableNumber">
 
         <div class="selected-table-box" id="selectedTableBox">
-          <div><strong>Selected table:</strong> <span id="selectedTableText">No table selected</span></div>
-          <div><strong>Table type:</strong> <span id="selectedTableTypeText">-</span></div>
-          <div><strong>Deposit:</strong> <span id="selectedTableDepositText">Not required</span></div>
+          <div><strong>Bàn đã chọn:</strong> <span id="selectedTableText">Chưa chọn bàn</span></div>
+          <div><strong>Loại bàn:</strong> <span id="selectedTableTypeText">-</span></div>
+          <div><strong>Tiền cọc:</strong> <span id="selectedTableDepositText">Không yêu cầu</span></div>
         </div>
 
         <button id="submitReservationBtn" type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
-          Complete Reservation
+          Hoàn tất đặt bàn
         </button>
       </form>
     </div>
 
     <div class="table-map-panel">
-      <h3>Choose Your Table</h3>
-      <p>Only green tables can be selected.</p>
+      <h3>Chọn bàn của bạn</h3>
+      <p>Chỉ có thể chọn các bàn màu xanh.</p>
 
       <div class="table-legend">
         <div class="legend-item">
-          <span class="legend-dot available"></span> Available
+          <span class="legend-dot available"></span> Còn trống
         </div>
         <div class="legend-item">
-          <span class="legend-dot reserved"></span> Reserved
+          <span class="legend-dot reserved"></span> Đã Đặt
         </div>
         <div class="legend-item">
-          <span class="legend-dot occupied"></span> Occupied
+          <span class="legend-dot occupied"></span> Đang có khách
         </div>
       </div>
 
       <div class="table-type-legend">
         <div class="legend-item">
-          <span class="table-type-badge standard">Standard</span>
+          <span class="table-type-badge standard">Tiêu chuẩn</span>
         </div>
         <div class="legend-item">
           <span class="table-type-badge vip">VIP</span>
         </div>
         <div class="legend-item">
-          <span class="table-type-badge private">Private Room</span>
+          <span class="table-type-badge private">Phòng riêng</span>
         </div>
       </div>
 
       <div class="table-map-grid" id="tableMapGrid"></div>
 
       <div class="helper-note">
-        Green = empty table you can choose.<br>
-        Yellow = already reserved.<br>
-        Red = currently occupied / unavailable.
+        Màu xanh = Bàn trống<br>
+        Màu vàng = Bàn đã đặt trước.<br>
+        Màu đỏ = Bàn đang có khách
       </div>
     </div>
   </div>
 
   <div class="card" style="margin-top: 2rem; background-color: #f8f9fa;">
-    <h3>Reservation Information</h3>
+    <h3>Thông tin đặt bàn</h3>
     <ul style="list-style: none; padding: 0;">
-      <li style="padding: 0.5rem 0;">✓ Reservations accepted Monday - Sunday</li>
-      <li style="padding: 0.5rem 0;">✓ Please arrive 10-15 minutes early</li>
-      <li style="padding: 0.5rem 0;">✓ Tables held for 10 minutes after reservation time</li>
-      <li style="padding: 0.5rem 0;">✓ Late arrivals may lead to automatic cancellation</li>
-      <li style="padding: 0.5rem 0;">✓ Groups of 10+ require a phone call</li>
+      <li style="padding: 0.5rem 0;">✓ Đặt bàn được phục vụ từ Thứ Hai đến Chủ Nhật</li>
+      <li style="padding: 0.5rem 0;">✓ Vui lòng đến sớm trước 10–15 phút</li>
+      <li style="padding: 0.5rem 0;">✓ Bàn sẽ được giữ trong 10 phút sau giờ đặt</li>
+      <li style="padding: 0.5rem 0;">✓ Đến muộn có thể dẫn đến việc tự động hủy bàn</li>
+      <li style="padding: 0.5rem 0;">✓ Nhóm trên 10 người vui lòng liên hệ qua điện thoại</li>
     </ul>
   </div>
 </section>
@@ -437,36 +440,44 @@
 <footer>
   <div class="footer-content">
     <div class="footer-section">
-      <h4>RestaurantOS</h4>
-      <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+      <h4>Hương Việt</h4>
+      <p>Trải nghiệm ẩm thực cao cấp với dịch vụ tận tâm và tinh hoa ẩm thực Việt.</p>
+      <div class="social-links">
+        <a href="#facebook" title="Facebook">f</a>
+        <a href="#twitter" title="Twitter">𝕏</a>
+        <a href="#instagram" title="Instagram">📷</a>
+        <a href="#youtube" title="YouTube">▶️</a>
+      </div>
     </div>
 
     <div class="footer-section">
       <h4>Quick Links</h4>
-      <a href="index.html">Home</a>
-      <a href="menu.html">Menu</a>
-      <a href="/user/reservation-history.html">My Bookings</a>
-      <a href="review.html">Reviews</a>
-      <a href="contact.html">Contact</a>
+      <a href="index.html">Trang chủ</a>
+      <a href="menu.html">Món ăn</a>
+      <a href="reservation.html">Đặt bàn</a>
+      <a href="review.html">Bàn đã đặt</a>
+      <a href="contact.html">Liên hệ</a>
     </div>
 
     <div class="footer-section">
-      <h4>Hours of Operation</h4>
-      <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
-      <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
-      <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
+      <h4>Giờ mở cửa</h4>
+      <p><strong>Thứ 2 - Thứ 5:</strong> 5:00 PM - 10:00 PM</p>
+      <p><strong>Thứ 6 - Thứ 7:</strong> 5:00 PM - 11:00 PM</p>
+      <p><strong>Chủ nhật:</strong> 5:00 PM - 9:00 PM</p>
+      <p><strong>Đóng cửa:</strong> Nếu có nghỉ lễ</p>
     </div>
 
     <div class="footer-section">
-      <h4>Contact Info</h4>
-      <p>📍 123 Gourmet Street, Food City</p>
-      <p>📞 (123) 456-7890</p>
-      <p>✉️ info@restaurantos.com</p>
+      <h4>Thông tin liên lạc</h4>
+      <p>📍 123 Gourmet Street, Food City, FC 12345</p>
+      <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
+      <p>✉️ <a href="mailto:info@restaurantos.com">info@huongviet.com</a></p>
+      <p>🌐 www.HuongViet.com</p>
     </div>
   </div>
 
   <div class="footer-bottom">
-    <p>2024 RestaurantOS. All rights reserved.</p>
+    <p>&copy; 2020 HuongViet. Bảo lưu mọi quyền. | <a href="#">Chính sách bảo mật</a> | <a href="#">Điều khoản dịch vụ</a></p>
   </div>
 </footer>
 
@@ -487,6 +498,89 @@
   const reservationFormEl = document.getElementById("reservationForm");
   const submitReservationBtn = document.getElementById("submitReservationBtn");
   const guestsInput = document.getElementById("guests");
+  async function loadCustomerTables() {
+  try {
+    console.log('[tables] loading customer tables...');
+    const res = await fetch(TABLE_API, { credentials: 'include', headers: { 'Accept': 'application/json' }});
+    if (!res.ok) {
+      console.error('[tables] failed to fetch', res.status);
+      return;
+    }
+    const list = await res.json();
+    console.log('[tables] server list count=', (list||[]).length);
+
+    // Lọc bỏ bàn đã ẩn: active === false
+    const visible = (list || []).filter(t => t.active !== false);
+    tables = visible; // cập nhật biến global 'tables' bạn đang dùng trên trang
+
+    console.log('[tables] visible count=', tables.length, 'sample=', tables.slice(0,5).map(t=>({id:t.id,tableNumber:t.tableNumber,active:t.active})));
+
+    // Gọi function render hiện có (nếu bạn đã có)
+    if (typeof renderCustomerTableMap === 'function') {
+      renderCustomerTableMap();
+      return;
+    }
+
+    // Nếu không có renderCustomerTableMap, dùng fallback nhẹ:
+    if (!tableMapGrid) return;
+    tableMapGrid.innerHTML = '';
+    if (!tables || tables.length === 0) {
+      tableMapGrid.innerHTML = '<div class="text-muted">Không có bàn</div>';
+      return;
+    }
+    tables.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'customer-table-card';
+      el.innerHTML = `
+        <div class="table-number">Bàn ${t.tableNumber}</div>
+        <div class="table-type">${getTypeText(t.tableType)}</div>
+        <div class="table-capacity">${t.capacity} chỗ</div>
+        <div class="table-status">${t.status}</div>
+      `;
+      if (t.status === 'AVAILABLE') {
+        el.classList.add('clickable');
+        el.addEventListener('click', () => {
+          // gọi hàm chọn bàn nếu bạn có (ví dụ selectCustomerTable)
+          if (typeof selectCustomerTable === 'function') selectCustomerTable(t);
+        });
+      } else {
+        el.classList.add('disabled');
+      }
+      tableMapGrid.appendChild(el);
+    });
+  } catch (e) {
+    console.error('[tables] loadCustomerTables error', e);
+  }
+}
+let userStompClient = null;
+function connectTableWS() {
+  try {
+    if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+      console.warn('SockJS/STOMP chưa được load; skip WS connect');
+      return;
+    }
+
+    const socket = new SockJS('/ws-notify');
+    userStompClient = Stomp.over(socket);
+    userStompClient.debug = null;
+
+    userStompClient.connect({}, function(frame) {
+      console.log('[ws] connected (user)', frame);
+      userStompClient.subscribe('/topic/tables', function(message) {
+        console.log('[ws] /topic/tables message received:', message.body);
+        // reload table list when admin changes tables
+        loadTables().catch(err => console.warn('[ws] reload failed', err));
+      });
+    }, function(err) {
+      console.warn('[ws] connect error (user):', err);
+      userStompClient = null;
+      // try reconnect after delay
+      setTimeout(connectTableWS, 5000);
+    });
+  } catch (err) {
+    console.warn('[ws] connectTableWS error', err);
+  }
+}
 
   function getSelectedGuests() {
     return Number(guestsInput.value || 0);
@@ -523,43 +617,45 @@
   }
 
   async function loadTables() {
-    try {
-      const response = await fetch(TABLE_API, {
-        method: "GET",
-        headers: {
-          "Accept": "application/json"
-        },
-        credentials: "include"
-      });
+  try {
+    const response = await fetch(TABLE_API, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      },
+      credentials: "include"
+    });
 
-      const tableText = await response.text();
-      console.log("loadTables status:", response.status);
-      console.log("loadTables raw response:", tableText);
+    const tableText = await response.text();
+    console.log("loadTables status:", response.status);
+    console.log("loadTables raw response:", tableText);
 
-      if (response.status === 401 || response.status === 403) {
-        tableMapGrid.innerHTML = `<div style="color:#f87171;">Bạn chưa có quyền xem danh sách bàn.</div>`;
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`Không tải được danh sách bàn. HTTP ${response.status}`);
-      }
-
-      let data = [];
-      try {
-        data = tableText ? JSON.parse(tableText) : [];
-      } catch (e) {
-        data = [];
-      }
-
-      tables = Array.isArray(data) ? data : [];
-      validateSelectedTableAfterReload();
-      renderTableMap();
-    } catch (error) {
-      console.error("Lỗi loadTables:", error);
-      tableMapGrid.innerHTML = `<div style="color:#f87171;">Không thể tải danh sách bàn.</div>`;
+    if (response.status === 401 || response.status === 403) {
+      tableMapGrid.innerHTML = `<div style="color:#f87171;">Bạn chưa có quyền xem danh sách bàn.</div>`;
+      return;
     }
+
+    if (!response.ok) {
+      throw new Error(`Không tải được danh sách bàn. HTTP ${response.status}`);
+    }
+
+    let data = [];
+    try {
+      data = tableText ? JSON.parse(tableText) : [];
+    } catch (e) {
+      data = [];
+    }
+
+    // --- IMPORTANT: filter out tables with active === false ---
+    tables = Array.isArray(data) ? data.filter(t => t && t.active !== false) : [];
+
+    validateSelectedTableAfterReload();
+    renderTableMap();
+  } catch (error) {
+    console.error("Lỗi loadTables:", error);
+    tableMapGrid.innerHTML = `<div style="color:#f87171;">Không thể tải danh sách bàn.</div>`;
   }
+}
 
   function validateSelectedTableAfterReload() {
     if (!selectedTableId) return;

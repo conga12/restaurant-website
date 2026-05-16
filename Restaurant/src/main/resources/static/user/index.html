@@ -30,16 +30,19 @@
     </div>
     <div class="header-nav">
     <nav>
-      <a href="index.html">Home</a>
-      <a href="menu.html">Menu</a>
-      <a href="reservation.html">Reservations</a>
-      <a href="/user/reservation-history.html">My Bookings</a>
-      <a href="/user/review.html">Reviews</a>
-      <a href="contact.html">Contact</a>
+      <a href="index.html">TRANG CHỦ</a>
+      <a href="menu.html">MÓN ĂN</a>
+      <a href="reservation.html">ĐẶT BÀN</a>
+      <a href="/user/reservation-history.html">BÀN ĐÃ ĐẶT</a>
+      <a href="/user/review.html">ĐÁNH GIÁ</a>
+      <a href="contact.html">LIÊN HỆ</a>
     </nav>
     </div>
     <div class="header-reserve">
-    <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
+      <button class="btn btn-reserve"
+              onclick="window.location.href='/auth/login.html?redirect=' + encodeURIComponent(window.location.pathname)">
+        Login
+      </button>
     </div>
     <div class="hamburger">
       <span></span>
@@ -68,54 +71,14 @@
 <section class="container">
   <div class="grid grid-2">
     <div>
-      <h2>About Us</h2>
-      <p>RestaurantOS is a premier fine dining establishment dedicated to delivering an unforgettable culinary experience. With over 15 years of excellence, we combine traditional flavors with modern techniques.</p>
-      <p>Our award-winning chefs source the finest local and international ingredients to create dishes that delight the palate and inspire conversation.</p>
-      <p>Whether you're celebrating a special occasion or enjoying a casual evening, RestaurantOS welcomes you to our table.</p>
-      <a href="menu.html" class="btn btn-primary mt-3">Explore Our Menu</a>
+      <h2>Về chúng tôi</h2>
+      <p>Nhà hàng Hương Việt là không gian ẩm thực đậm đà bản sắc Việt, nơi chúng tôi gìn giữ hương vị truyền thống và nâng tầm bằng cách chế biến tinh tế, hiện đại. Với sự chỉn chu trong từng nguyên liệu và cách trình bày, Hương Việt mong muốn mang đến cho thực khách một trải nghiệm gần gũi nhưng vẫn sang trọng và đáng nhớ.</p>
+      <p>Chúng tôi chọn lọc nguyên liệu tươi ngon theo mùa, ưu tiên đặc sản Việt Nam và gia vị quen thuộc để tạo nên những món ăn hài hòa giữa vị xưa và gu thưởng thức hôm nay.</p>
+      <p>Dù bạn đến để sum vầy cùng gia đình, gặp gỡ bạn bè hay tổ chức một dịp đặc biệt, Hương Việt luôn hân hạnh được chào đón và phục vụ bạn bằng sự ấm áp, chân thành.</p>
+      <a href="menu.html" class="btn btn-primary mt-3">Khám phá món ăn</a>
     </div>
     <div>
       <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&h=400&fit=crop" alt="Restaurant interior" class="card-image" style="border-radius: 8px; margin-top: 0;">
-    </div>
-  </div>
-</section>
-
-<!-- ============================================
-     FEATURED DISHES SECTION
-     ============================================ -->
-<section class="featured-section">
-  <div class="container">
-    <div class="section-title">
-      <h2>Chef's Featured Dishes</h2>
-      <p>Discover our most celebrated creations</p>
-    </div>
-    <div class="grid grid-3">
-      <!-- Dish 1 -->
-      <div class="card animate-fade-in-up" style="animation-delay: 0.2s">
-        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop" alt="Pan-Seared Salmon" class="card-image">
-        <h3 class="card-title">Pan-Seared Salmon</h3>
-        <p class="card-subtitle">With lemon beurre blanc and seasonal vegetables</p>
-        <p class="card-price">$32</p>
-        <a href="menu.html" class="btn btn-secondary">View Full Menu</a>
-      </div>
-
-      <!-- Dish 2 -->
-      <div class="card animate-fade-in-up" style="animation-delay: 0.4s">
-        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561286?w=400&h=300&fit=crop" alt="Ribeye Steak" class="card-image">
-        <h3 class="card-title">Premium Ribeye Steak</h3>
-        <p class="card-subtitle">Dry-aged 45 days, served with truffle mashed potatoes</p>
-        <p class="card-price">$48</p>
-        <a href="menu.html" class="btn btn-secondary">View Full Menu</a>
-      </div>
-
-      <!-- Dish 3 -->
-      <div class="card animate-fade-in-up" style="animation-delay: 0.6s">
-        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop" alt="Lobster Tail" class="card-image">
-        <h3 class="card-title">Atlantic Lobster Tail</h3>
-        <p class="card-subtitle">Butter-poached, served with seasonal greens</p>
-        <p class="card-price">$44</p>
-        <a href="menu.html" class="btn btn-secondary">View Full Menu</a>
-      </div>
     </div>
   </div>
 </section>
@@ -125,92 +88,33 @@
      ============================================ -->
 <section class="container">
   <div class="section-title">
-    <h2>Why Choose RestaurantOS</h2>
-    <p>Excellence in every detail</p>
+    <h2>Tại sao chọn Hương Việt</h2>
+    <p>Tuyệt vời trong từng cảm xúc</p>
   </div>
   <div class="grid grid-3">
     <div class="card">
-      <h3 style="text-align: center; color: var(--color-accent);">🍽️ Culinary Excellence</h3>
-      <p>Our award-winning chefs craft each dish with meticulous attention to quality and presentation.</p>
+      <h3 style="text-align: center; color: var(--color-accent);">🍽️ Tinh hoa ẩm thực</h3>
+      <p>Đội ngũ đầu bếp giàu kinh nghiệm chăm chút từng món ăn, chú trọng chất lượng và cách trình bày..</p>
     </div>
     <div class="card">
-      <h3 style="text-align: center; color: var(--color-accent);">🌟 Exceptional Service</h3>
-      <p>Our trained staff provides personalized service tailored to your dining preferences.</p>
+      <h3 style="text-align: center; color: var(--color-accent);">🌟 Dịch vụ tận tâm</h3>
+      <p>Nhân viên được đào tạo bài bản, phục vụ chu đáo và linh hoạt theo nhu cầu của bạn.</p>
     </div>
     <div class="card">
-      <h3 style="text-align: center; color: var(--color-accent);">✨ Elegant Ambiance</h3>
-      <p>Dine in our beautifully appointed spaces designed for intimate and celebratory moments.</p>
+      <h3 style="text-align: center; color: var(--color-accent);">✨ Không gian sang trọng</h3>
+      <p>Không gian được thiết kế tinh tế, phù hợp cho những buổi gặp gỡ ấm cúng và dịp kỷ niệm.</p>
     </div>
     <div class="card">
-      <h3 style="text-align: center; color: var(--color-accent);">🏆 Award-Winning</h3>
-      <p>Recognized by leading culinary organizations for our innovation and consistency.</p>
+      <h3 style="text-align: center; color: var(--color-accent);">🏆 Được ghi nhận</h3>
+      <p>Được ghi nhận bởi các đơn vị ẩm thực uy tín nhờ sự sáng tạo và chất lượng ổn định.</p>
     </div>
     <div class="card">
-      <h3 style="text-align: center; color: var(--color-accent);">🌍 Premium Ingredients</h3>
-      <p>We source the finest local and international ingredients for optimal flavor.</p>
+      <h3 style="text-align: center; color: var(--color-accent);">🌍 Nguyên liệu thượng hạng</h3>
+      <p>Chọn lọc nguyên liệu tươi ngon trong nước và quốc tế để mang lại hương vị trọn vẹn.</p>
     </div>
     <div class="card">
-      <h3 style="text-align: center; color: var(--color-accent);">💝 Special Events</h3>
-      <p>Perfect venue for weddings, anniversaries, and corporate celebrations.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================
-     TESTIMONIALS SECTION
-     ============================================ -->
-<section class="container">
-  <div class="section-title">
-    <h2>What Our Guests Say</h2>
-    <p>Join thousands of satisfied diners</p>
-  </div>
-  <div class="grid grid-2">
-    <div class="testimonial-card">
-      <div class="stars">
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-      </div>
-      <p class="testimonial-text">"An absolutely exceptional dining experience. The food was exquisite, the service impeccable, and the atmosphere perfect for our anniversary celebration."</p>
-      <p class="testimonial-author">- Sarah Johnson</p>
-    </div>
-
-    <div class="testimonial-card">
-      <div class="stars">
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-      </div>
-      <p class="testimonial-text">"Every dish was a masterpiece. The chef's attention to detail is remarkable, and the wine pairings were spot-on. Will definitely return!"</p>
-      <p class="testimonial-author">- Michael Chen</p>
-    </div>
-
-    <div class="testimonial-card">
-      <div class="stars">
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-      </div>
-      <p class="testimonial-text">"RestaurantOS is simply the best. The ambiance is elegant, the staff is attentive, and the food is absolutely divine. Highly recommend!"</p>
-      <p class="testimonial-author">- Emily Rodriguez</p>
-    </div>
-
-    <div class="testimonial-card">
-      <div class="stars">
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-      </div>
-      <p class="testimonial-text">"Outstanding experience from start to finish. The chef's tasting menu was innovative and delicious. Worth every penny!"</p>
-      <p class="testimonial-author">- David Thompson</p>
+      <h3 style="text-align: center; color: var(--color-accent);">💝 Sự kiện đặc biệt</h3>
+      <p>Địa điểm lý tưởng cho tiệc cưới, kỷ niệm và sự kiện doanh nghiệp.</p>
     </div>
   </div>
 </section>
@@ -218,23 +122,124 @@
 <!-- ============================================
      CTA SECTION
      ============================================ -->
-<section style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%); color: white; text-align: center; padding: 4rem 2rem;">
-  <div class="container">
-    <h2 style="color: white; margin-bottom: 1rem;">Ready for an Unforgettable Experience?</h2>
-    <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 2rem; font-size: 1.1rem;">Book your table today and discover why RestaurantOS is the destination for fine dining.</p>
-    <button class="btn btn-primary" onclick="window.location.href='reservation.html'">Reserve Your Table</button>
+<section class="container faq-ot">
+  <div class="faq-ot-top">
+    <div>
+      <h2 class="faq-ot-title">Câu hỏi thường gặp</h2>
+      <p class="faq-ot-sub">
+        Những thắc mắc phổ biến về đặt bàn, đặt món và đánh giá tại Hương Việt.
+      </p>
+    </div>
+
+    <div class="faq-ot-intro">
+      <h3>Hương Việt giúp bạn đặt bàn nhanh chóng</h3>
+      <p>
+        Bạn có thể xem menu, đặt bàn trực tuyến, theo dõi lịch sử đặt bàn và gửi đánh giá sau khi trải nghiệm.
+        Nếu cần hỗ trợ, chatbot AI sẽ trả lời các câu hỏi thường gặp.
+      </p>
+    </div>
+  </div>
+
+  <!-- “How it works” cards -->
+  <div class="faq-ot-cards">
+    <div class="faq-ot-card">
+      <div class="faq-ot-ico">🍽️</div>
+      <div class="faq-ot-card-title">Khám phá món ăn</div>
+      <div class="faq-ot-card-desc">Xem menu, lọc theo danh mục và xem chi tiết món.</div>
+    </div>
+    <div class="faq-ot-card">
+      <div class="faq-ot-ico">🗓️</div>
+      <div class="faq-ot-card-title">Đặt bàn dễ dàng</div>
+      <div class="faq-ot-card-desc">Chọn ngày/giờ/số khách và chọn bàn trống.</div>
+    </div>
+    <div class="faq-ot-card">
+      <div class="faq-ot-ico">🔔</div>
+      <div class="faq-ot-card-title">Theo dõi trạng thái</div>
+      <div class="faq-ot-card-desc">Xem lịch sử đặt bàn và trạng thái xác nhận.</div>
+    </div>
+    <div class="faq-ot-card">
+      <div class="faq-ot-ico">🤖</div>
+      <div class="faq-ot-card-title">AI hỗ trợ</div>
+      <div class="faq-ot-card-desc">Chatbot AI + phân tích review giúp trải nghiệm tốt hơn.</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="faq-ot-tabs" role="tablist" aria-label="FAQ tabs">
+    <button class="faq-ot-tab is-active" data-tab="tab-discovery" type="button">Khám phá</button>
+    <button class="faq-ot-tab" data-tab="tab-reservation" type="button">Đặt bàn</button>
+    <button class="faq-ot-tab" data-tab="tab-orders" type="button">Đặt món</button>
+    <button class="faq-ot-tab" data-tab="tab-reviews" type="button">Đánh giá & AI</button>
+  </div>
+
+  <!-- Tab panels -->
+  <div class="faq-ot-panels">
+    <div class="faq-ot-panel is-active" id="tab-discovery">
+      <div class="faq-ot-accordion">
+        <button class="faq-ot-q" type="button">Tôi có thể xem thực đơn ở đâu?</button>
+        <div class="faq-ot-a">
+          Bạn vào mục <b>Menu</b> để xem món ăn, giá, mô tả và hình ảnh.
+        </div>
+
+        <button class="faq-ot-q" type="button">Có thể lọc món theo danh mục không?</button>
+        <div class="faq-ot-a">
+          Có. Menu hỗ trợ lọc theo danh mục (khai vị, món chính, tráng miệng, đồ uống…).
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-ot-panel" id="tab-reservation">
+      <div class="faq-ot-accordion">
+        <button class="faq-ot-q" type="button">Làm sao để đặt bàn?</button>
+        <div class="faq-ot-a">
+          Vào <b>Reservations</b>, chọn ngày/giờ/số khách và chọn bàn còn trống để gửi yêu cầu.
+        </div>
+
+        <button class="faq-ot-q" type="button">Tôi xem lịch sử đặt bàn ở đâu?</button>
+        <div class="faq-ot-a">
+          Vào <b>My Bookings</b> để xem danh sách đặt bàn, trạng thái và chi tiết.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-ot-panel" id="tab-orders">
+      <div class="faq-ot-accordion">
+        <button class="faq-ot-q" type="button">Tôi có thể đặt món trước không?</button>
+        <div class="faq-ot-a">
+          Có. Bạn có thể đặt món theo mã đặt bàn (nếu nhà hàng hỗ trợ) để tiết kiệm thời gian.
+        </div>
+
+        <button class="faq-ot-q" type="button">Có hỗ trợ thanh toán online không?</button>
+        <div class="faq-ot-a">
+          Hệ thống hỗ trợ phương thức thanh toán theo cấu hình của nhà hàng (online/cash…).
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-ot-panel" id="tab-reviews">
+      <div class="faq-ot-accordion">
+        <button class="faq-ot-q" type="button">Tôi có thể đánh giá sau khi ăn không?</button>
+        <div class="faq-ot-a">
+          Có. Sau khi hoàn thành trải nghiệm, bạn có thể gửi review và hình ảnh (nếu bật).
+        </div>
+
+        <button class="faq-ot-q" type="button">AI được dùng để làm gì?</button>
+        <div class="faq-ot-a">
+          AI hỗ trợ chatbot trả lời câu hỏi thường gặp và hỗ trợ phân tích nội dung đánh giá
+          (tóm tắt/nhận diện cảm xúc/gợi ý phản hồi).
+        </div>
+      </div>
+    </div>
   </div>
 </section>
-
 <!-- ============================================
      FOOTER
      ============================================ -->
 <footer>
   <div class="footer-content">
-    <!-- Restaurant Info -->
     <div class="footer-section">
-      <h4>RestaurantOS</h4>
-      <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+      <h4>Hương Việt</h4>
+      <p>Trải nghiệm ẩm thực cao cấp với dịch vụ tận tâm và tinh hoa ẩm thực Việt.</p>
       <div class="social-links">
         <a href="#facebook" title="Facebook">f</a>
         <a href="#twitter" title="Twitter">𝕏</a>
@@ -243,37 +248,34 @@
       </div>
     </div>
 
-    <!-- Quick Links -->
     <div class="footer-section">
       <h4>Quick Links</h4>
-      <a href="index.html">Home</a>
-      <a href="menu.html">Menu</a>
-      <a href="reservation.html">Reservations</a>
-      <a href="review.html">Reviews</a>
-      <a href="contact.html">Contact</a>
+      <a href="index.html">Trang chủ</a>
+      <a href="menu.html">Món ăn</a>
+      <a href="reservation.html">Đặt bàn</a>
+      <a href="review.html">Bàn đã đặt</a>
+      <a href="contact.html">Liên hệ</a>
     </div>
 
-    <!-- Hours -->
     <div class="footer-section">
-      <h4>Hours of Operation</h4>
-      <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
-      <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
-      <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
-      <p><strong>Closed:</strong> Mondays (except holidays)</p>
+      <h4>Giờ mở cửa</h4>
+      <p><strong>Thứ 2 - Thứ 5:</strong> 5:00 PM - 10:00 PM</p>
+      <p><strong>Thứ 6 - Thứ 7:</strong> 5:00 PM - 11:00 PM</p>
+      <p><strong>Chủ nhật:</strong> 5:00 PM - 9:00 PM</p>
+      <p><strong>Đóng cửa:</strong> Nếu có nghỉ lễ</p>
     </div>
 
-    <!-- Contact -->
     <div class="footer-section">
-      <h4>Contact Info</h4>
+      <h4>Thông tin liên lạc</h4>
       <p>📍 123 Gourmet Street, Food City, FC 12345</p>
       <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
-      <p>✉️ <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
-      <p>🌐 www.restaurantos.com</p>
+      <p>✉️ <a href="mailto:info@restaurantos.com">info@huongviet.com</a></p>
+      <p>🌐 www.HuongViet.com</p>
     </div>
   </div>
 
   <div class="footer-bottom">
-    <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    <p>&copy; 2020 HuongViet. Bảo lưu mọi quyền. | <a href="#">Chính sách bảo mật</a> | <a href="#">Điều khoản dịch vụ</a></p>
   </div>
 </footer>
 
@@ -312,5 +314,39 @@
 <script src="assets/js/main.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Tabs
+  document.querySelectorAll('.faq-ot-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.faq-ot-tab').forEach(b => b.classList.remove('is-active'));
+      document.querySelectorAll('.faq-ot-panel').forEach(p => p.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const id = btn.getAttribute('data-tab');
+      document.getElementById(id)?.classList.add('is-active');
+    });
+  });
+
+  // Accordion (only one open at a time in each panel)
+  document.querySelectorAll('.faq-ot-accordion').forEach(acc => {
+    acc.addEventListener('click', (e) => {
+      const q = e.target.closest('.faq-ot-q');
+      if (!q) return;
+      const a = q.nextElementSibling;
+      if (!a || !a.classList.contains('faq-ot-a')) return;
+
+      // close others
+      acc.querySelectorAll('.faq-ot-a').forEach(x => { if (x !== a) x.style.display = 'none'; });
+      acc.querySelectorAll('.faq-ot-q').forEach(x => { if (x !== q) x.classList.remove('is-open'); });
+
+      // toggle current
+      const open = a.style.display === 'block';
+      a.style.display = open ? 'none' : 'block';
+      q.classList.toggle('is-open', !open);
+    });
+
+    // start collapsed
+    acc.querySelectorAll('.faq-ot-a').forEach(a => a.style.display = 'none');
+  });
+</script>
 </body>
 </html>

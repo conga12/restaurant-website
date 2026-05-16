@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="RestaurantOS Menu - Khám phá thực đơn nhà hàng">
-  <title>Menu - RestaurantOS</title>
+  <meta name="description" content="Hương Việt Menu - Khám phá thực đơn nhà hàng">
+  <title>Menu - HuongVietRes</title>
   <link rel="stylesheet" href="/user/assets/css/style.css">
   <!-- Global Styles -->
   <link rel="stylesheet" href="/user/assets/css/global-style.css">
@@ -157,11 +157,21 @@
       color: #b91c1c;
     }
 
-    .menu-grid-custom {
+    .menu-grid-custom{
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 1.4rem;
       margin-bottom: 3rem;
+    }
+
+    @media (max-width: 1100px){
+      .menu-grid-custom{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 900px){
+      .menu-grid-custom{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px){
+      .menu-grid-custom{ grid-template-columns: 1fr; }
     }
 
     .menu-card {
@@ -312,16 +322,19 @@
     </div>
     <div class="header-nav">
       <nav>
-        <a href="index.html">Home</a>
-        <a href="menu.html">Menu</a>
-        <a href="reservation.html">Reservations</a>
-        <a href="/user/reservation-history.html">My Bookings</a>
-        <a href="review.html">Reviews</a>
-        <a href="contact.html">Contact</a>
+        <a href="index.html">TRANG CHỦ</a>
+        <a href="menu.html">MÓN ĂN</a>
+        <a href="reservation.html">ĐẶT BÀN</a>
+        <a href="/user/reservation-history.html">BÀN ĐÃ ĐẶT</a>
+        <a href="/user/review.html">ĐÁNH GIÁ</a>
+        <a href="contact.html">LIÊN HỆ</a>
       </nav>
     </div>
     <div class="header-reserve">
-      <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
+      <button class="btn btn-reserve"
+              onclick="window.location.href='/auth/login.html?redirect=' + encodeURIComponent(window.location.pathname)">
+        Login
+      </button>
     </div>
     <div class="hamburger">
       <span></span>
@@ -334,32 +347,25 @@
 <section class="container">
   <div class="menu-hero">
     <div class="menu-hero-content">
-      <div class="menu-hero-badge">RestaurantOS Menu</div>
-      <h1>Discover our signature dishes</h1>
+      <div class="menu-hero-badge">Thực đơn nhà hàng</div>
+      <h1>Khám phá các món đặc trưng của chúng tôi</h1>
       <p>
-        Explore our carefully selected menu, from light starters to satisfying mains,
-        refined desserts, and refreshing beverages.
+        Khám phá thực đơn được chọn lọc kỹ lưỡng của chúng tôi, từ món khai vị nhẹ nhàng, món chính hấp dẫn, tráng miệng tinh tế đến đồ uống mát lành.
       </p>
     </div>
   </div>
 
   <div class="menu-toolbar">
     <div class="menu-search">
-      <input type="text" id="searchInput" placeholder="Search dishes..." oninput="applyFilters()">
+      <input type="text" id="searchInput" placeholder="Tìm món..." oninput="applyFilters()">
     </div>
     <div class="menu-count-box">
-      <small>Dishes showing</small>
+      <small>Số món</small>
       <strong id="dishCount">0</strong>
     </div>
   </div>
 
-  <div class="menu-filter-bar">
-    <button class="btn btn-primary filter-btn active" data-filter="all" onclick="setCategoryFilter('all', this)">All Dishes</button>
-    <button class="btn btn-outline filter-btn" data-filter="appetizer" onclick="setCategoryFilter('appetizer', this)">Appetizers</button>
-    <button class="btn btn-outline filter-btn" data-filter="main" onclick="setCategoryFilter('main', this)">Main Courses</button>
-    <button class="btn btn-outline filter-btn" data-filter="dessert" onclick="setCategoryFilter('dessert', this)">Desserts</button>
-    <button class="btn btn-outline filter-btn" data-filter="beverage" onclick="setCategoryFilter('beverage', this)">Beverages</button>
-  </div>
+  <div class="menu-filter-bar" id="categoryFilterBar"></div>
 
   <div id="infoBox" class="menu-status info show">Loading menu...</div>
   <div id="errorBox" class="menu-status error"></div>
@@ -368,22 +374,48 @@
 </section>
 
 <div id="menuModal" class="modal">
-  <div class="modal-content">
+  <div class="modal-content" style="max-width: 920px;">
     <div class="modal-header">
       <h3 id="modalTitle">Dish Details</h3>
       <button class="modal-close" onclick="closeModal('menuModal')">&times;</button>
     </div>
-    <p id="modalDescription"></p>
-    <p id="modalPrice" class="card-price"></p>
-    <button class="btn btn-secondary" onclick="closeModal('menuModal')">Close</button>
+
+    <div style="display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start;">
+      <!-- LEFT: image -->
+      <div>
+        <img id="modalImage" src="/images/no-image.jpg" alt="Dish image"
+             style="width:100%;height:260px;object-fit:cover;border-radius:16px;background:#e5e7eb;">
+        <div id="modalBadge"
+             style="display:inline-block;margin-top:10px;padding:8px 12px;border-radius:999px;font-weight:700;font-size:12px;background:#ecfdf5;color:#047857;">
+          Available
+        </div>
+      </div>
+
+      <!-- RIGHT: info -->
+      <div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+          <span id="modalCategory" class="menu-card-tag">Category</span>
+          <span id="modalId" class="menu-card-tag" style="background:#eef2ff;color:#3730a3;">ID: -</span>
+        </div>
+
+        <div id="modalPrice" class="card-price" style="font-size:28px;font-weight:800;margin:10px 0;"></div>
+
+        <p id="modalDescription" style="color:#475569;margin:0 0 12px;"></p>
+        <h4 style="margin:14px 0 6px;">Mô tả</h4>
+        <p id="modalLongDescription" style="color:#334155;margin:0;line-height:1.7;"></p>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn btn-secondary" onclick="closeModal('menuModal')">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <footer>
   <div class="footer-content">
     <div class="footer-section">
-      <h4>RestaurantOS</h4>
-      <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+      <h4>Hương Việt</h4>
+      <p>Trải nghiệm ẩm thực cao cấp với dịch vụ tận tâm và tinh hoa ẩm thực Việt.</p>
       <div class="social-links">
         <a href="#facebook" title="Facebook">f</a>
         <a href="#twitter" title="Twitter">𝕏</a>
@@ -394,32 +426,32 @@
 
     <div class="footer-section">
       <h4>Quick Links</h4>
-      <a href="index.html">Home</a>
-      <a href="menu.html">Menu</a>
-      <a href="reservation.html">Reservations</a>
-      <a href="review.html">Reviews</a>
-      <a href="contact.html">Contact</a>
+      <a href="index.html">Trang chủ</a>
+      <a href="menu.html">Món ăn</a>
+      <a href="reservation.html">Đặt bàn</a>
+      <a href="review.html">Bàn đã đặt</a>
+      <a href="contact.html">Liên hệ</a>
     </div>
 
     <div class="footer-section">
-      <h4>Hours of Operation</h4>
-      <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
-      <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
-      <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
-      <p><strong>Closed:</strong> Mondays (except holidays)</p>
+      <h4>Giờ mở cửa</h4>
+      <p><strong>Thứ 2 - Thứ 5:</strong> 5:00 PM - 10:00 PM</p>
+      <p><strong>Thứ 6 - Thứ 7:</strong> 5:00 PM - 11:00 PM</p>
+      <p><strong>Chủ nhật:</strong> 5:00 PM - 9:00 PM</p>
+      <p><strong>Đóng cửa:</strong> Nếu có nghỉ lễ</p>
     </div>
 
     <div class="footer-section">
-      <h4>Contact Info</h4>
+      <h4>Thông tin liên lạc</h4>
       <p>📍 123 Gourmet Street, Food City, FC 12345</p>
       <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
-      <p>✉️ <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
-      <p>🌐 www.restaurantos.com</p>
+      <p>✉️ <a href="mailto:info@restaurantos.com">info@huongviet.com</a></p>
+      <p>🌐 www.HuongViet.com</p>
     </div>
   </div>
 
   <div class="footer-bottom">
-    <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    <p>&copy; 2020 HuongViet. Bảo lưu mọi quyền. | <a href="#">Chính sách bảo mật</a> | <a href="#">Điều khoản dịch vụ</a></p>
   </div>
 </footer>
 
@@ -429,7 +461,8 @@
   const menuGrid = document.getElementById('menuGrid');
   const dishCount = document.getElementById('dishCount');
   const searchInput = document.getElementById('searchInput');
-
+  const categoryFilterBar = document.getElementById('categoryFilterBar');
+  let categories = [];
   let allDishes = [];
   let currentCategory = 'all';
 
@@ -457,17 +490,6 @@
     return Number(value || 0).toLocaleString('vi-VN') + 'đ';
   }
 
-  function mapCategoryName(categoryName) {
-    const value = (categoryName || '').toLowerCase();
-
-    if (value.includes('starter') || value.includes('appetizer') || value.includes('khai vị')) return 'appetizer';
-    if (value.includes('main') || value.includes('món chính')) return 'main';
-    if (value.includes('dessert') || value.includes('tráng miệng')) return 'dessert';
-    if (value.includes('drink') || value.includes('beverage') || value.includes('đồ uống')) return 'beverage';
-
-    return 'main';
-  }
-
   function setCategoryFilter(category, button) {
     currentCategory = category;
 
@@ -483,24 +505,27 @@
   }
 
   function applyFilters() {
-    const keyword = searchInput.value.trim().toLowerCase();
+  const keyword = searchInput.value.trim().toLowerCase();
+  let filtered = [...allDishes];
 
-    let filtered = [...allDishes];
-
-    if (currentCategory !== 'all') {
-      filtered = filtered.filter(dish => dish.uiCategory === currentCategory);
-    }
-
-    if (keyword) {
-      filtered = filtered.filter(dish => {
-        const name = (dish.name || '').toLowerCase();
-        const desc = (dish.description || '').toLowerCase();
-        return name.includes(keyword) || desc.includes(keyword);
-      });
-    }
-
-    renderDishes(filtered);
+  // lọc theo categoryId
+  if (currentCategory !== 'all') {
+    filtered = filtered.filter(d =>
+      String(d.categoryId) === String(currentCategory)
+    );
   }
+
+  // lọc theo keyword
+  if (keyword) {
+    filtered = filtered.filter(d => {
+      const name = (d.name || '').toLowerCase();
+      const desc = (d.description || '').toLowerCase();
+      return name.includes(keyword) || desc.includes(keyword);
+    });
+  }
+
+  renderDishes(filtered);
+}
 
   function escapeHtml(text) {
     return String(text || '')
@@ -553,18 +578,18 @@
 
     dishes.forEach(dish => {
       console.log('👉 dish object:', dish);
-  console.log('👉 dish.imageUrl:', dish.imageUrl);
+      console.log('👉 dish.imageUrl:', dish.imageUrl);
 
-  const imageSrc = getImageUrl(dish.imageUrl);
+      const imageSrc = getImageUrl(dish.imageUrl);
 
-  console.log('👉 final imageSrc:', imageSrc);
+      console.log('👉 final imageSrc:', imageSrc);
       const dishName = escapeHtml(dish.name || 'Unnamed Dish');
       const dishDescription = escapeHtml(dish.description || 'No description available for this dish yet.');
       const dishPrice = formatPrice(dish.price);
 
       const card = document.createElement('div');
       card.className = 'menu-card';
-      card.setAttribute('data-category', dish.uiCategory);
+      card.setAttribute('data-category', dish.categoryId);
 
       card.innerHTML = `
         <div class="menu-card-image-wrap">
@@ -593,11 +618,7 @@
       const detailButton = card.querySelector('button');
       detailButton.addEventListener('click', function () {
         openModal('menuModal');
-        setMenuDetails(
-          dish.name || 'Unnamed Dish',
-          dishPrice,
-          dish.description || 'No description available.'
-        );
+        setMenuDetails(dish);
       });
 
       menuGrid.appendChild(card);
@@ -619,7 +640,7 @@
       allDishes = (Array.isArray(data) ? data : []).map(dish => ({
         ...dish,
         imageUrl: (dish.imageUrl || '').trim(),
-        uiCategory: mapCategoryName(dish.category?.name || '')
+        categoryId: dish.categoryId ?? null   // ✅ dùng field DTO trả về
       }));
 
       applyFilters();
@@ -635,13 +656,91 @@
     }
   }
 
-  function setMenuDetails(title, price, description) {
-    document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalPrice').textContent = price;
-    document.getElementById('modalDescription').textContent = description;
+  function formatDateTime(value) {
+  if (!value) return '-';
+  // nếu backend trả ISO string
+  const d = new Date(value);
+  if (!isNaN(d.getTime())) return d.toLocaleString('vi-VN');
+  return String(value);
+}
+function renderCategoryButtons(categories) {
+  categoryFilterBar.innerHTML = '';
+
+  // Tất cả
+  const allBtn = document.createElement('button');
+  allBtn.className = 'btn btn-primary filter-btn active';
+  allBtn.textContent = 'Tất cả';
+  allBtn.onclick = () => setCategoryFilter('all', allBtn);
+  categoryFilterBar.appendChild(allBtn);
+
+  // Theo DB
+  categories.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-outline filter-btn';
+    btn.textContent = c.name;
+    btn.onclick = () => setCategoryFilter(String(c.id), btn);
+    categoryFilterBar.appendChild(btn);
+  });
+}
+async function loadCategories() {
+  const res = await fetch('/api/categories');
+  if (!res.ok) throw new Error('Không tải được danh mục');
+  categories = await res.json();
+  renderCategoryButtons(categories);
+}
+
+function setMenuDetails(dish) {
+  const title = dish?.name || 'Unnamed Dish';
+  const price = formatPrice(dish?.price);
+  const desc = dish?.description || 'No description available.';
+  const category = dish?.categoryName || 'Unknown';
+  const id = dish?.id != null ? String(dish.id) : '-';
+
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalPrice').textContent = price;
+  document.getElementById('modalDescription').textContent = desc;
+
+  const img = document.getElementById('modalImage');
+  img.src = getImageUrl(dish?.imageUrl);
+  img.onerror = function () { handleImageError(this); };
+
+  const badge = document.getElementById('modalBadge');
+  // nếu dish có available/status thì dùng, còn không mặc định Available
+  const available = (dish?.available ?? dish?.isAvailable);
+  if (available === false) {
+    badge.textContent = 'Out of stock';
+    badge.style.background = '#fef2f2';
+    badge.style.color = '#b91c1c';
+  } else {
+    badge.textContent = 'Available';
+    badge.style.background = '#ecfdf5';
+    badge.style.color = '#047857';
   }
 
-  loadMenu();
+  document.getElementById('modalCategory').textContent = category;
+  document.getElementById('modalId').textContent = 'ID: ' + id;
+  const shortDesc = dish?.description || '';
+  document.getElementById('modalDescription').textContent = shortDesc;
+
+  document.getElementById('modalLongDescription').textContent =
+    shortDesc && shortDesc.length >= 40
+      ? shortDesc
+      : (shortDesc
+          ? (shortDesc + " — Món ăn phù hợp dùng kèm nước chấm, phục vụ tươi mỗi ngày.")
+          : "Món ăn được chế biến từ nguyên liệu tươi, phù hợp cho mọi lứa tuổi. Vui lòng liên hệ nếu bạn cần thông tin dị ứng/thành phần.");
+
+}
+
+  (async function init() {
+  try {
+    showInfo('Loading menu...');
+    await loadCategories();
+    await loadMenu();
+  } catch (e) {
+    hideInfo();
+    showError(e.message || 'An error occurred while loading the menu.');
+  }
+})();
 </script>
 <script src="/user/assets/js/main.js"></script>
 </body>

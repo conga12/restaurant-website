@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đặt Món Trước - RestaurantOS</title>
+    <title>Đặt Món Trước - HuongVietRes</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <!-- Global Styles -->
     <link rel="stylesheet" href="/user/assets/css/global-style.css">
@@ -577,17 +577,19 @@
 <body>
 <header>
     <div class="header-container">
-        <div class="logo">RestaurantOS</div>
+        <div class="logo">HƯƠNG VIỆT</div>
         <nav>
-            <a href="index.html">Home</a>
-            <a href="menu.html">Menu</a>
-            <a href="reservation.html">Reservations</a>
-            <a href="order.html" class="active">Order</a>
-            <a href="/user/reservation-history.html">My Bookings</a>
-            <a href="review.html">Reviews</a>
-            <a href="contact.html">Contact</a>
+            <a href="index.html">TRANG CHỦ</a>
+            <a href="menu.html">MÓN ĂN</a>
+            <a href="reservation.html">ĐẶT BÀN</a>
+            <a href="/user/reservation-history.html">BÀN ĐÃ ĐẶT</a>
+            <a href="/user/review.html">ĐÁNH GIÁ</a>
+            <a href="contact.html">LIÊN HỆ</a>
         </nav>
-        <button class="btn btn-primary" onclick="window.location.href='reservation.html'">Reserve Now</button>
+        <button class="btn btn-reserve"
+                onclick="window.location.href='/auth/login.html?redirect=' + encodeURIComponent(window.location.pathname)">
+            Login
+        </button>
     </div>
 </header>
 
@@ -752,8 +754,46 @@
     </div>
 </div>
 <footer>
-    <div class="container">
-        © 2024 RestaurantOS. All rights reserved.
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>Hương Việt</h4>
+            <p>Trải nghiệm ẩm thực cao cấp với dịch vụ tận tâm và tinh hoa ẩm thực Việt.</p>
+            <div class="social-links">
+                <a href="#facebook" title="Facebook">f</a>
+                <a href="#twitter" title="Twitter">𝕏</a>
+                <a href="#instagram" title="Instagram">📷</a>
+                <a href="#youtube" title="YouTube">▶️</a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <a href="index.html">Trang chủ</a>
+            <a href="menu.html">Món ăn</a>
+            <a href="reservation.html">Đặt bàn</a>
+            <a href="review.html">Bàn đã đặt</a>
+            <a href="contact.html">Liên hệ</a>
+        </div>
+
+        <div class="footer-section">
+            <h4>Giờ mở cửa</h4>
+            <p><strong>Thứ 2 - Thứ 5:</strong> 5:00 PM - 10:00 PM</p>
+            <p><strong>Thứ 6 - Thứ 7:</strong> 5:00 PM - 11:00 PM</p>
+            <p><strong>Chủ nhật:</strong> 5:00 PM - 9:00 PM</p>
+            <p><strong>Đóng cửa:</strong> Nếu có nghỉ lễ</p>
+        </div>
+
+        <div class="footer-section">
+            <h4>Thông tin liên lạc</h4>
+            <p>📍 123 Gourmet Street, Food City, FC 12345</p>
+            <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
+            <p>✉️ <a href="mailto:info@restaurantos.com">info@huongviet.com</a></p>
+            <p>🌐 www.HuongViet.com</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2020 HuongViet. Bảo lưu mọi quyền. | <a href="#">Chính sách bảo mật</a> | <a href="#">Điều khoản dịch vụ</a></p>
     </div>
 </footer>
 

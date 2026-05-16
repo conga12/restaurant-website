@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Reviews - RestaurantOS">
-  <title>Reviews - RestaurantOS</title>
+  <title>Reviews - HuongVietRs</title>
   <link rel="stylesheet" href="/user/assets/css/style.css">
   <link rel="stylesheet" href="/user/assets/css/review-feed.css">
 </head>
@@ -22,16 +22,19 @@
     </div>
     <div class="header-nav">
       <nav>
-        <a href="/user/index.html">Home</a>
-        <a href="/user/menu.html">Menu</a>
-        <a href="/user/reservation.html">Reservations</a>
-        <a href="/user/reservation-history.html">My Bookings</a>
-        <a href="/user/review.html">Reviews</a>
-        <a href="/user/contact.html">Contact</a>
+        <a href="index.html">TRANG CHỦ</a>
+        <a href="menu.html">MÓN ĂN</a>
+        <a href="reservation.html">ĐẶT BÀN</a>
+        <a href="/user/reservation-history.html">BÀN ĐÃ ĐẶT</a>
+        <a href="/user/review.html">ĐÁNH GIÁ</a>
+        <a href="contact.html">LIÊN HỆ</a>
       </nav>
     </div>
     <div class="header-reserve">
-      <button class="btn btn-reserve" onclick="window.location.href='reservation.html'">Reserve Now</button>
+      <button class="btn btn-reserve"
+              onclick="window.location.href='/auth/login.html?redirect=' + encodeURIComponent(window.location.pathname)">
+        Login
+      </button>
     </div>
     <div class="hamburger">
       <span></span>
@@ -46,8 +49,8 @@
      ============================================ -->
 <section class="hero">
   <div class="hero-content">
-    <h1>Guest Reviews</h1>
-    <p>See what our guests have to say about their dining experience</p>
+    <h1>Đánh giá của thượng đế</h1>
+    <p>Khám phá cảm nhận của thực khách về trải nghiệm dùng bữa</p>
   </div>
 </section>
 
@@ -60,7 +63,7 @@
     <div class="card">
       <!-- Review Stats -->
       <h3 id="avgRating" style="color: var(--color-accent); font-size: 2.5rem; margin: 0;">--</h3>
-      <p style="margin: 0;">Average Rating</p>
+      <p style="margin: 0;">Đánh giá</p>
       <div class="stars" style="justify-content: center;">
         <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
       </div>
@@ -68,11 +71,11 @@
 
     <div class="card">
       <h3 id="totalReviews" style="color: var(--color-accent); font-size: 2.5rem; margin: 0;">--</h3>
-      <p style="margin: 0;">Total Reviews</p>
+      <p style="margin: 0;">Tổng</p>
     </div>
     <div class="card">
       <h3 id="recommendedPercent" style="color: var(--color-accent); font-size: 2.5rem; margin: 0;">--%</h3>
-      <p style="margin: 0;">Recommended</p>
+      <p style="margin: 0;">Đề xuất</p>
     </div>
   </div>
 
@@ -81,54 +84,65 @@
     <!-- LEFT -->
     <div class="reviews-left">
       <div class="section-title">
-        <h2>Recent Reviews</h2>
-        <p>Read what our guests have shared about their experience</p>
+        <h2>Đánh giá dịch vụ</h2>
+        <p>Đọc những chia sẻ của thực khách về trải nghiệm của họ</p>
       </div>
 
       <div id="reviewsList" style="min-height: 300px;">
-        <p>Loading reviews...</p>
+        <p>Đang tải dánh giá...</p>
       </div>
     </div>
 
     <!-- RIGHT: Share review -->
     <div class="reviews-right">
       <div class="section-title">
-        <h2>Share Your Experience</h2>
-        <p>We'd love to hear about your dining experience at RestaurantOS</p>
+        <h2>Chia sẻ trải nghiệm của bạn</h2>
+        <p>Chúng tôi rất muốn lắng nghe cảm nhận của bạn về trải nghiệm dùng bữa tại Hương Việt</p>
       </div>
 
       <div class="card" style="padding: 2rem;">
-        <div id="reviewLoginHint" class="card" style="padding: 1rem; display:none; margin-bottom: 1rem;">
-          Vui lòng <a href="/auth/login.html?redirect=/user/review.html">đăng nhập</a> để gửi đánh giá.
+        <div class="card" style="padding: 1rem; margin-bottom: 1rem; border-left: 4px solid var(--color-accent);">
+          <p>Nhập <strong>Email</strong> hoặc <strong>Số điện thoại</strong> bạn đã dùng khi đặt bàn để xem mục có thể đánh giá.</p>
+
+          <input id="reviewLookupIdentity" type="text" class="form-control"
+                 placeholder="Nhập Email hoặc Số điện thoại" oninput="autoLookupDebounced()"/>
+
         </div>
 
         <form id="reviewForm">
           <!-- Eligible target: order/reservation -->
-          <div class="form-group">
-            <label for="reviewTarget">Đánh giá cho *</label>
-            <select id="reviewTarget" required>
-              <option value="">Chọn đơn hàng/đặt bàn đã hoàn thành</option>
-            </select>
-            <div class="form-error"></div>
+          <div id="eligibleWrap" style="display:none;">
+            <div class="form-group">
+              <label for="reviewTarget">Đánh giá cho *</label>
+              <select id="reviewTarget" required>
+                <option value="">Chọn đơn hàng/đặt bàn đã hoàn thành</option>
+              </select>
+              <div class="form-error"></div>
+            </div>
           </div>
 
+<!--          <div id="eligibleStatus" style="margin:-6px 0 12px; color:#64748b; font-size:0.95rem;">-->
+<!--            Nhập Email/SĐT để hiện danh sách.-->
+<!--          </div>-->
+
+          <!-- Rating -->
           <!-- Rating -->
           <div class="form-group">
-            <label for="rating">Rating *</label>
+            <label for="rating">Đánh giá (sao) *</label>
             <select id="rating" name="rating" required>
-              <option value="">Select a rating</option>
-              <option value="5">⭐⭐⭐⭐⭐ Excellent - Outstanding experience</option>
-              <option value="4">⭐⭐⭐⭐ Very Good - Great experience</option>
-              <option value="3">⭐⭐⭐ Good - Satisfactory experience</option>
-              <option value="2">⭐⭐ Fair - Some issues</option>
-              <option value="1">⭐ Poor - Disappointing</option>
+              <option value="">Chọn mức đánh giá</option>
+              <option value="5">⭐⭐⭐⭐⭐ Xuất sắc - Trải nghiệm tuyệt vời</option>
+              <option value="4">⭐⭐⭐⭐ Rất tốt - Trải nghiệm rất hài lòng</option>
+              <option value="3">⭐⭐⭐ Tốt - Trải nghiệm ổn</option>
+              <option value="2">⭐⭐ Trung bình - Có một vài vấn đề</option>
+              <option value="1">⭐ Kém - Chưa hài lòng</option>
             </select>
             <div class="form-error"></div>
           </div>
 
           <!-- Review Text -->
           <div class="form-group">
-            <label for="review-text">Your Review *</label>
+            <label for="review-text">Đánh giá của bạn *</label>
             <textarea id="review-text" name="review" required
                       placeholder="Tell us about your dining experience. What did you enjoy? What could be improved?"
                       style="min-height: 150px;"></textarea>
@@ -149,13 +163,14 @@
 
       <!-- Review Guidelines -->
       <div class="card reviews-guidelines">
-        <h4>Review Guidelines</h4>
+        <h4>Quy định đánh giá</h4>
         <ul style="list-style: none; padding: 0; font-size: 0.95rem;">
-          <li style="padding: 0.5rem 0;">✓ Be honest and fair in your review</li>
-          <li style="padding: 0.5rem 0;">✓ Focus on your personal dining experience</li>
-          <li style="padding: 0.5rem 0;">✓ Avoid offensive language or personal attacks</li>
-          <li style="padding: 0.5rem 0;">✓ Reviews are moderated before publication</li>
-          <li style="padding: 0.5rem 0;">✓ We may not publish reviews without specific details</li>
+          <li style="padding: 0.5rem 0;">✓ Hãy viết đánh giá trung thực và công bằng</li>
+          <li style="padding: 0.5rem 0;">✓ Tập trung vào trải nghiệm dùng bữa của bạn</li>
+          <li style="padding: 0.5rem 0;">✓ Tránh sử dụng ngôn từ phản cảm hoặc công kích cá nhân</li>
+          <li style="padding: 0.5rem 0;">✓ Đánh giá sẽ được kiểm duyệt trước khi hiển thị</li>
+          <li style="padding: 0.5rem 0;">✓ Chúng tôi có thể không hiển thị các đánh giá thiếu thông tin cụ thể</li>
+        </ul>
         </ul>
       </div>
     </div>
@@ -169,8 +184,8 @@
 <footer>
   <div class="footer-content">
     <div class="footer-section">
-      <h4>RestaurantOS</h4>
-      <p>Premium fine dining experience with exceptional service and culinary excellence.</p>
+      <h4>Hương Việt</h4>
+      <p>Trải nghiệm ẩm thực cao cấp với dịch vụ tận tâm và tinh hoa ẩm thực Việt.</p>
       <div class="social-links">
         <a href="#facebook" title="Facebook">f</a>
         <a href="#twitter" title="Twitter">𝕏</a>
@@ -181,32 +196,32 @@
 
     <div class="footer-section">
       <h4>Quick Links</h4>
-      <a href="index.html">Home</a>
-      <a href="menu.html">Menu</a>
-      <a href="reservation.html">Reservations</a>
-      <a href="review.html">Reviews</a>
-      <a href="contact.html">Contact</a>
+      <a href="index.html">Trang chủ</a>
+      <a href="menu.html">Món ăn</a>
+      <a href="reservation.html">Đặt bàn</a>
+      <a href="review.html">Bàn đã đặt</a>
+      <a href="contact.html">Liên hệ</a>
     </div>
 
     <div class="footer-section">
-      <h4>Hours of Operation</h4>
-      <p><strong>Monday - Thursday:</strong> 5:00 PM - 10:00 PM</p>
-      <p><strong>Friday - Saturday:</strong> 5:00 PM - 11:00 PM</p>
-      <p><strong>Sunday:</strong> 5:00 PM - 9:00 PM</p>
-      <p><strong>Closed:</strong> Mondays (except holidays)</p>
+      <h4>Giờ mở cửa</h4>
+      <p><strong>Thứ 2 - Thứ 5:</strong> 5:00 PM - 10:00 PM</p>
+      <p><strong>Thứ 6 - Thứ 7:</strong> 5:00 PM - 11:00 PM</p>
+      <p><strong>Chủ nhật:</strong> 5:00 PM - 9:00 PM</p>
+      <p><strong>Đóng cửa:</strong> Nếu có nghỉ lễ</p>
     </div>
 
     <div class="footer-section">
-      <h4>Contact Info</h4>
+      <h4>Thông tin liên lạc</h4>
       <p>📍 123 Gourmet Street, Food City, FC 12345</p>
       <p>📞 <a href="tel:+1234567890">(123) 456-7890</a></p>
-      <p>✉️ <a href="mailto:info@restaurantos.com">info@restaurantos.com</a></p>
-      <p>🌐 www.restaurantos.com</p>
+      <p>✉️ <a href="mailto:info@restaurantos.com">info@huongviet.com</a></p>
+      <p>🌐 www.HuongViet.com</p>
     </div>
   </div>
 
   <div class="footer-bottom">
-    <p>&copy; 2024 RestaurantOS. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    <p>&copy; 2020 HuongViet. Bảo lưu mọi quyền. | <a href="#">Chính sách bảo mật</a> | <a href="#">Điều khoản dịch vụ</a></p>
   </div>
 </footer>
 

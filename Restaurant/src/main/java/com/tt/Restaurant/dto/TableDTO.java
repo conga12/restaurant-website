@@ -8,6 +8,7 @@ public class TableDTO {
     private String tableType;
     private String location;
     private String status;
+    private Boolean active;
 
     public TableDTO() {
     }
@@ -19,7 +20,19 @@ public class TableDTO {
         this.tableType = tableType;
         this.location = location;
         this.status = status;
+        this.active = true;
     }
+
+    public TableDTO(Long id, Integer tableNumber, Integer capacity, String tableType, String location, String status, Boolean active) {
+        this.id = id;
+        this.tableNumber = tableNumber;
+        this.capacity = capacity;
+        this.tableType = tableType;
+        this.location = location;
+        this.status = status;
+        this.active = active != null ? active : true;
+    }
+
 
     public Long getId() {
         return id;
@@ -68,4 +81,8 @@ public class TableDTO {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public Boolean getActive() { return active; }
+
+    public void setActive(Boolean active) { this.active = active; }
 }

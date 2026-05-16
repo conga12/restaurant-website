@@ -8,21 +8,20 @@ let filteredReservations = [];
 let autoRefreshTimer = null;
 let isLoadingReservations = false;
 
-function formatDateToISO(dateStr) {
-    if (!dateStr) return "";
-    // Nếu là yyyy-MM-dd thì return luôn
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+function notify(message, type = "info") {
+  if (typeof showToast === "function") {
+    showToast(message, type);
+  } else {
+    alert(message);
+  }
+}
 
-    // Nếu là dd/MM/yyyy hoặc d/M/yyyy
-    const parts = dateStr.split("/");
-    if (parts.length === 3 && parts[2].length === 4) {
-        const day = parts[0].padStart(2, "0");
-        const month = parts[1].padStart(2, "0");
-        const year = parts[2];
-        return `${year}-${month}-${day}`;
-    }
-    // Nếu bị thiếu phần (ví dụ "21/04/", "21//2026") thì trả ""
-    return "";
+function isPastDateIso(dateIso) {
+  if (!dateIso) return false;
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // 00:00 today
+  const d = new Date(dateIso + 'T00:00:00');
+  return d < todayStart;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -35,37 +34,76 @@ document.addEventListener("DOMContentLoaded", function () {
     startAutoRefreshReservations();
 });
 
-async function loadReservations() {
-    if (isLoadingReservations) return;
-    isLoadingReservations = true;
+async function loadReservations(page = 0, size = 20) {
+  try {
+    const rawDate = document.getElementById("filterDate")?.value || "";
+    // convert to yyyy-MM-dd (formatDateToISO should exist in file)
+    const dateIso = formatDateToISO(rawDate);
 
-    try {
-        const response = await fetch(API_URL, {
-            credentials: "include"
-        });
-
-        if (response.status === 401 || response.status === 403) {
-            alert("Bạn chưa đăng nhập hoặc không có quyền.");
-            window.location.href = "/auth/login.html";
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error("Không thể tải danh sách đặt bàn");
-        }
-
-        allReservations = await response.json();
-        filteredReservations = [];
-        renderReservationTable(allReservations);
-        updateSummary(allReservations.length, allReservations.length);
-        await loadReservationUnreadBadge();
-    } catch (error) {
-        console.error("Lỗi loadReservations:", error);
-        renderErrorRow("Không thể tải dữ liệu đặt bàn.");
-    } finally {
-        isLoadingReservations = false;
+    // if user entered a date but formatDateToISO returned "", it's invalid input
+    if (rawDate && !dateIso) {
+      notify("Ngày không hợp lệ. Vui lòng chọn ngày theo định dạng yyyy-MM-dd hoặc dd/MM/yyyy.", "warning");
+      return;
     }
+
+    // disallow past dates
+    if (dateIso && isPastDateIso(dateIso)) {
+      notify("Vui lòng chọn ngày hiện tại hoặc tương lai.", "warning");
+      return;
+    }
+
+    const status = document.getElementById("filterStatus")?.value || "";
+    const keyword = (document.getElementById("filterKeyword")?.value || "").trim() || "";
+
+    let url = `/admin/api/reservations?page=${page}&size=${size}`;
+    if (dateIso) url += `&date=${encodeURIComponent(dateIso)}`;
+    if (status) url += `&status=${encodeURIComponent(status)}`;
+    if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+
+    const res = await fetch(url, { credentials: "include" });
+    if (res.status === 401 || res.status === 403) {
+      notify("Bạn chưa đăng nhập hoặc không có quyền.", "danger");
+      window.location.href = "/auth/login.html";
+      return;
+    }
+    if (!res.ok) {
+      throw new Error("Không thể tải danh sách đặt bàn");
+    }
+
+    const data = await res.json();
+
+    // render as before
+    renderReservationTable(data.content);
+    renderPagination(data.totalPages, data.number);
+    updateTableFooter(data);
+    lastPageData = data.content;
+  } catch (err) {
+    console.error("Lỗi loadReservations:", err);
+    renderErrorRow("Không thể tải dữ liệu đặt bàn.");
+  }
 }
+
+// Ensure the date input cannot pick past dates and wire the filter button
+document.addEventListener("DOMContentLoaded", function () {
+  // set min for native date input
+  const filterDateEl = document.getElementById("filterDate");
+  if (filterDateEl) {
+    // If it's a native date input, set min to today
+    if (filterDateEl.type === "date") {
+      const todayIso = new Date().toISOString().slice(0, 10); // yyyy-MM-dd
+      filterDateEl.min = todayIso;
+    }
+    // optional: if user types in dd/MM/yyyy, keep formatDateToISO to validate
+  }
+
+  // ensure filter button triggers loadReservations with validation above
+  const filterBtn = document.getElementById("filter-btn");
+  if (filterBtn) {
+    filterBtn.onclick = function () {
+      loadReservations(0);
+    };
+  }
+});
 
 function renderReservationTable(reservations) {
     const tbody = document.getElementById("reservationTableBody");
@@ -205,16 +243,16 @@ function openCreateModal() {
 }
 
 function resetForm() {
-    const form = document.getElementById("reservationForm");
-    if (form) form.reset();
+  const form = document.getElementById("reservationForm");
+  if (form) form.reset();
 
-    const reservationId = document.getElementById("reservationId");
-    if (reservationId) reservationId.value = "";
+  const reservationId = document.getElementById("reservationId");
+  if (reservationId) reservationId.value = "";
 
-    const tableSelect = document.getElementById("tableId");
-    if (tableSelect) {
-        tableSelect.innerHTML = `<option value="">Tự động chọn bàn phù hợp</option>`;
-    }
+  const tableSelect = document.getElementById("tableId");
+  if (tableSelect) {
+    tableSelect.innerHTML = '<option value="">Tự động chọn bàn phù hợp</option>';
+  }
 }
 
 async function loadAvailableTables() {
@@ -449,7 +487,7 @@ async function saveReservation() {
             !payload.numberOfGuests ||
             !/^\d{4}-\d{2}-\d{2}$/.test(payload.reservationDate) // kiểm tra reservationDate hợp lệ
         ) {
-            alert("Vui lòng nhập đầy đủ thông tin bắt buộc và chọn ngày theo định dạng yyyy-MM-dd.");
+            notify("Vui lòng nhập đầy đủ thông tin bắt buộc và chọn ngày theo định dạng yyyy-MM-dd.", "warning");
             if (btn) btn.disabled = false;
             return;
         }
@@ -505,10 +543,10 @@ async function saveReservation() {
         }
 
         await loadReservations();
-        alert(id ? "Cập nhật đặt bàn thành công" : "Thêm đặt bàn thành công");
+        notify(id ? "Cập nhật đặt bàn thành công" : "Thêm đặt bàn thành công", "success");
     } catch (error) {
         console.error("Lỗi saveReservation:", error);
-        alert(error.message || "Có lỗi xảy ra khi lưu đặt bàn");
+        notify(error.message || "Có lỗi xảy ra khi lưu đặt bàn", "danger");
     } finally {
         if (btn) btn.disabled = false;
     }
@@ -634,70 +672,121 @@ async function completeReservation(id) {
 }
 
 async function cancelReservation(id) {
-    const confirmed = confirm("Bạn có chắc muốn hủy đặt bàn này không?");
+  try {
+    // show modal confirm (returns Promise<boolean>)
+    const confirmed = await confirmDialog("Bạn có chắc muốn hủy đặt bàn này không?");
     if (!confirmed) return;
 
-    try {
-        const response = await fetch(`${API_URL}/${id}/cancel`, {
-            method: "PUT",
-            headers: {
-                "Accept": "application/json"
-            },
-            credentials: "include"
-        });
+    const response = await fetch(`${API_URL}/${id}/cancel`, {
+      method: "PUT",
+      headers: {
+        "Accept": "application/json"
+      },
+      credentials: "include"
+    });
 
-        const text = await response.text();
-        console.log("cancel status:", response.status);
-        console.log("cancel raw:", text);
+    const text = await response.text();
+    console.log("cancel status:", response.status);
+    console.log("cancel raw:", text);
 
-        if (response.status === 401 || response.status === 403) {
-            alert("Bạn không có quyền hủy đặt bàn hoặc phiên đăng nhập đã hết hạn.");
-            window.location.href = "/auth/login.html";
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error(text || "Hủy đặt bàn thất bại");
-        }
-
-        await loadReservations();
-        alert("Đã hủy đặt bàn");
-    } catch (error) {
-        console.error("Lỗi cancelReservation:", error);
-        alert(error.message || "Không thể hủy đặt bàn");
+    if (response.status === 401 || response.status === 403) {
+      // not authorized
+      showToast("Bạn không có quyền hủy đặt bàn hoặc phiên đăng nhập đã hết hạn.", "danger");
+      window.location.href = "/auth/login.html";
+      return;
     }
+
+    if (!response.ok) {
+      // show server error (try parse JSON message if present)
+      let msg = text || "Hủy đặt bàn thất bại";
+      try {
+        const parsed = text ? JSON.parse(text) : null;
+        if (parsed && (parsed.message || parsed.error)) msg = parsed.message || parsed.error;
+      } catch (e) { /* ignore parse error */ }
+      throw new Error(msg);
+    }
+
+    // success: reload list and show toast
+    await loadReservations();
+    showToast("Đã hủy đặt bàn", "success");
+  } catch (error) {
+    console.error("Lỗi cancelReservation:", error);
+    showToast(error.message || "Không thể hủy đặt bàn", "danger");
+  }
 }
 
+// Thay thế hàm viewReservation cũ bằng hàm này
 async function viewReservation(id) {
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            credentials: "include"
-        });
-
-        if (!response.ok) {
-            throw new Error("Không lấy được chi tiết đặt bàn");
-        }
-
-        const r = await response.json();
-
-        await loadReservationUnreadBadge();
-        await loadReservations();
-
-        alert(
-            `Khách hàng: ${safe(r.customerName)}\n` +
-            `SĐT: ${safe(r.customerPhone)}\n` +
-            `Email: ${safe(r.customerEmail)}\n` +
-            `Ngày: ${safe(r.reservationDate)}\n` +
-            `Giờ: ${formatTime(r.reservationTime)}\n` +
-            `Số khách: ${safe(r.numberOfGuests)}\n` +
-            `Bàn: ${r.tableNumber ? "Bàn " + r.tableNumber : "Chưa chọn"}\n` +
-            `Trạng thái: ${safe(r.status)}\n` +
-            `Ghi chú: ${safe(r.specialRequest)}`
-        );
-    } catch (error) {
-        console.error("Lỗi viewReservation:", error);
-        alert("Không thể xem chi tiết đặt bàn");
+  try {
+    const response = await fetch(`${API_URL}/${id}`, { credentials: "include" });
+    if (!response.ok) {
+      throw new Error("Không lấy được chi tiết đặt bàn");
     }
+    const r = await response.json();
+
+    // Helper format
+    function fmtDate(d) {
+      if (!d) return "-";
+      try {
+        const dt = new Date(d);
+        return dt.toLocaleString('vi-VN', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+      } catch (e) { return d; }
+    }
+    function money(v) { if (v == null) return "0 đ"; return (Number(v).toLocaleString('vi-VN') + " đ"); }
+    function statusBadgeHtml(status) {
+      if (!status) return '<span class="badge bg-secondary">—</span>';
+      switch (String(status).toUpperCase()) {
+        case 'PENDING': return '<span class="badge bg-warning text-dark">Chờ xác nhận</span>';
+        case 'CONFIRMED': return '<span class="badge bg-success">Đã xác nhận</span>';
+        case 'COMPLETED': return '<span class="badge bg-primary">Hoàn tất</span>';
+        case 'CANCELLED': return '<span class="badge bg-danger">Đã hủy</span>';
+        default: return `<span class="badge bg-secondary">${status}</span>`;
+      }
+    }
+
+    // Fill modal fields
+    document.getElementById('detailReservationCode').textContent = r.id ? `#RSV${r.id}` : '-';
+    document.getElementById('detailCustomerName').textContent = r.customerName || '-';
+    document.getElementById('detailCustomerPhone').textContent = r.customerPhone || '-';
+    document.getElementById('detailCustomerEmail').textContent = r.customerEmail || '-';
+    document.getElementById('detailDateTime').textContent = `${r.reservationDate || '-'} ${r.reservationTime || ''}`;
+    document.getElementById('detailGuests').textContent = (r.numberOfGuests || '-') + ' người';
+    document.getElementById('detailTable').textContent = r.tableNumber ? `Bàn ${r.tableNumber}` : 'Chưa chọn';
+    document.getElementById('detailStatus').innerHTML = statusBadgeHtml(r.status);
+    document.getElementById('detailNote').textContent = r.specialRequest || '-';
+    document.getElementById('detailDepositRequired').textContent = r.depositRequired ? 'Có' : 'Không';
+    document.getElementById('detailDepositAmount').textContent = money(r.depositAmount);
+    document.getElementById('detailCreatedAt').textContent = r.createdAt ? fmtDate(r.createdAt) : '-';
+    document.getElementById('detailExpireAt').textContent = r.expireAt ? fmtDate(r.expireAt) : '-';
+
+    // Open modal
+    const modalEl = document.getElementById('reservationDetailModal');
+    const bsModal = new bootstrap.Modal(modalEl);
+    bsModal.show();
+
+    // Hook edit button to open edit modal (existing editReservation)
+    const btnEdit = document.getElementById('btnOpenEditFromDetail');
+    btnEdit.onclick = function() {
+      bsModal.hide();
+
+      if (typeof editReservation === 'function') {
+        editReservation(id);
+      } else {
+        // fallback: cập nhật tiêu đề modal (nếu có) và mở modal edit thủ công
+        const modalTitleEl = document.querySelector('#reservationModal .modal-title');
+        if (modalTitleEl) modalTitleEl.innerText = 'Cập nhật đặt bàn';
+
+        const reservationModalEl = document.getElementById('reservationModal');
+        if (reservationModalEl) {
+          const modal = new bootstrap.Modal(reservationModalEl);
+          modal.show();
+        }
+      }
+    };
+  } catch (error) {
+    console.error("Lỗi viewReservation:", error);
+    showToast ? showToast("Không thể lấy chi tiết đặt bàn", "danger") : alert("Không thể lấy chi tiết đặt bàn");
+  }
 }
 
 function getStatusBadge(status) {
