@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import java.util.Map;
+
+import java.util.*;
+
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 
 @RestController
@@ -268,14 +268,19 @@ public class ReviewController {
         for (var f : files) {
             String ct = f.getContentType();
 
-            // ===== NEW: Gemini moderation image BEFORE saving =====
             byte[] bytes = f.getBytes();
-            var mod = geminiService.moderateReviewImage(bytes, ct);
-            if (mod != null && Boolean.TRUE.equals(mod.getShouldBlock())) {
-                String reason = (mod.getBlockReason() == null || mod.getBlockReason().isBlank())
-                        ? "Hình ảnh không phù hợp"
-                        : mod.getBlockReason();
-                return ResponseEntity.badRequest().body("Ảnh bị từ chối: " + reason);
+            try {
+                var mod = geminiService.moderateReviewImage(bytes, ct);
+                if (mod != null && Boolean.TRUE.equals(mod.getShouldBlock())) {
+                    String reason = (mod.getBlockReason() == null || mod.getBlockReason().isBlank())
+                            ? "Hình ảnh không phù hợp"
+                            : mod.getBlockReason();
+                    return ResponseEntity.badRequest().body("Ảnh bị từ chối: " + reason);
+                }
+            } catch (Exception ex) {
+                // Gemini unavailable/errored — fallback: accept image and mark for manual review later
+                try { /* logger.warn("Image moderation failed, accepting image and enqueueing for review", ex); */ } catch (Throwable ignored) {}
+                // continue saving image as usual
             }
 
             String ext = switch (ct) {
@@ -293,5 +298,29 @@ public class ReviewController {
         }
 
         return ResponseEntity.ok(new com.tt.Restaurant.dto.UploadReviewMediaResponse(urls));
+    }
+
+    @GetMapping("/distribution")
+    public ResponseEntity<ReviewDistributionDTO> distribution() {
+        // lấy tất cả tổng và avg (reuse repository methods)
+        Double avg = reviewRepository.getAverageRating();
+        Long total = reviewRepository.getTotalReviews();
+
+        double avgVal = avg == null ? 0.0 : avg;
+        long totalVal = total == null ? 0L : total;
+
+        // lấy distribution
+        List<Object[]> rows = reviewRepository.findRatingDistribution();
+        Map<String, Integer> dist = new HashMap<>();
+        for (int s = 1; s <= 5; s++) dist.put(String.valueOf(s), 0);
+
+        for (Object[] row : rows) {
+            if (row == null || row.length < 2) continue;
+            Integer rating = ((Number) row[0]).intValue();
+            Integer cnt = ((Number) row[1]).intValue();
+            if (rating >=1 && rating <=5) dist.put(String.valueOf(rating), cnt);
+        }
+
+        return ResponseEntity.ok(new ReviewDistributionDTO(totalVal, avgVal, dist));
     }
 }

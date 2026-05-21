@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
@@ -30,6 +31,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("select count(r) from Review r where r.rating >= 4")
     Long getRecommendedCount();
+
+    // trong ReviewRepository
+    @Query("SELECT r.rating as rating, COUNT(r) as cnt FROM Review r GROUP BY r.rating")
+    List<Object[]> findRatingDistribution();
 
     boolean existsByReservation_Id(Long reservationId);
 

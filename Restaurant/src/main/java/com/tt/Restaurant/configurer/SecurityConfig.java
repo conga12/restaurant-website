@@ -97,7 +97,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/payment/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/reviews/recent", "/api/reviews/stats").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews", "/api/reviews/recent", "/api/reviews/stats", "/api/reviews/distribution").permitAll()
                         .requestMatchers("/api/reviews/**").hasRole("CUSTOMER")
 
                         .anyRequest().authenticated()

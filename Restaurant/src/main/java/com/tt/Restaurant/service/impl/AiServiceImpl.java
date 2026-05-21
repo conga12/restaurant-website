@@ -53,25 +53,25 @@ public class AiServiceImpl implements AiService {
 
         // System policy: không hứa bừa, ownerReply không lộ coupon
         String system = """
-Bạn là trợ lý CSKH cho nhà hàng. Viết tiếng Việt, lịch sự, chân thành.
-Quy tắc:
-- Không cam kết hoàn tiền/đền bù ngoài mã khuyến mãi đã cấp.
-- Không xin lỗi theo kiểu thừa nhận lỗi pháp lý.
-- ownerReply: 1-2 câu, công khai, KHÔNG nhắc coupon/mã.
-- emailBody: email xin lỗi, ngắn gọn, có hướng dẫn dùng mã giảm giá.
-- Trả về DUY NHẤT JSON hợp lệ: {"ownerReply":"...","emailBody":"..."}.
-""";
+            Bạn là trợ lý CSKH cho nhà hàng. Viết tiếng Việt, lịch sự, chân thành.
+            Quy tắc:
+            - Không cam kết hoàn tiền/đền bù ngoài mã khuyến mãi đã cấp.
+            - Không xin lỗi theo kiểu thừa nhận lỗi pháp lý.
+            - ownerReply: 1-2 câu, công khai, KHÔNG nhắc coupon/mã.
+            - emailBody: email xin lỗi, ngắn gọn, có hướng dẫn dùng mã giảm giá.
+            - Trả về DUY NHẤT JSON hợp lệ: {"ownerReply":"...","emailBody":"..."}.
+            """;
 
         String user = """
-Thông tin:
-- Tên khách: %s
-- Rating: %d/5
-- Nội dung khách: %s
-- Coupon: %s
-- Giảm: %d%%
-- Hạn dùng: %s
-Hãy tạo ownerReply và emailBody theo quy tắc.
-""".formatted(
+            Thông tin:
+            - Tên khách: %s
+            - Rating: %d/5
+            - Nội dung khách: %s
+            - Coupon: %s
+            - Giảm: %d%%
+            - Hạn dùng: %s
+            Hãy tạo ownerReply và emailBody theo quy tắc.
+            """.formatted(
                 customerName == null ? "Khách hàng" : customerName,
                 rating,
                 customerComment == null ? "" : customerComment,

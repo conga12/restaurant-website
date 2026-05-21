@@ -41,7 +41,6 @@ public class EmailServiceImpl implements EmailService {
         );
     }
 
-    // ✅ NEW
     @Override
     public void sendReservationConfirmedEmailWithOrderLink(
             String to,
@@ -155,7 +154,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendPasswordResetEmail(String to, String resetLink) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Reset mật khẩu - RestaurantOS");
+        message.setSubject("Reset mật khẩu - Hương Việt");
         message.setText(
                 "Xin chào,\n\n" +
                         "Bạn vừa yêu cầu đặt lại mật khẩu.\n\n" +
@@ -192,11 +191,11 @@ public class EmailServiceImpl implements EmailService {
     public void sendLowRatingReviewAutoReply(String to, String customerName, String messageText) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Xin lỗi về trải nghiệm của bạn - RestaurantOS");
+        message.setSubject("Xin lỗi về trải nghiệm của bạn - Hương Việt");
         message.setText(
                 "Xin chào " + (customerName != null ? customerName : "bạn") + ",\n\n"
                         + (messageText != null ? messageText : "") + "\n\n"
-                        + "Trân trọng,\nRestaurantOS"
+                        + "Trân trọng,\nHuongViet"
         );
         mailSender.send(message);
     }

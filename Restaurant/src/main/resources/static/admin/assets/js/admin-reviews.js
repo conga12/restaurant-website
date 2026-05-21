@@ -53,7 +53,35 @@ async function loadStats() {
   const distTotal = document.getElementById("adminDistTotal");
   if (distTotal) distTotal.textContent = `${s.totalReviews ?? 0} đánh giá`;
 }
+async function loadDistribution() {
+  try {
+    const res = await fetch('/api/reviews/distribution', { credentials: 'include' });
+    if (!res.ok) {
+      console.warn('distribution API not ok', res.status);
+      return;
+    }
+    const d = await res.json();
+    // d.distribution expected like { "5": 10, "4": 5, ... }
+    const dist = d.distribution || {};
+    const total = d.total || Object.values(dist).reduce((a,b)=>a+(Number(b||0)),0);
+    // update total/avg if you want
+    const distAvg = document.getElementById('adminDistAvg');
+    if (distAvg && d.avg !== undefined) distAvg.textContent = (d.avg ?? 0).toFixed(1);
+    const distTotal = document.getElementById('adminDistTotal');
+    if (distTotal) distTotal.textContent = `${total} đánh giá`;
 
+    for (let star = 5; star >= 1; star--) {
+      const cnt = Number(dist[String(star)] || 0);
+      const pct = total ? Math.round((cnt * 100) / total) : 0;
+      const bar = document.getElementById(`adminBar${star}`);
+      const cntEl = document.getElementById(`adminCount${star}`);
+      if (bar) bar.style.width = pct + '%';
+      if (cntEl) cntEl.textContent = cnt;
+    }
+  } catch (err) {
+    console.error('loadDistribution error', err);
+  }
+}
 async function loadRecentReviews() {
   const res = await fetch("/api/reviews/recent", { credentials: "include" });
   if (!res.ok) throw new Error("recent " + res.status);
@@ -106,7 +134,7 @@ async function loadRecentReviews() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    await Promise.all([loadStats(), loadRecentReviews()]);
+    await Promise.all([loadStats(), loadRecentReviews(), loadDistribution()]);
   } catch (e) {
     console.error(e);
     const el = document.getElementById("adminReviewsList");
